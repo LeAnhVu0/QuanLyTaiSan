@@ -1,0 +1,12 @@
+bin/
+obj/
+.vscode/
+.vs/
+*.user
+*.suo
+*.db
+*.sqlite
+*.cache
+*.log
+*.pfx
+appsettings.Development.json
