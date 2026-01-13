@@ -1,3 +1,10 @@
+﻿
+using Microsoft.EntityFrameworkCore;
+using QuanLyTaiSanTest.Data;
+using QuanLyTaiSanTest.Repositories.Implementations;
+using QuanLyTaiSanTest.Repositories.Interfaces;
+using QuanLyTaiSanTest.Services.Implementations;
+using QuanLyTaiSanTest.Services.Interfaces;
 
 namespace QuanLyTaiSan
 {
@@ -14,7 +21,33 @@ namespace QuanLyTaiSan
             builder.Services.AddEndpointsApiExplorer();
             builder.Services.AddSwaggerGen();
 
+
+            //Đăng kí cors 
+            builder.Services.AddCors(options => options.AddDefaultPolicy(policy =>
+                                                                         policy.AllowAnyOrigin()
+                                                                              .AllowAnyHeader()
+                                                                              .AllowAnyMethod()));
+
+            //DbContext
+            var connectString = builder.Configuration.GetConnectionString("MyDb");
+            builder.Services.AddDbContext<AppDbContext>(option => option.UseSqlServer(connectString));
+
+
+
+            //Khai báo di
+            builder.Services.AddScoped<IAssetRepository, AssetRepository>();
+            builder.Services.AddScoped<IAssetService, AssetService>();
+            builder.Services.AddScoped<ICategoryService, CategoryService>();
+            builder.Services.AddScoped<ICategoryRepository, CategoryRepository>();
+            builder.Services.AddScoped<IAssetHistoryRepository, AssetHistoryRepository>();
+            builder.Services.AddScoped<IAssetHistoryService, AssetHistoryService>();
+            builder.Services.AddScoped<IReportRepository, ReportRepository>();
+            builder.Services.AddScoped<IReportService, ReportService>();
+
+            //cấu hình httpClient để gọi api khác
+            builder.Services.AddHttpClient();
             var app = builder.Build();
+
 
             // Configure the HTTP request pipeline.
             if (app.Environment.IsDevelopment())
@@ -24,6 +57,7 @@ namespace QuanLyTaiSan
             }
 
             app.UseHttpsRedirection();
+            app.UseCors();
 
             app.UseAuthorization();
 
