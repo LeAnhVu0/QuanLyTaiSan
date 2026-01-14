@@ -1,35 +1,75 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore;
+using QuanLyTaiSan.Models;
 using QuanLyTaiSanTest.Models;
 
 namespace QuanLyTaiSanTest.Data
 {
-    public class AppDbContext:DbContext
+    using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
+
+    public class AppDbContext
+        : IdentityDbContext<ApplicationUser>
     {
-        public AppDbContext(DbContextOptions<AppDbContext> options) : base(options) { }
+        public AppDbContext(DbContextOptions<AppDbContext> options)
+            : base(options)
+        { }
+
         public DbSet<Asset> Assets { get; set; }
         public DbSet<Category> Category { get; set; }
         public DbSet<AssetHistory> AssetHistory { get; set; }
         public DbSet<Report> Report { get; set; }
+        public DbSet<RefreshToken> RefreshTokens { get; set; }
+        public DbSet<Department> Department { get; set; }
+
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
+            
+            base.OnModelCreating(modelBuilder);
+
             modelBuilder.Entity<Asset>(e =>
             {
-                e.Property(x => x.OriginalValue).HasPrecision(19,0);
+                e.Property(x => x.OriginalValue).HasPrecision(19, 0);
             });
 
             modelBuilder.Entity<Asset>()
                 .HasOne(a => a.Category)
                 .WithMany(a => a.Assets)
                 .HasForeignKey(a => a.CategoryId)
-                .OnDelete(DeleteBehavior.Restrict); // ràng buộc xóa
-            
+                .OnDelete(DeleteBehavior.Restrict);
+
             modelBuilder.Entity<AssetHistory>(e =>
             {
                 e.Property(x => x.OriginalValue).HasPrecision(19, 0);
             });
 
+            modelBuilder.Entity<RefreshToken>(entity =>
+            {
+                entity.HasKey(rt => rt.Id);
 
+                entity.HasIndex(rt => rt.Token).IsUnique();
+                entity.HasIndex(rt => rt.UserId);
+                entity.HasIndex(rt => rt.ExpiresAt);
 
+                entity.HasOne(rt => rt.User)
+                    .WithMany()
+                    .HasForeignKey(rt => rt.UserId)
+                    .OnDelete(DeleteBehavior.Cascade);
+
+                entity.Property(rt => rt.CreatedAt)
+                    .HasDefaultValueSql("GETUTCDATE()");
+
+                entity.Property(rt => rt.IsRevoked)
+                    .HasDefaultValue(false);
+            });
+
+            modelBuilder.Entity<ApplicationUser>(entity =>
+            {
+                entity.HasOne(u => u.Department)
+                    .WithMany(d => d.User)
+                    .HasForeignKey(u => u.DepartmentId)
+                    .OnDelete(DeleteBehavior.SetNull);
+            });
         }
     }
+
 }

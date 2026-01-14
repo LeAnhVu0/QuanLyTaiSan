@@ -1,6 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using QuanLyTaiSanTest.Dtos.Asset;
-using QuanLyTaiSanTest.Dtos.NewFolder;
+
 using QuanLyTaiSanTest.Enum;
 using QuanLyTaiSanTest.Models;
 using QuanLyTaiSanTest.Repositories.Interfaces;

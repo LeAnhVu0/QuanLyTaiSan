@@ -1,10 +1,21 @@
 ﻿
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.IdentityModel.Tokens;
+using QuanLyTaiSan.Mappings;
+using QuanLyTaiSan.Models;
+using QuanLyTaiSan.Repositories.Implementations;
+using QuanLyTaiSan.Repositories.Interfaces;
+using QuanLyTaiSan.Services.Implementations;
+using QuanLyTaiSan.Services.Interfaces;
 using QuanLyTaiSanTest.Data;
 using QuanLyTaiSanTest.Repositories.Implementations;
 using QuanLyTaiSanTest.Repositories.Interfaces;
 using QuanLyTaiSanTest.Services.Implementations;
 using QuanLyTaiSanTest.Services.Interfaces;
+using System.Security.Claims;
+using System.Text;
 
 namespace QuanLyTaiSan
 {
@@ -29,11 +40,55 @@ namespace QuanLyTaiSan
                                                                               .AllowAnyMethod()));
 
             //DbContext
+        //    builder.Services.AddDbContext<AppDbContext>(options =>
+        //    options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection"))
+        //);
             var connectString = builder.Configuration.GetConnectionString("MyDb");
             builder.Services.AddDbContext<AppDbContext>(option => option.UseSqlServer(connectString));
+            // Identity
+            builder.Services
+                .AddIdentityCore<ApplicationUser>(options =>
+                {
+                    options.User.RequireUniqueEmail = true;
+                })
+                .AddRoles<IdentityRole>()
+                .AddSignInManager()
+                .AddEntityFrameworkStores<AppDbContext>()
+                .AddDefaultTokenProviders();
 
+            // JWT
+            builder.Services
+                .AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+                .AddJwtBearer(options =>
+                {
+                    options.MapInboundClaims = false;
+                    options.TokenValidationParameters = new TokenValidationParameters
+                    {
+                        ValidateIssuer = true,
+                        ValidateAudience = true,
+                        ValidateLifetime = true,
+                        ValidateIssuerSigningKey = true,
+                        ValidIssuer = builder.Configuration["Jwt:Issuer"],
+                        ValidAudience = builder.Configuration["Jwt:Audience"],
+                        IssuerSigningKey = new SymmetricSecurityKey(
+                            Encoding.UTF8.GetBytes(builder.Configuration["Jwt:Key"])
+                        ),
+                        NameClaimType = ClaimTypes.Name,
+                        RoleClaimType = ClaimTypes.Role,
+                        ClockSkew = TimeSpan.Zero
+                    };
+                });
+            builder.Services.AddAuthorization();
+            //Repo
+            builder.Services.AddScoped<IRefreshTokenRepository, RefreshTokenRepository>();
+            builder.Services.AddScoped<IDepartmentRepository, DepartmentRepository>();
 
-
+            //Service
+            builder.Services.AddScoped<IAuthService, AuthService>();
+            builder.Services.AddScoped<JwtService>();
+            builder.Services.AddScoped<IDepartmentService, DepartmentService>();
+            //mapping
+            builder.Services.AddAutoMapper(typeof(MappingProfile));
             //Khai báo di
             builder.Services.AddScoped<IAssetRepository, AssetRepository>();
             builder.Services.AddScoped<IAssetService, AssetService>();
@@ -58,7 +113,7 @@ namespace QuanLyTaiSan
 
             app.UseHttpsRedirection();
             app.UseCors();
-
+            app.UseAuthentication();
             app.UseAuthorization();
 
 
