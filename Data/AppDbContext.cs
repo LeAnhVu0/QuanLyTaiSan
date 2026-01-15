@@ -20,6 +20,7 @@ namespace QuanLyTaiSanTest.Data
         public DbSet<Report> Report { get; set; }
         public DbSet<RefreshToken> RefreshTokens { get; set; }
         public DbSet<Department> Department { get; set; }
+        public DbSet<Inventory> Inventory { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -31,15 +32,59 @@ namespace QuanLyTaiSanTest.Data
                 e.Property(x => x.OriginalValue).HasPrecision(19, 0);
             });
 
-            modelBuilder.Entity<Asset>()
-                .HasOne(a => a.Category)
+            modelBuilder.Entity<Asset>(e =>
+            {
+                e.HasOne(a => a.Category)
                 .WithMany(a => a.Assets)
                 .HasForeignKey(a => a.CategoryId)
                 .OnDelete(DeleteBehavior.Restrict);
+                
+                
+                e.HasOne(a => a.User)
+                .WithMany(a => a.Assets)
+                .HasForeignKey(a => a.UserId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+                e.HasOne(a => a.Department)
+                .WithMany(a => a.Assets)
+                .HasForeignKey(a => a.DepartmentId)
+                .OnDelete(DeleteBehavior.Restrict);
+            });
+
+            modelBuilder.Entity<Inventory>(e =>
+            {
+                e.HasOne(a => a.Department)
+                .WithMany()
+                .HasForeignKey(a => a.DepartmentId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+
+                e.HasOne(x => x.User)
+                .WithMany(u => u.inventories)
+                .HasForeignKey(x => x.UserIdBy)
+                .OnDelete(DeleteBehavior.Restrict);
+            });
+
 
             modelBuilder.Entity<AssetHistory>(e =>
             {
-                e.Property(x => x.OriginalValue).HasPrecision(19, 0);
+                e.HasOne(a => a.CreatedByUser)
+                .WithMany()
+                .HasForeignKey(a => a.CreatedByUserId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+                e.HasOne(a => a.AssignedToUser)
+                .WithMany()
+                .HasForeignKey(a => a.AssignedToUserId) 
+                .OnDelete(DeleteBehavior.Restrict);
+            });
+
+            modelBuilder.Entity<Report>(e =>
+            { 
+                e.HasOne(a => a.User)
+                .WithMany()
+                .HasForeignKey(a => a.UserId)
+                .OnDelete(DeleteBehavior.Restrict);
             });
 
             modelBuilder.Entity<RefreshToken>(entity =>

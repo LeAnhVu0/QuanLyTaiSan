@@ -19,7 +19,7 @@ namespace QuanLyTaiSanTest.Controllers
             _assetHistoryService = assetHistoryService;
         }
         [HttpGet]
-        public async Task<IActionResult> GetAll(string? searchName, int? categoryId , int? status, int pageIndex = 1, int pageSize = 3)
+        public async Task<IActionResult> GetAll(int pageIndex = 1, int pageSize = 5, string? searchName = null, int? status = null, int? categoryId = null)
         {
            
             try
@@ -32,7 +32,7 @@ namespace QuanLyTaiSanTest.Controllers
                 {
                     pageSize = 3;
                 }
-                return Ok(await _assetService.GetAll(searchName,categoryId,status,pageIndex,pageSize));
+                return Ok(await _assetService.GetAll(pageIndex, pageSize,searchName, categoryId,status));
             }
             catch (Exception ex)
             {
@@ -95,7 +95,7 @@ namespace QuanLyTaiSanTest.Controllers
                 return BadRequest(ex.Message);
             }
         }
-        [HttpPut("{id}")]
+        [HttpPatch("{id}")]
         public async Task<IActionResult> Update(int id,UpdateAssetDto updateAssetDto)
         {
             if (id <= 0)

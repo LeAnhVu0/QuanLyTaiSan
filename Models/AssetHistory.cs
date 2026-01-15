@@ -1,4 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using QuanLyTaiSan.Models;
+using System.ComponentModel.DataAnnotations;
 
 namespace QuanLyTaiSanTest.Models
 {
@@ -16,16 +17,17 @@ namespace QuanLyTaiSanTest.Models
         public DateTime ActionDate { get; set; } = DateTime.Now;
 
         public string? AssetName { get; set; }
-        public decimal OriginalValue { get; set; }
         public int Status { get; set; }
-        public DateTime? PurchaseDate { get; set; }
-        public DateTime CreatedTime { get; set; }
-        public DateTime? UpdatedTime { get; set; }
 
         // Khóa ngoại
-        public int AssetId { get; set; } 
-        public int? UserId { get; set; } 
+        public string? AssignedToUserId { get; set; }
+        public ApplicationUser? AssignedToUser {  get; set; }
 
+        public string CreatedByUserId { get; set; } = string.Empty;
+        public ApplicationUser CreatedByUser { get; set; } 
+        public int AssetId { get; set; } 
         public Asset? Asset { get; set; }
+
+
     }
 }

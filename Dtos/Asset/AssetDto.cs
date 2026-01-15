@@ -29,7 +29,7 @@ namespace QuanLyTaiSanTest.Dtos.Asset
         public DateTime CreatedTime { get; set; } 
         public DateTime? UpdatedTime { get; set; }
         public int CategoryId {  get; set; }
-        public int? UserId { get; set; }
+        public string? UserId { get; set; }
         public int DepartmentId { get; set; }
     }
 }

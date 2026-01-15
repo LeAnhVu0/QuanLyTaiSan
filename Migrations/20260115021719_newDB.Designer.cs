@@ -12,8 +12,8 @@ using QuanLyTaiSanTest.Data;
 namespace QuanLyTaiSan.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20260114031523_InitIdentity")]
-    partial class InitIdentity
+    [Migration("20260115021719_newDB")]
+    partial class newDB
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)

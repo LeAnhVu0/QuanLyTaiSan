@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
+using Microsoft.OpenApi.Models;
 using QuanLyTaiSan.Mappings;
 using QuanLyTaiSan.Models;
 using QuanLyTaiSan.Repositories.Implementations;
@@ -30,7 +31,37 @@ namespace QuanLyTaiSan
             builder.Services.AddControllers();
             // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
             builder.Services.AddEndpointsApiExplorer();
-            builder.Services.AddSwaggerGen();
+            builder.Services.AddSwaggerGen(c =>
+            {
+                c.SwaggerDoc("v1", new() { Title = "QuanLySach API", Version = "v1" });
+
+                //  Khai báo JWT
+                c.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
+                {
+                    Name = "Authorization",
+                    Type = SecuritySchemeType.Http,
+                    Scheme = "Bearer",
+                    BearerFormat = "JWT",
+                    In = ParameterLocation.Header,
+                    Description = "Nhập JWT theo dạng: Bearer {token}"
+                });
+
+                //  Áp dụng cho các API có [Authorize]
+                c.AddSecurityRequirement(new OpenApiSecurityRequirement
+                {
+                    {
+                        new OpenApiSecurityScheme
+                        {
+                            Reference = new OpenApiReference
+                            {
+                                Type = ReferenceType.SecurityScheme,
+                                Id = "Bearer"
+                            }
+                        },
+                        Array.Empty<string>()
+                    }
+                });
+            });
 
 
             //Đăng kí cors 
@@ -98,12 +129,14 @@ namespace QuanLyTaiSan
             builder.Services.AddScoped<IAssetHistoryService, AssetHistoryService>();
             builder.Services.AddScoped<IReportRepository, ReportRepository>();
             builder.Services.AddScoped<IReportService, ReportService>();
+            builder.Services.AddScoped<IInventoryService, InventoryService>();
+            builder.Services.AddScoped<IInventoryRepository, InventoryRepository>();
 
             //cấu hình httpClient để gọi api khác
             builder.Services.AddHttpClient();
             var app = builder.Build();
-
-
+            // sử dụng HttpContextAccessor
+            builder.Services.AddHttpContextAccessor();
             // Configure the HTTP request pipeline.
             if (app.Environment.IsDevelopment())
             {

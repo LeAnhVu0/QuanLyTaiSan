@@ -24,12 +24,9 @@ namespace QuanLyTaiSanTest.Services.Implementations
                 Descriptions = h.Descriptions,
                 AssetId = h.AssetId,
                 AssetName = h.AssetName,
-                OriginalValue = h.OriginalValue,
-                PurchaseDate = h.PurchaseDate,
                 Status = h.Status,
-                CreatedTime = h.CreatedTime,
-                UpdatedTime = h.UpdatedTime,
-                UserId = h.UserId,
+                CreatedByUserId = h.CreatedByUserId,
+                AssignedToUserId = h.AssignedToUserId
             }).ToList();
         }
     }

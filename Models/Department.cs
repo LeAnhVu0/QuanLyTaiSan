@@ -1,4 +1,6 @@
-﻿namespace QuanLyTaiSan.Models
+﻿using QuanLyTaiSanTest.Models;
+
+namespace QuanLyTaiSan.Models
 {
     public class Department
     {
@@ -10,7 +12,6 @@
         public DateTime CreateTime { get; set; }
         public DateTime? UpdateTime { get; set; }
         public ICollection<ApplicationUser> User { get; set; } = new List<ApplicationUser>();
-
-
+        public ICollection<Asset> Assets { get; set; } = new List<Asset>();
     }
 }

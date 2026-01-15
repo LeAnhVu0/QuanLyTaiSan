@@ -1,4 +1,5 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using QuanLyTaiSan.Models;
 using QuanLyTaiSanTest.Enum;
 namespace QuanLyTaiSanTest.Models
 {
@@ -40,8 +41,10 @@ namespace QuanLyTaiSanTest.Models
         public Category? Category { get; set; }
 
         // kết nối user và department qua id
-        public int? UserId { get; set; } 
-        public int DepartmentId { get; set; } 
+        public string? UserId { get; set; } 
+        public ApplicationUser? User { get; set; }
 
+        public int DepartmentId { get; set; } 
+        public Department? Department { get; set; }
     }
 }

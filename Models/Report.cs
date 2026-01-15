@@ -1,4 +1,5 @@
-﻿using QuanLyTaiSanTest.Enum;
+﻿using QuanLyTaiSan.Models;
+using QuanLyTaiSanTest.Enum;
 namespace QuanLyTaiSanTest.Models
 {
     public class Report
@@ -10,6 +11,8 @@ namespace QuanLyTaiSanTest.Models
         public DateTime CreateTime {  get; set; } = DateTime.Now;
         public DateTime? UpdateTime { get; set; }
         public bool IsDeleted {  get; set; } = false;
-        public int? UserId { get; set; } 
+        // FK đến user
+        public string? UserId { get; set; }
+        public ApplicationUser? User { get; set; }
     }
 }

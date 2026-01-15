@@ -11,6 +11,6 @@ namespace QuanLyTaiSanTest.Dtos.Report
         public DateTime CreateTime { get; set; } 
         public DateTime? UpdateTime { get; set; }
         public bool IsDeleted { get; set; } = false;
-        public int? UserId { get; set; }
+        public string? UserId { get; set; }
     }
 }

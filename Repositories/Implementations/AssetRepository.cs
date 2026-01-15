@@ -33,7 +33,7 @@ namespace QuanLyTaiSanTest.Repositories.Implementations
            await _context.SaveChangesAsync();
         }
 
-        public async Task<List<Asset>> GetAll(string? search, int? categoryId, int? status, int pageIndex, int pageSize)
+        public async Task<(List<Asset> Items, int TotalCount)> GetAll(int pageIndex, int pageSize, string? search, int? categoryId, int? status)
         {
             var listAsset =  _context.Assets.Include(h => h.Category).AsQueryable();
             if(!string.IsNullOrEmpty(search))
@@ -47,10 +47,12 @@ namespace QuanLyTaiSanTest.Repositories.Implementations
             if (status!= null)
             {
                 listAsset = listAsset.Where(h => h.Status == (AssetStatus)status);
-            }    
+            }
+            var totalCount = await listAsset.CountAsync();
+
             //page
-            listAsset = listAsset.Skip((pageIndex-1)*pageSize).Take(pageSize);
-            return await listAsset.ToListAsync();
+            var list = await listAsset.Skip((pageIndex-1)*pageSize).Take(pageSize).ToListAsync();
+            return (list, totalCount);
         }
 
         public async Task<Asset?> GetById(int id)

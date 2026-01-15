@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using QuanLyTaiSanTest.Data;
 
@@ -11,9 +12,11 @@ using QuanLyTaiSanTest.Data;
 namespace QuanLyTaiSan.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260115035331_addAllForeignkey")]
+    partial class addAllForeignkey
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -468,46 +471,6 @@ namespace QuanLyTaiSan.Migrations
                     b.ToTable("Category");
                 });
 
-            modelBuilder.Entity("QuanLyTaiSanTest.Models.Inventory", b =>
-                {
-                    b.Property<int>("InventoryId")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("InventoryId"));
-
-                    b.Property<int>("ActualQuantity")
-                        .HasColumnType("int");
-
-                    b.Property<int>("BookQuantity")
-                        .HasColumnType("int");
-
-                    b.Property<int>("DepartmentId")
-                        .HasColumnType("int");
-
-                    b.Property<DateTime>("InventoryDate")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("Note")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<DateTime>("PlanDate")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("UserIdBy")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(450)");
-
-                    b.HasKey("InventoryId");
-
-                    b.HasIndex("DepartmentId");
-
-                    b.HasIndex("UserIdBy");
-
-                    b.ToTable("Inventory");
-                });
-
             modelBuilder.Entity("QuanLyTaiSanTest.Models.Report", b =>
                 {
                     b.Property<int>("ReportId")
@@ -669,25 +632,6 @@ namespace QuanLyTaiSan.Migrations
                     b.Navigation("CreatedByUser");
                 });
 
-            modelBuilder.Entity("QuanLyTaiSanTest.Models.Inventory", b =>
-                {
-                    b.HasOne("QuanLyTaiSan.Models.Department", "Department")
-                        .WithMany()
-                        .HasForeignKey("DepartmentId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
-                    b.HasOne("QuanLyTaiSan.Models.ApplicationUser", "User")
-                        .WithMany("inventories")
-                        .HasForeignKey("UserIdBy")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
-                    b.Navigation("Department");
-
-                    b.Navigation("User");
-                });
-
             modelBuilder.Entity("QuanLyTaiSanTest.Models.Report", b =>
                 {
                     b.HasOne("QuanLyTaiSan.Models.ApplicationUser", "User")
@@ -701,8 +645,6 @@ namespace QuanLyTaiSan.Migrations
             modelBuilder.Entity("QuanLyTaiSan.Models.ApplicationUser", b =>
                 {
                     b.Navigation("Assets");
-
-                    b.Navigation("inventories");
                 });
 
             modelBuilder.Entity("QuanLyTaiSan.Models.Department", b =>
