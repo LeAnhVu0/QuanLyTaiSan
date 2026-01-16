@@ -4,7 +4,7 @@ namespace QuanLyTaiSan.Repositories.Interfaces
 {
     public interface IDepartmentRepository
     {
-        Task<List<Department>> GetAll();
+        IQueryable<Department> GetAll();
         Task<Department?> GetDepartmentById(int id);
         Task<Department> AddDepartment(Department department);
         Task<Department> UpdateDepartment(Department department);

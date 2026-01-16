@@ -48,14 +48,41 @@ namespace QuanLyTaiSan.Services.Implementations
             var audience = _config["Jwt:Audience"];
             var key = Encoding.UTF8.GetBytes(_config["Jwt:Key"]);
             var tokenValidityMins = _config.GetValue<int>("Jwt:TokenValidityMins");
+
             var tokenExpiryTimeStamp = DateTime.UtcNow.AddMinutes(tokenValidityMins);
-            var token = new JwtSecurityToken(issuer,
+
+           
+            var claims = new List<Claim>
+        {
+            new Claim(JwtRegisteredClaimNames.Sub, user.Id),
+            new Claim(JwtRegisteredClaimNames.UniqueName, user.UserName),
+            new Claim(JwtRegisteredClaimNames.Email, user.Email ?? "")
+        };
+
+            var roles = await _userManager.GetRolesAsync(user);
+            foreach (var role in roles)
+            {
+                claims.Add(new Claim(ClaimTypes.Role, role));
+            }
+
+            var userClaims = await _userManager.GetClaimsAsync(user);
+            foreach (var claim in userClaims.Where(c => c.Type == "Permission"))
+            {
+                claims.Add(claim);
+            }
+
+            var token = new JwtSecurityToken(
+                issuer,
                 audience,
-                [new Claim(JwtRegisteredClaimNames.Name, user.UserName)],
+                claims,
                 expires: tokenExpiryTimeStamp,
-                signingCredentials: new SigningCredentials(new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha256)
-                );
+                signingCredentials: new SigningCredentials(
+                    new SymmetricSecurityKey(key),
+                    SecurityAlgorithms.HmacSha256)
+            );
+
             var accessToken = new JwtSecurityTokenHandler().WriteToken(token);
+
             return new LoginResponeDto
             {
                 Username = user.UserName,
@@ -64,6 +91,7 @@ namespace QuanLyTaiSan.Services.Implementations
                 RefreshToken = await GenerateRefreshToken(user.Id)
             };
         }
+
         public async Task<string> GenerateRefreshToken(string userId)
         {
             var refreshTokenValidityMins = _config.GetValue<int>("Jwt:RefreshTokenValidityMins");

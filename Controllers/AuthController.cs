@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using QuanLyTaiSan.Dtos.Auth;
+using QuanLyTaiSan.Models;
 using QuanLyTaiSan.Services.Implementations;
 using QuanLyTaiSan.Services.Interfaces;
 
@@ -24,7 +25,7 @@ namespace QuanLyTaiSan.Controllers
             var result = await _jwtService.Authenticate(request);
             return result is not null ? Ok(result) : Unauthorized();
         }
-
+        [Authorize]
         [HttpPost("Refresh")]
         public async Task<ActionResult<LoginResponeDto>> Refresh([FromBody] RefreshRequestDto request)
         {
@@ -41,12 +42,14 @@ namespace QuanLyTaiSan.Controllers
             return Ok(user);
 
         }
+        [Authorize(Policy = Permissions.UserGet)]
         [HttpGet]
         public async Task<ActionResult<List<UserDto>>> GetAllUser()
         {
             var result = await _authService.GetAllUser();
             return Ok(result);
         }
+        [Authorize(Policy = Permissions.UserGet)]
         [HttpGet("{id}")]
         public async Task<ActionResult<UserDto>> GetUserById(string id)
         {
@@ -54,6 +57,7 @@ namespace QuanLyTaiSan.Controllers
             if (result == null) return NotFound();
             return Ok(result);
         }
+        [Authorize(Policy = Permissions.UserDelete)]
         [HttpDelete("{id}")]
         public async Task<ActionResult<string>> DeleteUserAsync(string id)
         {
@@ -62,6 +66,7 @@ namespace QuanLyTaiSan.Controllers
             await _authService.DeleteUser(id);
             return Ok("Xoa thanh cong ");
         }
+
         [HttpPatch("reset-password")]
         public async Task<ActionResult<string>> ResetPassword(ResetPasswordDto dto)
         {

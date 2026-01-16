@@ -1,9 +1,11 @@
-﻿using QuanLyTaiSan.Dtos.Auth;
+﻿using AutoMapper;
+using Microsoft.EntityFrameworkCore;
+using QuanLyTaiSan.Dtos.Auth;
 using QuanLyTaiSan.Dtos.Department;
 using QuanLyTaiSan.Models;
 using QuanLyTaiSan.Repositories.Interfaces;
 using QuanLyTaiSan.Services.Interfaces;
-using AutoMapper;
+using static Microsoft.EntityFrameworkCore.DbLoggerCategory;
 namespace QuanLyTaiSan.Services.Implementations
 {
     public class DepartmentService : IDepartmentService
@@ -15,10 +17,30 @@ namespace QuanLyTaiSan.Services.Implementations
             _mapper = mapper;
             _repository = repository;
         }
-        public async Task<List<DepartmentDto>> GetAll()
+        public async Task<PagedResult<DepartmentDto>> GetDepartmentsAsync(int pageIndex, int pageSize)
         {
-            var department = await _repository.GetAll();
-            return _mapper.Map<List<DepartmentDto>>(department);
+            var totalCount =await _repository.GetAll().CountAsync();
+            var totalPage = (int)Math.Ceiling(totalCount / (double)pageSize);
+            var items = await _repository.GetAll()
+           .Skip((pageIndex - 1) * pageSize)
+           .Take(pageSize)
+           .Select(d => new DepartmentDto
+           {
+               Id = d.Id,
+               DepartmentName = d.DepartmentName,
+               Description = d.Description,
+               DepartmentStatus = d.DepartmentStatus
+           })
+           .ToListAsync();
+
+            return new PagedResult<DepartmentDto>
+            {
+                PageIndex = pageIndex,
+                PageSize = pageSize,
+                TotalCount = totalCount,
+                TotalPage = totalPage,
+                Items = items
+            };
         }
         public async Task<DepartmentDetailDto> GetDepartmentById(int id)
         {

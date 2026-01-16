@@ -1,10 +1,13 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using QuanLyTaiSan.Models;
 using QuanLyTaiSanTest.Services.Interfaces;
 using System.Threading.Tasks;
 
 namespace QuanLyTaiSanTest.Controllers
 {
+    [Authorize(Policy = Permissions.ReportGet)]
     [Route("api/[controller]")]
     [ApiController]
     public class ReportController : ControllerBase

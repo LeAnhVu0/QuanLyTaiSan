@@ -1,5 +1,7 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using QuanLyTaiSan.Models;
 using QuanLyTaiSanTest.Dtos.Asset;
 using QuanLyTaiSanTest.Services.Interfaces;
 using System.Threading.Tasks;
@@ -64,6 +66,7 @@ namespace QuanLyTaiSanTest.Controllers
                 return BadRequest(ex.Message);
             }
         }
+        [Authorize(Policy = Permissions.UserCreate)]
         [HttpPost]
         public async Task<IActionResult> Create(CreateAssetDto createAssetDto)
         {
@@ -78,6 +81,7 @@ namespace QuanLyTaiSanTest.Controllers
                 return BadRequest(ex.Message);
             }
         }
+        [Authorize(Policy = Permissions.AssetDelete)]
         [HttpDelete("{id}")]
         public async Task<IActionResult> Delete(int id)
         {
@@ -96,6 +100,7 @@ namespace QuanLyTaiSanTest.Controllers
             }
         }
         [HttpPatch("{id}")]
+        [Authorize(Policy = Permissions.AssetUpdate)]
         public async Task<IActionResult> Update(int id,UpdateAssetDto updateAssetDto)
         {
             if (id <= 0)
@@ -112,6 +117,7 @@ namespace QuanLyTaiSanTest.Controllers
                 return BadRequest(ex.Message);
             }
         }
+        [Authorize(Policy = Permissions.AssetGetHistory)]
         [HttpGet("History")]
         public async Task<IActionResult> GetAllHistory()
         {

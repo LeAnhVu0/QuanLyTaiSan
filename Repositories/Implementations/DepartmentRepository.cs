@@ -11,10 +11,9 @@ namespace QuanLyTaiSan.Repositories.Implementations
         {
             _appDbContext = appDbContext;
         }
-        public async Task<List<Department>> GetAll()
+        public IQueryable<Department> GetAll()
         {
-            return await _appDbContext.Department
-                .ToListAsync();
+            return _appDbContext.Department.AsQueryable();
         }
 
         public async Task<Department> GetDepartmentById(int id)

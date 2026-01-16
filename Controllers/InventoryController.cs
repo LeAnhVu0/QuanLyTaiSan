@@ -1,5 +1,7 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using QuanLyTaiSan.Models;
 using QuanLyTaiSanTest.Dtos.NewFolder1;
 using QuanLyTaiSanTest.Services.Interfaces;
 
@@ -15,7 +17,7 @@ namespace QuanLyTaiSanTest.Controllers
         {
             _inventoryService = inventoryService;
         }
-
+        [Authorize(Policy = Permissions.InventoryCreate)]
         [HttpPost]
         public async Task<IActionResult> Create(CreateInventoryDto createInventoryDto)
         {
@@ -28,6 +30,7 @@ namespace QuanLyTaiSanTest.Controllers
                 return BadRequest(ex.Message);
             }
         }
+        [Authorize(Policy = Permissions.DepartmentUpdate)]
         [HttpPut("{id}")]
         public async Task<IActionResult> Update(int id, UpdateInventoryDto  updateInventoryDto)
         {

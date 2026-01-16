@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
+using QuanLyTaiSan.Data;
 using QuanLyTaiSan.Mappings;
 using QuanLyTaiSan.Models;
 using QuanLyTaiSan.Repositories.Implementations;
@@ -22,7 +23,7 @@ namespace QuanLyTaiSan
 {
     public class Program
     {
-        public static void Main(string[] args)
+        public static async Task Main(string[] args)
         {
             var builder = WebApplication.CreateBuilder(args);
 
@@ -71,11 +72,11 @@ namespace QuanLyTaiSan
                                                                               .AllowAnyMethod()));
 
             //DbContext
-        //    builder.Services.AddDbContext<AppDbContext>(options =>
-        //    options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection"))
-        //);
-            var connectString = builder.Configuration.GetConnectionString("MyDb");
-            builder.Services.AddDbContext<AppDbContext>(option => option.UseSqlServer(connectString));
+            builder.Services.AddDbContext<AppDbContext>(options =>
+            options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection"))
+        );
+            //var connectString = builder.Configuration.GetConnectionString("MyDb");
+            //builder.Services.AddDbContext<AppDbContext>(option => option.UseSqlServer(connectString));
             // Identity
             builder.Services
                 .AddIdentityCore<ApplicationUser>(options =>
@@ -110,6 +111,58 @@ namespace QuanLyTaiSan
                     };
                 });
             builder.Services.AddAuthorization();
+            builder.Services.AddAuthorization(options =>
+            {
+                options.AddPolicy(Permissions.GrantPermission,
+                    p => p.RequireClaim("Permission", Permissions.GrantPermission));
+
+                options.AddPolicy(Permissions.AssetCreate,
+                    p => p.RequireClaim("Permission", Permissions.AssetCreate));
+
+                options.AddPolicy(Permissions.AssetAssign,
+                    p => p.RequireClaim("Permission", Permissions.AssetAssign));
+
+                options.AddPolicy(Permissions.AssetDelete,
+                    p => p.RequireClaim("Permission", Permissions.AssetDelete));
+
+                options.AddPolicy(Permissions.AssetGetHistory,
+                    p => p.RequireClaim("Permission", Permissions.AssetGetHistory));
+
+                options.AddPolicy(Permissions.AssetRecall,
+                    p => p.RequireClaim("Permission", Permissions.AssetRecall));
+
+                options.AddPolicy(Permissions.DepartmentCreate,
+                    p => p.RequireClaim("Permission", Permissions.DepartmentCreate));
+
+                options.AddPolicy(Permissions.DepartmentDelete,
+                    p => p.RequireClaim("Permission", Permissions.DepartmentDelete));
+
+                options.AddPolicy(Permissions.DepartmentGet,
+                    p => p.RequireClaim("Permission", Permissions.DepartmentGet));
+
+                options.AddPolicy(Permissions.DepartmentUpdate,
+                    p => p.RequireClaim("Permission", Permissions.DepartmentUpdate));
+
+                options.AddPolicy(Permissions.InventoryCreate,
+                    p => p.RequireClaim("Permission", Permissions.InventoryCreate));
+
+                options.AddPolicy(Permissions.ReportGet,
+                    p => p.RequireClaim("Permission", Permissions.ReportGet));
+
+                options.AddPolicy(Permissions.UserCreate,
+                    p => p.RequireClaim("Permission", Permissions.UserCreate));
+
+                options.AddPolicy(Permissions.UserDelete,
+                    p => p.RequireClaim("Permission", Permissions.UserDelete));
+
+                options.AddPolicy(Permissions.UserGet,
+                    p => p.RequireClaim("Permission", Permissions.UserGet));
+
+                options.AddPolicy(Permissions.UserRefreshToken,
+                    p => p.RequireClaim("Permission", Permissions.UserRefreshToken));
+            });
+
+
             //Repo
             builder.Services.AddScoped<IRefreshTokenRepository, RefreshTokenRepository>();
             builder.Services.AddScoped<IDepartmentRepository, DepartmentRepository>();
@@ -118,6 +171,7 @@ namespace QuanLyTaiSan
             builder.Services.AddScoped<IAuthService, AuthService>();
             builder.Services.AddScoped<JwtService>();
             builder.Services.AddScoped<IDepartmentService, DepartmentService>();
+            builder.Services.AddScoped<IPermissionService, PermissionService>();
             //mapping
             builder.Services.AddAutoMapper(typeof(MappingProfile));
             //Khai báo di
@@ -135,6 +189,10 @@ namespace QuanLyTaiSan
             //cấu hình httpClient để gọi api khác
             builder.Services.AddHttpClient();
             var app = builder.Build();
+            using (var scope = app.Services.CreateScope())
+            {
+                await IdentitySeeder.SeedAsync(scope.ServiceProvider);
+            }
             // sử dụng HttpContextAccessor
             builder.Services.AddHttpContextAccessor();
             // Configure the HTTP request pipeline.

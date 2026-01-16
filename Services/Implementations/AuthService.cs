@@ -1,8 +1,9 @@
-﻿using Microsoft.AspNetCore.Identity;
+﻿using AutoMapper;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
 using QuanLyTaiSan.Dtos.Auth;
 using QuanLyTaiSan.Models;
 using QuanLyTaiSan.Services.Interfaces;
-using AutoMapper;
 namespace QuanLyTaiSan.Services.Implementations
 {
     public class AuthService : IAuthService
@@ -35,7 +36,8 @@ namespace QuanLyTaiSan.Services.Implementations
             };
 
             var result = await _userManager.CreateAsync(user, dto.Password);
-
+            var role = dto.IsAdmin ? "Admin" : "User";
+            await _userManager.AddToRoleAsync(user, role);
             if (!result.Succeeded)
             {
                 var errors = string.Join(", ", result.Errors.Select(e => e.Description));
@@ -51,12 +53,33 @@ namespace QuanLyTaiSan.Services.Implementations
                 Address = user.Address,
                 DateOfBirth = user.DateOfBirth,
                 DepartmentId = dto.DepartmentId,
+                Role = role
             };
         }
         public async Task<List<UserDto>> GetAllUser()
         {
-            var users = _userManager.Users.ToList();
-            return _mapper.Map<List<UserDto>>(users);
+            var users = await _userManager.Users.ToListAsync();
+
+            var result = new List<UserDto>();
+
+            foreach (var user in users)
+            {
+                var roles = await _userManager.GetRolesAsync(user);
+
+                result.Add(new UserDto
+                {
+                    Id = user.Id,
+                    Username = user.UserName,
+                    Email = user.Email,
+                    PhoneNumber = user.PhoneNumber,
+                    Address = user.Address,
+                    DateOfBirth = user. DateOfBirth,
+                    DepartmentId = user.DepartmentId,
+                    Role = roles.FirstOrDefault() 
+                });
+            }
+
+            return result;
         }
         public async Task<UserDto> GetUserById(string id)
         {

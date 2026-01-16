@@ -1,5 +1,7 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using QuanLyTaiSan.Models;
 using QuanLyTaiSanTest.Services.Interfaces;
 
 namespace QuanLyTaiSan.Controllers
@@ -14,6 +16,7 @@ namespace QuanLyTaiSan.Controllers
         {
             _assetService = assetService;
         }
+        [Authorize(Policy = Permissions.AssetAssign)]
         [HttpPut("Handover")]
         public async Task<IActionResult> AssetHandover(int assetId , string userId)
         {
@@ -36,6 +39,7 @@ namespace QuanLyTaiSan.Controllers
                 return StatusCode(500, new { message = "Lỗi hệ thống: " + ex.Message });
             }
         }
+        [Authorize(Policy = Permissions.AssetRecall)]
         [HttpPut("Recall/{assetId}")]
         public async Task<IActionResult> AssetRecall(int assetId)
         {

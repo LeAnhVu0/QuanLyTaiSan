@@ -9,7 +9,8 @@
 
         public string? PhoneNumber { get; set; }
         public required string Email { get; set; }
-        public required string Role { get; set; }
+      
         public int? DepartmentId { get; set; }
+        public bool IsAdmin { get; set; }
     }
 }
