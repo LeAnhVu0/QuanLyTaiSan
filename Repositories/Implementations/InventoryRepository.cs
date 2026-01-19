@@ -20,6 +20,11 @@ namespace QuanLyTaiSanTest.Repositories.Implementations
             return inventory;
         }
 
+        public async Task<List<Inventory>> GetAll()
+        {
+           return await _context.Inventory.Include(h => h.User).Include(h => h.Department).ToListAsync();
+        }
+
         public async Task<Inventory?> GetById(int id)
         {
             return await _context.Inventory.FirstOrDefaultAsync(h => h.InventoryId==id);

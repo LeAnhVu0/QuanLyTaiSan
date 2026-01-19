@@ -44,7 +44,7 @@ namespace QuanLyTaiSanTest.Services.Implementations
             }).ToList();
         }
 
-        public async Task<List<AssetDto>> GetCategoryDetails(int? userId)
+        public async Task<List<AssetRespondDto>> GetCategoryDetails(int? userId)
         {
             var data = await _repo.GetCategoryDetails();
          // khi nào xuất pdf thì dùng
@@ -58,7 +58,7 @@ namespace QuanLyTaiSanTest.Services.Implementations
             //    FilterJson = null
             //};
             //await _repo.AddReport(history);
-            return data.Select( h => new AssetDto
+            return data.Select( h => new AssetRespondDto
             {
                 AssetCode = h.AssetCode,
                 AssetName = h.AssetName,

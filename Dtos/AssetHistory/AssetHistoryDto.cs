@@ -1,4 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using QuanLyTaiSan.Dtos.Auth;
+using System.ComponentModel.DataAnnotations;
 
 namespace QuanLyTaiSanTest.Dtos.AssetHistory
 {
@@ -18,9 +19,8 @@ namespace QuanLyTaiSanTest.Dtos.AssetHistory
 
         // Khóa ngoại
         public int AssetId { get; set; }
-        public int? UserId { get; set; }
-        public string? AssignedToUserId { get; set; }
-        public string CreatedByUserId { get; set; } = string.Empty;
+        public UserDto? AssignedToUserId { get; set; }
+        public UserDto? CreatedByUserId { get; set; } 
 
     }
 }

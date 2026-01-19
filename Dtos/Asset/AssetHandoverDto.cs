@@ -10,6 +10,8 @@
         public string? Status { get; set; }
         public string? AssignedToUserId { get; set; }
         public string? AssignedToUserName { get; set; }
+        public string CreateByUserId { get; set; }
+        public string CreateByUserName { get; set; }
         public DateTime? UpdatedAt { get; set; }
     }
 }

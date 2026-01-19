@@ -28,7 +28,7 @@ namespace QuanLyTaiSan.Controllers
         }
         [Authorize(Policy = Permissions.DepartmentGet)]
         [HttpGet("{id}")]
-        public async Task<ActionResult<DepartmentDto>> GetById(int id)
+        public async Task<ActionResult<DepartmentResponseDto>> GetById(int id)
         {
             var result = await _service.GetDepartmentById(id);
             if (result == null)
@@ -37,14 +37,14 @@ namespace QuanLyTaiSan.Controllers
         }
         [Authorize(Policy = Permissions.DepartmentCreate)]
         [HttpPost]
-        public async Task<ActionResult<DepartmentDto>> CreateDepartment([FromBody] DepartmentCreateDto dto)
+        public async Task<ActionResult<DepartmentResponseDto>> CreateDepartment([FromBody] DepartmentCreateDto dto)
         {
             var result = await _service.AddDepartment(dto);
             return Ok(result);
         }
         [Authorize(Policy = Permissions.DepartmentUpdate)]
         [HttpPatch("{id}")]
-        public async Task<ActionResult<DepartmentDto>> UpdateDepartment(int id, DepartmentUpdateDto dto)
+        public async Task<ActionResult<DepartmentResponseDto>> UpdateDepartment(int id, DepartmentUpdateDto dto)
         {
             var result = await _service.UpdateDepartment(id, dto);
             if (result == null)

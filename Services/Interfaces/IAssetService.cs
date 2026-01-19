@@ -13,9 +13,9 @@ namespace QuanLyTaiSanTest.Services.Interfaces
         public  Task AssetRecall(int assetId);
 
         public Task<AssetAllDto> GetAll(int pageIndex, int pageSize, string? search, int? categoryId, int? status);
-        public Task<List<AssetDto>> SortAssets(string sortBy, bool desc);
+        public Task<List<AssetRespondDto>> SortAssets(string sortBy, bool desc);
         public Task<AssetDto> GetById(int id);
-        public Task<AssetDto> Create(CreateAssetDto createAssetDto);
+        public Task<AssetRespondDto> Create(CreateAssetDto createAssetDto);
         public Task Update(UpdateAssetDto updateAssetDto, int id);
         public Task Delete(int id);
     }

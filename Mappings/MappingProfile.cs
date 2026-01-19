@@ -8,10 +8,10 @@ namespace QuanLyTaiSan.Mappings
     {
         public MappingProfile()
         {
-            CreateMap<Department, DepartmentDto>();
+            CreateMap<Department, DepartmentResponseDto>();
             CreateMap<DepartmentCreateDto, Department>();
             CreateMap<DepartmentUpdateDto, Department>();
-            CreateMap<ApplicationUser, UserDto>();
+            CreateMap<ApplicationUser, UserResponseDto>();
 
         }
     }

@@ -1,6 +1,8 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using QuanLyTaiSan.Dtos.Asset;
+using QuanLyTaiSan.Dtos.Common;
 using QuanLyTaiSan.Models;
 using QuanLyTaiSanTest.Services.Interfaces;
 
@@ -17,28 +19,48 @@ namespace QuanLyTaiSan.Controllers
             _assetService = assetService;
         }
         [Authorize(Policy = Permissions.AssetAssign)]
-        [HttpPut("Handover")]
-        public async Task<IActionResult> AssetHandover(int assetId , string userId)
+        [HttpPost("Handover")]
+        public async Task<IActionResult> Handover(int assetId, string userId)
         {
             try
             {
                 var result = await _assetService.AssetHandover(assetId, userId);
 
-                return Ok(new { message = "Bàn giao tài sản thành công", data = result });
+                return Ok(new ApiResponse<AssetHandoverDto>
+                {
+                    Success = true,
+                    Message = "Bàn giao tài sản thành công",
+                    Data = result
+                });
             }
             catch (KeyNotFoundException ex)
             {
-                return NotFound(new { message = ex.Message });
+                return NotFound(new ApiResponse<string>
+                {
+                    Success = false,
+                    Message = ex.Message,
+                    Errors = new { AssetId = assetId, UserId = userId }
+                });
             }
             catch (InvalidOperationException ex)
             {
-                return BadRequest(new { message = ex.Message });
+                return BadRequest(new ApiResponse<string>
+                {
+                    Success = false,
+                    Message = ex.Message
+                });
             }
             catch (Exception ex)
             {
-                return StatusCode(500, new { message = "Lỗi hệ thống: " + ex.Message });
+                return StatusCode(500, new ApiResponse<string>
+                {
+                    Success = false,
+                    Message = "Lỗi hệ thống",
+                    Errors = new { Detail = ex.Message }
+                });
             }
         }
+
         [Authorize(Policy = Permissions.AssetRecall)]
         [HttpPut("Recall/{assetId}")]
         public async Task<IActionResult> AssetRecall(int assetId)
@@ -46,15 +68,37 @@ namespace QuanLyTaiSan.Controllers
             try
             {
                 await _assetService.AssetRecall(assetId);
-                return Ok(new { message = "Thu hồi tài sản về kho thành công" });
+
+                return Ok(new ApiResponse<string>
+                {
+                    Success = true,
+                    Message = "Thu hồi tài sản thành công"
+                });
             }
             catch (KeyNotFoundException ex)
             {
-                return NotFound(new { message = ex.Message });
+                return NotFound(new ApiResponse<string>
+                {
+                    Success = false,
+                    Message = ex.Message
+                });
+            }
+            catch (InvalidOperationException ex)
+            {
+                return BadRequest(new ApiResponse<string>
+                {
+                    Success = false,
+                    Message = ex.Message
+                });
             }
             catch (Exception ex)
             {
-                return StatusCode(500, new { message = "Lỗi hệ thống: " + ex.Message });
+                return StatusCode(500, new ApiResponse<string>
+                {
+                    Success = false,
+                    Message = "Lỗi hệ thống",
+                    Errors = new { Detail = ex.Message }
+                });
             }
         }
     }

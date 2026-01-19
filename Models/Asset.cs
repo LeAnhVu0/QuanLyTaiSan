@@ -35,6 +35,7 @@ namespace QuanLyTaiSanTest.Models
         public DateTime CreatedTime { get; set; } = DateTime.Now;
         public DateTime? UpdatedTime { get; set; }
 
+        public bool IsDelete { get; set; } = false;
         
         //khóa ngoài
         public int CategoryId {  get; set; }

@@ -1,9 +1,12 @@
 ﻿using QuanLyTaiSan.Dtos.Auth;
 using QuanLyTaiSan.Dtos.Department;
+using QuanLyTaiSanTest.Dtos.Category;
+using QuanLyTaiSanTest.Enum;
+using System.ComponentModel.DataAnnotations;
 
-namespace QuanLyTaiSan.Dtos.Asset
+namespace QuanLyTaiSanTest.Dtos.Asset
 {
-    public class AssetDto
+    public class AssetRespondDto
     {
         public int AssetId { get; set; }
 
@@ -25,14 +28,11 @@ namespace QuanLyTaiSan.Dtos.Asset
         public string? Note { get; set; }
 
         public string? ImageAsset { get; set; }
-        public DateTime CreatedTime { get; set; }
+        public DateTime CreatedTime { get; set; } 
         public DateTime? UpdatedTime { get; set; }
-        public int CategoryId { get; set; }
+        public int CategoryId {  get; set; }
         public int DepartmentId { get; set; }
         public string? UserId { get; set; }
 
-        public QuanLyTaiSan.Dtos.Category.CategoryDto Category { get; set; }
-        public DepartmentDto Department { get; set; }
-        public UserDto User { get; set; }
     }
 }

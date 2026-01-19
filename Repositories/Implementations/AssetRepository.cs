@@ -35,7 +35,7 @@ namespace QuanLyTaiSanTest.Repositories.Implementations
 
         public async Task<(List<Asset> Items, int TotalCount)> GetAll(int pageIndex, int pageSize, string? search, int? categoryId, int? status)
         {
-            var listAsset =  _context.Assets.Include(h => h.Category).AsQueryable();
+            var listAsset =  _context.Assets.Where(h => h.IsDelete == false).Include(h => h.Category).AsQueryable();
             if(!string.IsNullOrEmpty(search))
             {
                 listAsset = listAsset.Where(h=>h.AssetName.Contains(search));
@@ -57,18 +57,22 @@ namespace QuanLyTaiSanTest.Repositories.Implementations
 
         public async Task<Asset?> GetById(int id)
         {
-            return await _context.Assets.Include(h=>h.Category).FirstOrDefaultAsync(h=>h.AssetId==id);
+            return await _context.Assets.Where(h => h.IsDelete == false)
+                                        .Include(h=>h.Category)
+                                        .Include(h => h.Department)
+                                        .Include(h => h.User)
+                                        .FirstOrDefaultAsync(h=>h.AssetId==id);
         }
         public async Task<Asset?> GetLatesAssetByCategory(int categoryId)
         {
-            return await _context.Assets.Where(h => h.CategoryId == categoryId)
+            return await _context.Assets.Where(h => h.CategoryId == categoryId && h.IsDelete == false)
                                         .OrderByDescending(h => h.AssetId)
                                         .FirstOrDefaultAsync();
         }
 
         public async Task<List<Asset>> SortAssets(string sortBy, bool desc)
         {
-            var listAsset = _context.Assets.Include(h => h.Category).AsQueryable();
+            var listAsset = _context.Assets.Where(h => h.IsDelete == false).Include(h => h.Category).AsQueryable();
             if (string.IsNullOrWhiteSpace(sortBy))
                 sortBy = "name";
             switch (sortBy.ToLower())

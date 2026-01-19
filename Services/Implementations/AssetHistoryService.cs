@@ -1,4 +1,5 @@
-﻿using QuanLyTaiSanTest.Dtos.AssetHistory;
+﻿using QuanLyTaiSan.Dtos.Auth;
+using QuanLyTaiSanTest.Dtos.AssetHistory;
 using QuanLyTaiSanTest.Repositories.Interfaces;
 using QuanLyTaiSanTest.Services.Interfaces;
 
@@ -16,7 +17,7 @@ namespace QuanLyTaiSanTest.Services.Implementations
         public async Task<List<AssetHistoryDto>> GetAll()
         {
             var listHistory = await _repo.GetAll();
-            return  listHistory.Select(h => new AssetHistoryDto
+            return listHistory.Select(h => new AssetHistoryDto
             {
                 HistoryID = h.HistoryID,
                 ActionType = h.ActionType,
@@ -25,8 +26,20 @@ namespace QuanLyTaiSanTest.Services.Implementations
                 AssetId = h.AssetId,
                 AssetName = h.AssetName,
                 Status = h.Status,
-                CreatedByUserId = h.CreatedByUserId,
-                AssignedToUserId = h.AssignedToUserId
+                CreatedByUserId = new UserDto
+                {
+                    Id = h.CreatedByUserId,
+                    Username = h.CreatedByUser.UserName,
+                    Email = h.CreatedByUser.Email,
+                    PhoneNumber = h.CreatedByUser.PhoneNumber
+                },
+                AssignedToUserId = h.AssignedToUserId == null ? null : new UserDto
+                { 
+                    Id = h.AssignedToUserId,
+                    Username = h.AssignedToUser.UserName,
+                    Email = h.AssignedToUser.Email,
+                    PhoneNumber = h.AssignedToUser.PhoneNumber
+                }
             }).ToList();
         }
     }

@@ -1,6 +1,8 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using QuanLyTaiSan.Dtos.Asset;
+using QuanLyTaiSan.Dtos.Common;
 using QuanLyTaiSan.Models;
 using QuanLyTaiSanTest.Dtos.Asset;
 using QuanLyTaiSanTest.Services.Interfaces;
@@ -59,26 +61,74 @@ namespace QuanLyTaiSanTest.Controllers
         {
             try
             {
-                return Ok(await _assetService.GetById(id));
+                var asset = await _assetService.GetById(id);
+                return Ok(new ApiResponse<AssetDto>
+                {
+                    Success = true,
+                    Message = "Lấy tài sản thành công",
+                    Data = asset
+                });
+            }
+            catch (KeyNotFoundException ex)
+            {
+                return NotFound(new ApiResponse<string>
+                {
+                    Success = false,
+                    Message = ex.Message,
+                    Errors = new { AssetId = id }
+                });
             }
             catch (Exception ex)
             {
-                return BadRequest(ex.Message);
+                return StatusCode(500, new ApiResponse<string>
+                {
+                    Success = false,
+                    Message = "Lỗi hệ thống",
+                    Errors = new { Detail = ex.Message }
+                });
             }
         }
+
         [Authorize(Policy = Permissions.UserCreate)]
         [HttpPost]
         public async Task<IActionResult> Create(CreateAssetDto createAssetDto)
         {
             try
             {
-                await _assetService.Create(createAssetDto);
+                var asset = await _assetService.Create(createAssetDto);
 
-                return Ok("Thêm tài sản thành công");
+                return Ok(new ApiResponse<AssetRespondDto> 
+                {
+                    Success = true,
+                    Message = "Thêm tài sản thành công",
+                    Data = asset
+                    
+                });
             }
-            catch (Exception ex)
+            catch (BadHttpRequestException ex)
             {
-                return BadRequest(ex.Message);
+                return BadRequest(new ApiResponse<string>
+                {
+                    Success = false,
+                    Message = ex.Message
+                });
+            }
+            catch (KeyNotFoundException ex)
+            {
+                return NotFound(new ApiResponse<string>
+                {
+                    Success = false,
+                    Message = ex.Message,
+                });
+            }
+            catch(Exception ex)
+            {
+                return StatusCode(500, new ApiResponse<string>
+                {
+                    Success = false,
+                    Message = "Lỗi hệ thống",
+                    Errors = new { Detail = ex.Message }
+                });
             }
         }
         [Authorize(Policy = Permissions.AssetDelete)]
@@ -92,29 +142,70 @@ namespace QuanLyTaiSanTest.Controllers
             try
             {
                 await _assetService.Delete(id);
-                return Ok("Xóa thành công");
+
+                return Ok(new ApiResponse<string>
+                {
+                    Success = true,
+                    Message = "Xóa tài sản thành công",
+                });
+            }
+            catch (KeyNotFoundException ex)
+            {
+                return NotFound(new ApiResponse<string>
+                {
+                    Success = false,
+                    Message = "Xóa thất bại",
+                    Errors = new { Detail = ex.Message }
+                });
             }
             catch (Exception ex)
             {
-                return BadRequest(ex.Message);
+                return StatusCode(500, new ApiResponse<string>
+                {
+                    Success = false,
+                    Message = "Lỗi hệ thống",
+                    Errors = new { Detail = ex.Message }
+                });
             }
         }
-        [HttpPatch("{id}")]
         [Authorize(Policy = Permissions.AssetUpdate)]
+        [HttpPatch("{id}")]
         public async Task<IActionResult> Update(int id,UpdateAssetDto updateAssetDto)
         {
             if (id <= 0)
             {
-                return BadRequest("Id không hợp lệ");
+                return BadRequest(new ApiResponse<string>
+                {
+                    Success=false,
+                    Message = "Id không hợp lệ"
+                });
             }
             try
             {
                 await _assetService.Update(updateAssetDto,id);
-                return Ok("Sửa thành công");
+                return Ok(new ApiResponse<string>
+                {
+                    Success=false,
+                    Message= "Sửa thành công"
+                });
+            }
+            catch (KeyNotFoundException ex)
+            {
+                return NotFound(new ApiResponse<string>
+                {
+                    Success = false,
+                    Message = "Sửa thất bại",
+                    Errors = new { Detail = ex.Message }
+                });
             }
             catch (Exception ex)
             {
-                return BadRequest(ex.Message);
+                return StatusCode(500, new ApiResponse<string>
+                {
+                    Success = false,
+                    Message = "Lỗi hệ thống",
+                    Errors = new { Detail = ex.Message }
+                });
             }
         }
         [Authorize(Policy = Permissions.AssetGetHistory)]

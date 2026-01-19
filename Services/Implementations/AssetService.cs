@@ -8,6 +8,7 @@ using QuanLyTaiSanTest.Enum;
 using QuanLyTaiSanTest.Models;
 using QuanLyTaiSanTest.Repositories.Interfaces;
 using QuanLyTaiSanTest.Services.Interfaces;
+using System.IdentityModel.Tokens.Jwt;
 using System.Runtime.InteropServices;
 using System.Security.Claims;
 
@@ -49,20 +50,22 @@ namespace QuanLyTaiSanTest.Services.Implementations
             {
                 throw new InvalidOperationException("Tài sản này không thuộc phòng ban của người nhận");
             }
-            if (asset.Status != AssetStatus.SanSang)
-            {
-                throw new InvalidOperationException("Tài sản không ở trạng thái sẵn sàng để bàn giao");
-            }
             if (!string.IsNullOrEmpty(asset.UserId))
             {
                 throw new InvalidOperationException("Tài sản đã được cấp phát cho người khác");
             }
+            if (asset.Status != AssetStatus.SanSang)
+            {
+                throw new InvalidOperationException("Tài sản không ở trạng thái sẵn sàng để bàn giao");
+            }
+          
 
             asset.UserId = userId;
             asset.Status = AssetStatus.DangSuDung;
             asset.UpdatedTime = DateTime.UtcNow;
             await _repo.Update();
 
+            await SaveHistory(asset, "HANDOVER", "Gán tài sản cho nhân viên", GetCurrentUserId(),userId);
             return new AssetHandoverDto
             {
                 AssetId = assetId,
@@ -70,7 +73,9 @@ namespace QuanLyTaiSanTest.Services.Implementations
                 AssetName = asset.AssetName,
                 AssignedToUserId = userId,
                 AssignedToUserName = user.Username,
-                Status =asset.Status.ToDisplayName(),
+                CreateByUserId = GetCurrentUserId(),
+                CreateByUserName = GetCurrentUsername(),
+                Status = asset.Status.ToDisplayName(),
                 UpdatedAt = asset.UpdatedTime
             };
         }
@@ -88,10 +93,11 @@ namespace QuanLyTaiSanTest.Services.Implementations
             asset.Status = AssetStatus.SanSang;
             asset.UpdatedTime = DateTime.UtcNow;
             asset.DepartmentId = 3;
+            await SaveHistory(asset, "RECALL", "Thu hồi tài sản của nhân viên", GetCurrentUserId());
             await _repo.Update();
         }
 
-        public async Task<AssetDto> Create(CreateAssetDto createAssetDto)
+        public async Task<AssetRespondDto> Create(CreateAssetDto createAssetDto)
         {
             if (createAssetDto == null)
             {
@@ -140,10 +146,10 @@ namespace QuanLyTaiSanTest.Services.Implementations
                 DepartmentId = createAssetDto.DepartmentId
             };
             // LẤY USER ID RA
-            //string currentUserId = GetCurrentUserId(); 
+            string currentUserId = GetCurrentUserId();
             await _repo.Create(h);
-            //await SaveHistory(h, "CREATE", $"Thêm mới tài sản từ loại ID: {h.CategoryId}",currentUserId);
-            return new AssetDto
+            await SaveHistory(h, "CREATE", $"Thêm mới tài sản từ loại ID: {h.CategoryId}",currentUserId);
+            return new AssetRespondDto
             {
                 AssetCode = h.AssetCode,
                 AssetName = h.AssetName,
@@ -194,8 +200,8 @@ namespace QuanLyTaiSanTest.Services.Implementations
                 h.UpdatedTime = DateTime.Now;
                 h.DepartmentId = updateAssetDto.DepartmentId;
                 await _repo.Update();
-                //string currentUserId = GetCurrentUserId();
-                //await SaveHistory(h, "UPDATE", "Người dùng cập nhật thông tin tài sản ID : " + id,currentUserId);
+                string currentUserId = GetCurrentUserId();
+                await SaveHistory(h, "UPDATE", "Người dùng cập nhật thông tin tài sản ID : " + id, currentUserId);
             }
         }
     
@@ -208,8 +214,10 @@ namespace QuanLyTaiSanTest.Services.Implementations
             }
             else
             {
-                //await SaveHistory(h, "DELETE", "Xóa tài sản khỏi hệ thống",GetCurrentUserId());
-                await _repo.Delete(h);
+                await SaveHistory(h, "DELETE", "Xóa tài sản khỏi hệ thống",GetCurrentUserId());
+                //await _repo.Delete(h);
+                h.IsDelete = true;
+                await _repo.Update();
             }
         }
 
@@ -221,7 +229,7 @@ namespace QuanLyTaiSanTest.Services.Implementations
                 return null;
             }
 
-            var items = data.Items.Select(h => new AssetDto
+            var items = data.Items.Select(h => new AssetRespondDto
             {
                 AssetCode = h.AssetCode,
                 AssetName = h.AssetName,
@@ -261,7 +269,7 @@ namespace QuanLyTaiSanTest.Services.Implementations
             };
 
         }
-        public async Task<List<AssetDto>> SortAssets(string sortBy, bool desc)
+        public async Task<List<AssetRespondDto>> SortAssets(string sortBy, bool desc)
         {
             var assets = await _repo.SortAssets(sortBy, desc);
             if (assets == null)
@@ -270,7 +278,7 @@ namespace QuanLyTaiSanTest.Services.Implementations
             }
             else
             {
-                return assets.Select(h => new AssetDto
+                return assets.Select(h => new AssetRespondDto
                 {
                     AssetCode = h.AssetCode,
                     AssetName = h.AssetName,
@@ -286,8 +294,8 @@ namespace QuanLyTaiSanTest.Services.Implementations
                     Note = h.Note,
                     Unit = h.Unit,
                     CreatedTime = h.CreatedTime,
-                    UpdatedTime = h.UpdatedTime,
-                    CategoryId = h.CategoryId
+                    UpdatedTime = h.UpdatedTime
+                    //CategoryId = h.CategoryId
                 }).ToList();
             }
         }
@@ -318,7 +326,28 @@ namespace QuanLyTaiSanTest.Services.Implementations
                     Unit = h.Unit,
                     CreatedTime = h.CreatedTime,
                     UpdatedTime = h.UpdatedTime,
-                    CategoryId = h.CategoryId
+                    CategoryId = h.CategoryId,
+                    DepartmentId = h.DepartmentId,
+                    UserId = h.UserId,
+                    Category = new QuanLyTaiSan.Dtos.Category.CategoryDto()
+                    {
+                        CategoryId = h.CategoryId,
+                        CategoryName = h.Category.CategoryName,
+                        Description = h.Category.Description
+                    },
+                    Department = new QuanLyTaiSan.Dtos.Department.DepartmentDto()
+                    {
+                        Id = h.Department.Id,
+                        DepartmentName = h.Department.DepartmentName,
+                        Description = h.Department.Description
+                    },
+                    User = h.UserId == null ? null : new QuanLyTaiSan.Dtos.Auth.UserDto()
+                    {
+                        Id = h.UserId,
+                        Username = h.User.UserName,
+                        Email = h.User.Email,
+                        PhoneNumber = h.User.PhoneNumber
+                    }
                 };
             }
         }
@@ -360,10 +389,22 @@ namespace QuanLyTaiSanTest.Services.Implementations
         //Hàm lấy thông tin người dùng 
         private string? GetCurrentUserId()
         {
-            // Lấy User name từ Token 
-            var username = _httpContextAccessor.HttpContext?.User?.FindFirst(ClaimTypes.Name)?.Value;
+            var user = _httpContextAccessor.HttpContext?.User;
 
-            return username ?? string.Empty;
+            if (user == null)
+                return null;
+
+            // UserId trong JWT nằm ở Sub hoặc NameIdentifier
+            var userId =
+                user.FindFirstValue(ClaimTypes.NameIdentifier)
+                ?? user.FindFirstValue(JwtRegisteredClaimNames.Sub);
+
+            return userId;
+        }
+        private string? GetCurrentUsername()
+        {
+            return _httpContextAccessor.HttpContext?.User?
+                .FindFirstValue(JwtRegisteredClaimNames.UniqueName);
         }
 
     }

@@ -1,4 +1,5 @@
-﻿using QuanLyTaiSanTest.Models;
+﻿using QuanLyTaiSan.Dtos.Inventory;
+using QuanLyTaiSanTest.Models;
 using System.Threading.Tasks;
 
 namespace QuanLyTaiSanTest.Repositories.Interfaces
@@ -8,5 +9,7 @@ namespace QuanLyTaiSanTest.Repositories.Interfaces
        public Task<Inventory> Create(Inventory inventory);
        public Task<Inventory?> GetById(int id);
        public Task Update();
+       public Task<List<Inventory>> GetAll();
+
     }
 }

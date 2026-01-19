@@ -6,8 +6,8 @@ namespace QuanLyTaiSanTest.Services.Interfaces
 {
     public interface ICategoryService
     {
-        public Task<CategoryDto> GetById(int id);
-        public Task<List<CategoryDto>> GetAll();
+        public Task<CategoryResponseDto> GetById(int id);
+        public Task<List<CategoryResponseDto>> GetAll();
         public Task Create(CreateCategoryDto createCategoryDto);
         public Task Update(UpdateCategoryDto updateCategoryDto, int id);
         public Task Delete(int id);

@@ -57,7 +57,6 @@ namespace QuanLyTaiSan.Controllers
         {
             var permissions =
                 await _permissionService.GetAdminPermissionsAsync(userId);
-
             return Ok(permissions);
         }
     }

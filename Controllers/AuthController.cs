@@ -36,7 +36,7 @@ namespace QuanLyTaiSan.Controllers
         }
         [AllowAnonymous]
         [HttpPost("Register")]
-        public async Task<ActionResult<UserDto>> Register([FromBody] UserRegisterDto request)
+        public async Task<ActionResult<UserResponseDto>> Register([FromBody] UserRegisterDto request)
         {
             var user = await _authService.RegisterAsync(request);
             return Ok(user);
@@ -44,14 +44,14 @@ namespace QuanLyTaiSan.Controllers
         }
         [Authorize(Policy = Permissions.UserGet)]
         [HttpGet]
-        public async Task<ActionResult<List<UserDto>>> GetAllUser()
+        public async Task<ActionResult<List<UserResponseDto>>> GetAllUser()
         {
             var result = await _authService.GetAllUser();
             return Ok(result);
         }
         [Authorize(Policy = Permissions.UserGet)]
         [HttpGet("{id}")]
-        public async Task<ActionResult<UserDto>> GetUserById(string id)
+        public async Task<ActionResult<UserResponseDto>> GetUserById(string id)
         {
             var result = await _authService.GetUserById(id);
             if (result == null) return NotFound();

@@ -23,7 +23,7 @@ namespace QuanLyTaiSan.Services.Implementations
             _jwtService = jwtService;
             _mapper = mapper;
         }
-        public async Task<UserDto> RegisterAsync(UserRegisterDto dto)
+        public async Task<UserResponseDto> RegisterAsync(UserRegisterDto dto)
         {
             var user = new ApplicationUser
             {
@@ -44,7 +44,7 @@ namespace QuanLyTaiSan.Services.Implementations
                 throw new Exception($"Register failed: {errors}");
             }
 
-            return new UserDto
+            return new UserResponseDto
             {
 
                 Username = user.UserName,
@@ -56,17 +56,17 @@ namespace QuanLyTaiSan.Services.Implementations
                 Role = role
             };
         }
-        public async Task<List<UserDto>> GetAllUser()
+        public async Task<List<UserResponseDto>> GetAllUser()
         {
             var users = await _userManager.Users.ToListAsync();
 
-            var result = new List<UserDto>();
+            var result = new List<UserResponseDto>();
 
             foreach (var user in users)
             {
                 var roles = await _userManager.GetRolesAsync(user);
 
-                result.Add(new UserDto
+                result.Add(new UserResponseDto
                 {
                     Id = user.Id,
                     Username = user.UserName,
@@ -81,11 +81,11 @@ namespace QuanLyTaiSan.Services.Implementations
 
             return result;
         }
-        public async Task<UserDto> GetUserById(string id)
+        public async Task<UserResponseDto> GetUserById(string id)
         {
             var user = await _userManager.FindByIdAsync(id);
             if (user == null) return null;
-            return _mapper.Map<UserDto>(user);
+            return _mapper.Map<UserResponseDto>(user);
         }
         public async Task<string> DeleteUser(string id)
         {

@@ -17,14 +17,14 @@ namespace QuanLyTaiSan.Services.Implementations
             _mapper = mapper;
             _repository = repository;
         }
-        public async Task<PagedResult<DepartmentDto>> GetDepartmentsAsync(int pageIndex, int pageSize)
+        public async Task<PagedResult<DepartmentResponseDto>> GetDepartmentsAsync(int pageIndex, int pageSize)
         {
             var totalCount =await _repository.GetAll().CountAsync();
             var totalPage = (int)Math.Ceiling(totalCount / (double)pageSize);
             var items = await _repository.GetAll()
            .Skip((pageIndex - 1) * pageSize)
            .Take(pageSize)
-           .Select(d => new DepartmentDto
+           .Select(d => new DepartmentResponseDto
            {
                Id = d.Id,
                DepartmentName = d.DepartmentName,
@@ -33,7 +33,7 @@ namespace QuanLyTaiSan.Services.Implementations
            })
            .ToListAsync();
 
-            return new PagedResult<DepartmentDto>
+            return new PagedResult<DepartmentResponseDto>
             {
                 PageIndex = pageIndex,
                 PageSize = pageSize,
@@ -59,21 +59,21 @@ namespace QuanLyTaiSan.Services.Implementations
                 }).ToList()
             };
         }
-        public async Task<DepartmentDto> AddDepartment(DepartmentCreateDto dto)
+        public async Task<DepartmentResponseDto> AddDepartment(DepartmentCreateDto dto)
         {
             var department = _mapper.Map<Department>(dto);
             await _repository.AddDepartment(department);
             await _repository.SaveAsync();
-            return _mapper.Map<DepartmentDto>(department);
+            return _mapper.Map<DepartmentResponseDto>(department);
         }
-        public async Task<DepartmentDto> UpdateDepartment(int id, DepartmentUpdateDto dto)
+        public async Task<DepartmentResponseDto> UpdateDepartment(int id, DepartmentUpdateDto dto)
         {
             var department = await _repository.GetDepartmentById(id);
             if (department == null)
                 return null;
             _mapper.Map(dto, department);
             await _repository.SaveAsync();
-            return _mapper.Map<DepartmentDto>(department);
+            return _mapper.Map<DepartmentResponseDto>(department);
 
         }
         public async Task<string> DeleteDepartment(int id)

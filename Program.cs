@@ -124,6 +124,8 @@ namespace QuanLyTaiSan
 
                 options.AddPolicy(Permissions.AssetDelete,
                     p => p.RequireClaim("Permission", Permissions.AssetDelete));
+                options.AddPolicy(Permissions.AssetUpdate,
+                  p => p.RequireClaim("Permission", Permissions.AssetUpdate));
 
                 options.AddPolicy(Permissions.AssetGetHistory,
                     p => p.RequireClaim("Permission", Permissions.AssetGetHistory));

@@ -21,7 +21,7 @@ namespace QuanLyTaiSanTest.Repositories.Implementations
 
         public async Task<List<AssetHistory>> GetAll()
         {
-            return await _context.AssetHistory.ToListAsync();
+            return await _context.AssetHistory.Include(h=>h.CreatedByUser).Include(h=>h.AssignedToUser).ToListAsync();
         }
     }
 }

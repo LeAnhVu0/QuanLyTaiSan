@@ -45,10 +45,10 @@ namespace QuanLyTaiSanTest.Services.Implementations
             }
         }
 
-        public async Task<List<CategoryDto>> GetAll()
+        public async Task<List<CategoryResponseDto>> GetAll()
         {
             var category = await _repo.GetAll();
-            return category.Select(c => new CategoryDto
+            return category.Select(c => new CategoryResponseDto
             {
                 CategoryId = c.CategoryId,
                 CategoryName = c.CategoryName,
@@ -60,7 +60,7 @@ namespace QuanLyTaiSanTest.Services.Implementations
             }).ToList();
         }
 
-        public async Task<CategoryDto> GetById(int id)
+        public async Task<CategoryResponseDto> GetById(int id)
         {
             var category = await _repo.GetById(id);
             if (category == null)
@@ -69,7 +69,7 @@ namespace QuanLyTaiSanTest.Services.Implementations
             }
             else
             {
-                return new CategoryDto
+                return new CategoryResponseDto
                 {
                     CategoryId = category.CategoryId,
                     CategoryName = category.CategoryName,

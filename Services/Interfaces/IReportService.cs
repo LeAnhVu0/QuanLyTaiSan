@@ -8,7 +8,7 @@ namespace QuanLyTaiSanTest.Services.Interfaces
     {
         public Task<List<ReportHistoryDto>> GetAllReport();
         public Task<List<ReportAnalyticsDto>> GetCategoryAnalytics();
-        public Task<List<AssetDto>> GetCategoryDetails(int? userId);
+        public Task<List<AssetRespondDto>> GetCategoryDetails(int? userId);
 
     }
 }

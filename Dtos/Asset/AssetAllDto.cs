@@ -4,7 +4,7 @@ namespace QuanLyTaiSan.Dtos.Asset
 {
     public class AssetAllDto
     {
-        public List<AssetDto> ListAsset { get; set; } = new List<AssetDto>();
+        public List<AssetRespondDto> ListAsset { get; set; } = new List<AssetRespondDto>();
 
         public string? SearchName { get; set; }
         public int? categoryId { get; set; }
