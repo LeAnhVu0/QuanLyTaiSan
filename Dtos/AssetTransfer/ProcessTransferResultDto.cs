@@ -10,12 +10,14 @@
         public string AssetCode { get; set; }
         public string AssetName { get; set; }
 
+        public int? DepartmentId { get; set; }
         public string? FromUserId { get; set; }
         public string? ToUserId { get; set; }
 
         public string? ApprovedByUserId { get; set; }
         public DateTime? ApprovedAt { get; set; }
 
+        public string? Purpose { get; set; }
         public string? RejectReason { get; set; }
     }
 }

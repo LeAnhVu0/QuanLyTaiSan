@@ -124,6 +124,11 @@ namespace QuanLyTaiSanTest.Data
                       .WithMany()
                       .HasForeignKey(x => x.AssetId)
                       .OnDelete(DeleteBehavior.Restrict);
+               
+                entity.HasOne(x => x.Department)
+                    .WithMany()
+                    .HasForeignKey(x => x.DepartmentId)
+                    .OnDelete(DeleteBehavior.Restrict);
 
                 entity.HasOne(x => x.FromUser)
                       .WithMany()

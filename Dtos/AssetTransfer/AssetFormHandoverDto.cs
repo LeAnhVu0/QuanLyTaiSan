@@ -7,6 +7,7 @@ namespace QuanLyTaiSan.Dtos.AssetTransfer
     {
         public int TransferId { get; set; }
         public int AssetId { get; set; }
+        public int? DepartmentId { get; set; }
 
         public string? TransferType { get; set; }
 
@@ -19,6 +20,7 @@ namespace QuanLyTaiSan.Dtos.AssetTransfer
         public string CreatedByUserId { get; set; }
 
         public string? Note { get; set; }
+        public string? Purpose { get; set; }
         public DateTime CreatedAt { get; set; }
 
     }

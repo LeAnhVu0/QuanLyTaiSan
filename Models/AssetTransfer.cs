@@ -10,7 +10,8 @@ namespace QuanLyTaiSan.Models
         public Asset Asset { get; set; }
 
         public AssetTransferType TransferType { get; set; }
-
+        public int? DepartmentId { get; set; }
+        public Department? Department { get; set; }
         public string? FromUserId { get; set; }
         public ApplicationUser? FromUser { get; set; }
 
@@ -29,5 +30,6 @@ namespace QuanLyTaiSan.Models
         public DateTime? ApprovedAt { get; set; }
         public string? RejectReason { get; set; }
         public string? Note { get; set; }
+        public string? Purpose { get; set; }
     }
 }

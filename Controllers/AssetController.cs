@@ -23,7 +23,7 @@ namespace QuanLyTaiSanTest.Controllers
             _assetHistoryService = assetHistoryService;
         }
         [HttpGet]
-        public async Task<IActionResult> GetAll(int pageIndex = 1, int pageSize = 5, string? searchName = null, int? status = null, int? categoryId = null, string sortBy = "date", bool desc = true)
+        public async Task<IActionResult> GetAll(int pageIndex = 1, int pageSize = 5, string? searchName = null, int? status = null, int? categoryId = null, string sortBy = "date", bool desc=true )
         {
            
             try
@@ -34,13 +34,27 @@ namespace QuanLyTaiSanTest.Controllers
                 }
                 if(pageSize < 1)
                 {
-                    pageSize = 3;
+                    pageSize = 5;
                 }
-                return Ok(await _assetService.GetAll(pageIndex, pageSize, searchName, categoryId, status, sortBy, desc));
+                return Ok( await _assetService.GetAll(pageIndex, pageSize, searchName, categoryId, status, sortBy, desc));
+            }
+            catch (KeyNotFoundException ex)
+            {
+                return Ok(new ApiResponse<string>
+                {
+                    Success = false,
+                    Message = "Lấy dữ liệu thất bại",
+                    Errors = new { Detail = ex.Message}
+                });
             }
             catch (Exception ex)
             {
-                return BadRequest(ex.Message);
+                return StatusCode(500, new ApiResponse<string>
+                {
+                    Success = false,
+                    Message = "Lỗi hệ thống",
+                    Errors = new { Detail = ex.Message }
+                });
             }
         }
         [HttpGet("{id}")]
@@ -58,7 +72,7 @@ namespace QuanLyTaiSanTest.Controllers
             }
             catch (KeyNotFoundException ex)
             {
-                return NotFound(new ApiResponse<string>
+                return Ok(new ApiResponse<string>
                 {
                     Success = false,
                     Message = ex.Message,

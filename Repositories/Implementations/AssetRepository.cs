@@ -115,7 +115,7 @@ namespace QuanLyTaiSanTest.Repositories.Implementations
             {
                 list = list.Where(h => h.Status == (AssetTransferStatus)status);
             }
-            if (status != null)
+            if (type != null)
             {
                 list = list.Where(h => h.TransferType == (AssetTransferType)type);
             }
