@@ -2,8 +2,10 @@
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using QuanLyTaiSan.Dtos.Auth;
+using QuanLyTaiSan.Enum;
 using QuanLyTaiSan.Models;
 using QuanLyTaiSan.Services.Interfaces;
+using System.Runtime.ConstrainedExecution;
 namespace QuanLyTaiSan.Services.Implementations
 {
     public class AuthService : IAuthService
@@ -30,6 +32,7 @@ namespace QuanLyTaiSan.Services.Implementations
                 UserName = dto.Username,
                 Email = dto.Email,
                 PhoneNumber = dto.PhoneNumber,
+                Status=dto.Status,
                 Address = dto.Address,
                 DateOfBirth = dto.DateofBirth,
                 DepartmentId = dto.DepartmentId == 0 ? null : dto.DepartmentId
@@ -50,6 +53,7 @@ namespace QuanLyTaiSan.Services.Implementations
                 Username = user.UserName,
                 Email = user.Email,
                 PhoneNumber = user.PhoneNumber,
+                Status = user.Status,
                 Address = user.Address,
                 DateOfBirth = user.DateOfBirth,
                 DepartmentId = dto.DepartmentId,
@@ -72,6 +76,7 @@ namespace QuanLyTaiSan.Services.Implementations
                     Username = user.UserName,
                     Email = user.Email,
                     PhoneNumber = user.PhoneNumber,
+                    Status = user.Status,
                     Address = user.Address,
                     DateOfBirth = user. DateOfBirth,
                     DepartmentId = user.DepartmentId,
@@ -91,8 +96,15 @@ namespace QuanLyTaiSan.Services.Implementations
         {
             var user = await _userManager.FindByIdAsync(id);
             if (user == null) return "User not found";
-            _userManager.DeleteAsync(user);
-            return $"User {user.Id} deleted";
+            if(user.Status == UserStatus.inactive)
+            {
+                return "User is already inactive";
+            }
+            user.Status = UserStatus.inactive;
+            user.LockoutEnabled = true;
+            user.LockoutEnd = DateTimeOffset.MaxValue;
+            await _userManager.UpdateAsync(user);
+            return $"User {user.Id} change status";
         }
         public async Task<string> ResetPasswordAsync(ResetPasswordDto dto)
         {

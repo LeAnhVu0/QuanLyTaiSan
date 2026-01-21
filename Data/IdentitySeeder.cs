@@ -33,7 +33,7 @@ namespace QuanLyTaiSan.Data
             {
                 superAdmin = new ApplicationUser
                 {
-                    UserName = superAdminEmail,
+                    UserName = "Nhat",
                     Email = superAdminEmail,
                     EmailConfirmed = true
                 };

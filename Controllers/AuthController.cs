@@ -64,7 +64,7 @@ namespace QuanLyTaiSan.Controllers
             var result = await _authService.GetUserById(id);
             if (result == null) return NotFound();
             await _authService.DeleteUser(id);
-            return Ok("Xoa thanh cong ");
+            return Ok("Change status done ");
         }
 
         [HttpPatch("reset-password")]
