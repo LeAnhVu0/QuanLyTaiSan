@@ -9,6 +9,9 @@ namespace QuanLyTaiSan.Services.Interfaces
         Task<List<UserResponseDto>> GetAllUser();
         Task<UserResponseDto> GetUserById(string id);
         Task<string> DeleteUser(string id);
+        Task<UserUpdateDto> UpdateUser(string id, UserUpdateDto dto);
+
+
     }
 }
 

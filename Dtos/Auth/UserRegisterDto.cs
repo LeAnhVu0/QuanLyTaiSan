@@ -1,4 +1,5 @@
 ﻿using QuanLyTaiSan.Enum;
+using System.ComponentModel.DataAnnotations;
 
 namespace QuanLyTaiSan.Dtos.Auth
 {
@@ -9,6 +10,7 @@ namespace QuanLyTaiSan.Dtos.Auth
         public required string Password { get; set; }
         public DateTime DateofBirth { get; set; }
         public string? Address { get; set; }
+        [EnumDataType(typeof(UserStatus))]
         public UserStatus Status { get; set; }
         public string? PhoneNumber { get; set; }
         public required string Email { get; set; }

@@ -7,6 +7,7 @@ using QuanLyTaiSanTest.Models;
         public class ApplicationUser : IdentityUser
         {
             public DateTime DateOfBirth { get; set; }
+            public string? FullName { get; set; }
             public string? Address { get; set; }
             public UserStatus Status { get; set; }
             public DateTime CreateTime { get; set; }
