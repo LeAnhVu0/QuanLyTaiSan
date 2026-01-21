@@ -3,6 +3,7 @@
     public class UserRegisterDto
     {
         public required string Username { get; set; }
+        public string? Fullname { get; set; }
         public required string Password { get; set; }
         public DateTime DateofBirth { get; set; }
         public string? Address { get; set; }

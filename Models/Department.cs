@@ -1,4 +1,5 @@
-﻿using QuanLyTaiSanTest.Models;
+﻿using QuanLyTaiSan.Enum;
+using QuanLyTaiSanTest.Models;
 
 namespace QuanLyTaiSan.Models
 {
@@ -8,7 +9,7 @@ namespace QuanLyTaiSan.Models
         public required string DepartmentName { get; set; }
 
         public string? Description { get; set; }
-        public string? DepartmentStatus { get; set; }
+        public DepartmentStatus DepartmentStatus { get; set; }
         public DateTime CreateTime { get; set; }
         public DateTime? UpdateTime { get; set; }
         public ICollection<ApplicationUser> User { get; set; } = new List<ApplicationUser>();

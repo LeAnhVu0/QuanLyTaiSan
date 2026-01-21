@@ -91,7 +91,7 @@ namespace QuanLyTaiSan.Services.Implementations
         {
             var user = await _userManager.FindByIdAsync(id);
             if (user == null) return "User not found";
-            _userManager.DeleteAsync(user);
+            await _userManager.DeleteAsync(user);
             return $"User {user.Id} deleted";
         }
         public async Task<string> ResetPasswordAsync(ResetPasswordDto dto)

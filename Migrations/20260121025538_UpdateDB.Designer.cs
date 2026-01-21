@@ -12,8 +12,8 @@ using QuanLyTaiSanTest.Data;
 namespace QuanLyTaiSan.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20260120080153_up")]
-    partial class up
+    [Migration("20260121025538_UpdateDB")]
+    partial class UpdateDB
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -315,8 +315,8 @@ namespace QuanLyTaiSan.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("DepartmentStatus")
-                        .HasColumnType("nvarchar(max)");
+                    b.Property<int>("DepartmentStatus")
+                        .HasColumnType("int");
 
                     b.Property<string>("Description")
                         .HasColumnType("nvarchar(max)");

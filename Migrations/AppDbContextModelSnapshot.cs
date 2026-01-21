@@ -312,8 +312,8 @@ namespace QuanLyTaiSan.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("DepartmentStatus")
-                        .HasColumnType("nvarchar(max)");
+                    b.Property<int>("DepartmentStatus")
+                        .HasColumnType("int");
 
                     b.Property<string>("Description")
                         .HasColumnType("nvarchar(max)");
