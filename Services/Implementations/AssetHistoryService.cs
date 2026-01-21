@@ -29,16 +29,16 @@ namespace QuanLyTaiSanTest.Services.Implementations
                 CreatedByUserId = new UserDto
                 {
                     Id = h.CreatedByUserId,
-                    Username = h.CreatedByUser.UserName,
-                    Email = h.CreatedByUser.Email,
-                    PhoneNumber = h.CreatedByUser.PhoneNumber
+                    Username = h.CreatedByUser.UserName
+                    //Email = h.CreatedByUser.Email,
+                    //PhoneNumber = h.CreatedByUser.PhoneNumber
                 },
                 AssignedToUserId = h.AssignedToUserId == null ? null : new UserDto
                 { 
                     Id = h.AssignedToUserId,
-                    Username = h.AssignedToUser.UserName,
-                    Email = h.AssignedToUser.Email,
-                    PhoneNumber = h.AssignedToUser.PhoneNumber
+                    Username = h.AssignedToUser.UserName
+                    //Email = h.AssignedToUser.Email,
+                    //PhoneNumber = h.AssignedToUser.PhoneNumber
                 }
             }).ToList();
         }

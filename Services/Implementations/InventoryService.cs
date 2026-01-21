@@ -51,8 +51,9 @@ namespace QuanLyTaiSanTest.Services.Implementations
                 { 
                     Id = h.User.Id,
                     Username = h.User.UserName,
-                    Email = h.User.Email,
-                    PhoneNumber = h.User.PhoneNumber
+                    Fullname = h.User.FullName 
+                    //Email = h.User.Email,
+                    //PhoneNumber = h.User.PhoneNumber
                 }
 
             }).ToList();

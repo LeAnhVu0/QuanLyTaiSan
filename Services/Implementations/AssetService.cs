@@ -281,13 +281,54 @@ namespace QuanLyTaiSanTest.Services.Implementations
             {
                 TransferId = h.TransferId,
                 AssetId = h.AssetId,
+                Asset = new AssetNameDtp
+                { 
+                    AssetId = h.AssetId,
+                    AssetCode = h.Asset.AssetCode,
+                    AssetName = h.Asset.AssetName
+                },
                 TransferType = h.TransferType.ToDisplayName(),
                 Status = h.Status.ToDisplayName(),
+
                 DepartmentId=h.DepartmentId,
+                Department = h.Department == null ? null : new QuanLyTaiSan.Dtos.Department.DepartmentDto
+                { 
+                    Id = h.DepartmentId,
+                    DepartmentName = h.Department.DepartmentName,
+                    Description = h.Department.Description
+                },
+
                 FromUserId = h.FromUserId,
+                FromUser = h.FromUser == null ? null : new QuanLyTaiSan.Dtos.Auth.UserDto
+                {
+                    Id = h.FromUserId,
+                    Username = h.FromUser.UserName,
+                    Fullname = h.FromUser.FullName
+                },
+
                 ToUserId = h.ToUserId,
+                ToUser = h.ToUser == null ? null : new QuanLyTaiSan.Dtos.Auth.UserDto
+                {
+                    Id = h.ToUserId,
+                    Username = h.ToUser.UserName,
+                    Fullname = h.ToUser.FullName
+                },
+
                 CreatedByUserId = h.CreatedByUserId,
+                CreatedByUser = h.CreatedByUser == null ? null : new QuanLyTaiSan.Dtos.Auth.UserDto
+                {
+                    Id = h.CreatedByUserId,
+                    Username = h.CreatedByUser.UserName,
+                    Fullname = h.CreatedByUser.FullName
+                },
+
                 ApprovedByUserId = h.ApprovedByUserId,
+                ApprovedByUser = h.ApprovedByUser == null ? null : new QuanLyTaiSan.Dtos.Auth.UserDto
+                {
+                    Id = h.ApprovedByUserId,
+                    Username = h.ApprovedByUser.UserName,
+                    Fullname = h.ApprovedByUser.FullName
+                },
                 CreatedAt = h.CreatedAt,
                 ApprovedAt =h.ApprovedAt,
                 Purpose = h.Purpose,
@@ -538,8 +579,9 @@ namespace QuanLyTaiSanTest.Services.Implementations
                     {
                         Id = h.UserId,
                         Username = h.User.UserName,
-                        Email = h.User.Email,
-                        PhoneNumber = h.User.PhoneNumber
+                        Fullname = h.User.FullName
+                        //Email = h.User.Email,
+                        //PhoneNumber = h.User.PhoneNumber
                     }
                 };
             }

@@ -110,7 +110,14 @@ namespace QuanLyTaiSanTest.Repositories.Implementations
 
         public async Task<List<AssetTransfer>> GetAllTransfer(int pageIndex, int pageSize, int? status , int? type)
         {
-            var list = _context.AssetTransfer.AsQueryable();
+            var list = _context.AssetTransfer
+        .Include(t => t.Asset)
+        .Include(t => t.Department)      // Join bảng Phòng ban
+        .Include(t => t.FromUser)        // Join người gửi
+        .Include(t => t.ToUser)          // Join người nhận
+        .Include(t => t.CreatedByUser)   // Join người tạo
+        .Include(t => t.ApprovedByUser)  // Join người duyệt
+        .AsQueryable();
             if (status != null)
             {
                 list = list.Where(h => h.Status == (AssetTransferStatus)status);

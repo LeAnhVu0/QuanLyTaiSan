@@ -80,7 +80,7 @@ namespace QuanLyTaiSanTest.Repositories.Implementations
         {
             // Tài sản tăng: Dựa vào ngày mua nằm trong khoảng
             var newAssets = await _dbcontext.Assets
-                .Where(a => a.PurchaseDate >= fromDate && a.PurchaseDate <= toDate)
+                .Where(a => a.CreatedTime >= fromDate && a.CreatedTime <= toDate)
                 .ToListAsync();
 
             // Tài sản giảm: Dựa vào Trạng thái là "Thanh lý" hoặc "Hỏng" 

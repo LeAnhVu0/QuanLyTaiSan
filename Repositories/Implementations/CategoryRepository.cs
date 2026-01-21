@@ -1,5 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using QuanLyTaiSanTest.Data;
+using QuanLyTaiSanTest.Enum;
 using QuanLyTaiSanTest.Models;
 using QuanLyTaiSanTest.Repositories.Interfaces;
 using System.Globalization;
@@ -17,7 +18,7 @@ namespace QuanLyTaiSanTest.Repositories.Implementations
 
         public async Task<bool> CheckAssetInCategory(int categoryId)
         {
-           return await _context.Assets.AnyAsync(h => h.CategoryId == categoryId);
+           return await _context.Assets.AnyAsync(h => h.CategoryId == categoryId && !h.IsDelete);
         }
 
         public async Task Create(Category category)
@@ -32,12 +33,16 @@ namespace QuanLyTaiSanTest.Repositories.Implementations
             await _context.SaveChangesAsync();
         }
 
-        public async Task<List<Category>> GetAll(string? search, string sortBy, bool desc)
+        public async Task<(List<Category> Items, int TotalCount)> GetAll(int pageIndex, int pageSize, string? search, int? status, string sortBy, bool desc)
         {
             var list = _context.Category.Include(h => h.Assets).AsQueryable();
             if (!string.IsNullOrEmpty(search))
             {
                 list = list.Where(h => h.CategoryName.Contains(search));
+            }
+            if (status != null)
+            {
+                list = list.Where(h => h.Status == (CategoryStatus)status);
             }
             switch (sortBy.ToLower())
             {
@@ -51,7 +56,9 @@ namespace QuanLyTaiSanTest.Repositories.Implementations
                     list = list.OrderBy(h => h.CategoryName);
                     break;
             }
-            return await list.ToListAsync();
+            var totalCount = await list.CountAsync();
+            var listPage = await list.Skip((pageIndex - 1) * pageSize).Take(pageSize).ToListAsync();
+            return (listPage,totalCount);
         }
 
         public async Task<Category?> GetById(int id)

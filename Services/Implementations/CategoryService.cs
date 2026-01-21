@@ -1,22 +1,33 @@
-﻿using QuanLyTaiSanTest.Dtos.Category;
+﻿using Microsoft.EntityFrameworkCore;
+using QuanLyTaiSan.Dtos.Asset;
+using QuanLyTaiSan.Dtos.Category;
+using QuanLyTaiSanTest.Dtos.Asset;
+using QuanLyTaiSanTest.Dtos.Category;
 using QuanLyTaiSanTest.Enum;
 using QuanLyTaiSanTest.Models;
 using QuanLyTaiSanTest.Repositories.Interfaces;
 using QuanLyTaiSanTest.Services.Interfaces;
+using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace QuanLyTaiSanTest.Services.Implementations
 {
     public class CategoryService : ICategoryService
     {
         private readonly ICategoryRepository _repo;
+        private readonly IAssetRepository _assetRepo;
 
-        public CategoryService(ICategoryRepository repo)
+        public CategoryService(ICategoryRepository repo , IAssetRepository assetRepo)
         {
             _repo = repo;
+            _assetRepo = assetRepo;
         }
 
         public async Task Create(CreateCategoryDto createCategoryDto)
         {
+            if (createCategoryDto == null)
+            {
+                throw new BadHttpRequestException("Dữ liệu gửi lên bị null");
+            }
             var newCategory = new Category
             {
                 CategoryName = createCategoryDto.CategoryName,
@@ -39,16 +50,21 @@ namespace QuanLyTaiSanTest.Services.Implementations
                 bool hasAssets = await _repo.CheckAssetInCategory(id);
                 if (hasAssets)
                 {
-                    throw new InvalidOperationException("Không thể xóa: Loại tài sản này đang được sử dụng.");
+                    throw new InvalidOperationException("Không thể xóa vì loại tài sản này đang được sử dụng");
                 }
                 await _repo.Delete(category);
             }
         }
 
-        public async Task<List<CategoryResponseDto>> GetAll(string? search, string sortBy, bool desc)
+        public async Task<CategoryAllDtocs> GetAll(int pageIndex, int pageSize, string? search, int? status, string sortBy, bool desc)
         {
-            var category = await _repo.GetAll(search, sortBy, desc);
-            return category.Select(c => new CategoryResponseDto
+            var category = await _repo.GetAll(pageIndex,pageSize, search, status, sortBy, desc);
+            if (category.Items == null || category.Items.Count == 0)
+            {
+                throw new KeyNotFoundException("Không có dữ liệu");
+            }
+
+            var items =  category.Items.Select(c => new CategoryResponseDto
             {
                 CategoryId = c.CategoryId,
                 CategoryName = c.CategoryName,
@@ -58,6 +74,22 @@ namespace QuanLyTaiSanTest.Services.Implementations
                 UpdatedTime = c.UpdatedTime,
                 AssetIds = c.Assets.Select(a => a.AssetId).ToList()
             }).ToList();
+
+            var totalPage = (int)Math.Ceiling(category.TotalCount / (double)pageSize);
+
+            return new CategoryAllDtocs
+            {
+                ListAsset = items,
+                SearchName = search,
+                Status = status,
+                PageIndex = pageIndex,
+                PageSize = pageSize,
+                TotalCount = category.TotalCount,
+                TotalPage = totalPage,
+
+                HasPreviousPage = pageIndex > 1,
+                HasNextPage = pageIndex < totalPage
+            };
         }
 
         public async Task<CategoryResponseDto> GetById(int id)
@@ -90,14 +122,19 @@ namespace QuanLyTaiSanTest.Services.Implementations
             {
                 throw new KeyNotFoundException("Không tìm thấy loại tài sản có id = " + id);
             }
-            else
+            bool hasAssets = await _repo.CheckAssetInCategory(id);
+            
+            if (category.Status == CategoryStatus.DangSuDung && updateCategoryDto.Status != 1 && hasAssets)
             {
-                category.CategoryName = updateCategoryDto.CategoryName;
-                category.Description = updateCategoryDto.Description;
-                category.Status = (CategoryStatus)updateCategoryDto.Status;
-                category.UpdatedTime = DateTime.Now;
-                await _repo.Update();
+                throw new InvalidOperationException("Không thể ngừng sử dụng loại tài sản này vì vẫn còn tài sản bên trong");
             }
+            category.CategoryName = updateCategoryDto.CategoryName;
+            category.Description = updateCategoryDto.Description;
+            category.Status = (CategoryStatus)updateCategoryDto.Status;
+            category.UpdatedTime = DateTime.Now;
+            await _repo.Update();
+
+
         }
     }
 }

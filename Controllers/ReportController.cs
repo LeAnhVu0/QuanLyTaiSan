@@ -18,11 +18,11 @@ namespace QuanLyTaiSanTest.Controllers
         {
             _reportService = reportService;
         }
-        [HttpGet("Report-History")]
-        public async Task<IActionResult> GetAllReport()
-        {
-            return Ok(await _reportService.GetAllReport());
-        }
+        //[HttpGet("Report-History")]
+        //public async Task<IActionResult> GetAllReport()
+        //{
+        //    return Ok(await _reportService.GetAllReport());
+        //}
 
         [HttpGet("Category-Analytics")]
         public async Task<IActionResult> GetCategoryAnalytics()
@@ -46,10 +46,10 @@ namespace QuanLyTaiSanTest.Controllers
             return Ok(result);
         }
 
-        [HttpGet("Category-Deltails")]
-        public async Task<IActionResult> GetCategoryDeltails()
-        {
-            return Ok(await _reportService.GetCategoryDetails(null));
-        }
+        //[HttpGet("Category-Deltails")]
+        //public async Task<IActionResult> GetCategoryDeltails()
+        //{
+        //    return Ok(await _reportService.GetCategoryDetails(null));
+        //}
     }
 }
