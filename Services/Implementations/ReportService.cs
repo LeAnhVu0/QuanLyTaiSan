@@ -1,4 +1,5 @@
-﻿using QuanLyTaiSanTest.Dtos.Asset;
+﻿using QuanLyTaiSan.Dtos.Report;
+using QuanLyTaiSanTest.Dtos.Asset;
 using QuanLyTaiSanTest.Dtos.Report;
 using QuanLyTaiSanTest.Enum;
 using QuanLyTaiSanTest.Models;
@@ -28,8 +29,6 @@ namespace QuanLyTaiSanTest.Services.Implementations
                 UpdateTime = h.UpdateTime,
                 IsDeleted = h.IsDeleted,
                 UserId = h.UserId
-
-
             }).ToList();
         }
 
@@ -47,17 +46,6 @@ namespace QuanLyTaiSanTest.Services.Implementations
         public async Task<List<AssetRespondDto>> GetCategoryDetails(int? userId)
         {
             var data = await _repo.GetCategoryDetails();
-         // khi nào xuất pdf thì dùng
-            //var history = new Report
-            //{
-            //    Title = $"Báo cáo tài sản theo Loại - Xuất lúc {DateTime.Now:dd/MM/yyyy}",
-            //    Type = ReportType.AssetByCategory,
-            //    CreateTime = DateTime.Now,
-            //    UserId = userId,
-            //    IsDeleted = false,
-            //    FilterJson = null
-            //};
-            //await _repo.AddReport(history);
             return data.Select( h => new AssetRespondDto
             {
                 AssetCode = h.AssetCode,
@@ -77,6 +65,40 @@ namespace QuanLyTaiSanTest.Services.Implementations
                 UpdatedTime = h.UpdatedTime,
                 CategoryId = h.CategoryId
             }).ToList();
+        }
+
+        public async Task<List<ReportAnalyticsDto>> GetDepartmentAnalytics()
+        {
+            var list = await _repo.GetDepartmentAnalytics();
+            return list.Select(h => new ReportAnalyticsDto
+            {
+                GroupName = h.GroupName,
+                Quantity = h.Quantity,
+                TotalValue = h.TotalValue
+            }).ToList();
+        }
+
+        public async Task<List<ReportAnalyticsDto>> GetStatusAnalytics()
+        {
+            var list = await _repo.GetStatusAnalytics();
+            return list.Select(h => new ReportAnalyticsDto
+            {
+                GroupName = h.GroupName,
+                Quantity = h.Quantity,
+                TotalValue = h.TotalValue
+            }).ToList();
+        }
+
+        public async Task<ReportFluctuationDto> GetFluctuation(DateTime fromDate, DateTime toDate)
+        {
+            var result = await _repo.GetFluctuationReport(fromDate, toDate);
+            return new ReportFluctuationDto
+            {
+                NewAssetsCount = result.NewAssetsCount,
+                NewAssetsValue = result.NewAssetsValue,
+                LiquidatedAssetsCount = result.LiquidatedAssetsCount,
+                LiquidatedAssetsValue = result.LiquidatedAssetsValue
+            };
         }
 
     }

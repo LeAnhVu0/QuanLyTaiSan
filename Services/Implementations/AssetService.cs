@@ -87,9 +87,17 @@ namespace QuanLyTaiSanTest.Services.Implementations
 
 
             //check xem tài sản , nhân viên có cùng thuộc 1 phòng ban không
+            if (asset.DepartmentId != createFormTransferDto.DepartmentId)
+            {
+                throw new InvalidOperationException($"Tài sản ID = {asset.AssetId} không thuộc về phòng ban ID = {createFormTransferDto.DepartmentId}");
+            }
+            if (user.DepartmentId != createFormTransferDto.DepartmentId)
+            {
+                throw new InvalidOperationException($"Nhân viên không thuộc về phòng ban ID = {createFormTransferDto.DepartmentId}");
+            }
             if (asset.DepartmentId != user.DepartmentId)
             {
-                throw new InvalidOperationException("Tài sản không thuộc phòng ban của người nhận");
+                throw new InvalidOperationException("Tài sản và nhân viên không cùng thuộc 1 phòng ban");
             }
 
             var transfer = new AssetTransfer

@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace QuanLyTaiSan.Migrations
 {
     /// <inheritdoc />
-    public partial class UpdateDB : Migration
+    public partial class UpDatabase : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -375,6 +375,7 @@ namespace QuanLyTaiSan.Migrations
                         .Annotation("SqlServer:Identity", "1, 1"),
                     AssetId = table.Column<int>(type: "int", nullable: false),
                     TransferType = table.Column<int>(type: "int", nullable: false),
+                    DepartmentId = table.Column<int>(type: "int", nullable: true),
                     FromUserId = table.Column<string>(type: "nvarchar(450)", nullable: true),
                     ToUserId = table.Column<string>(type: "nvarchar(450)", nullable: true),
                     Status = table.Column<int>(type: "int", nullable: false),
@@ -383,7 +384,8 @@ namespace QuanLyTaiSan.Migrations
                     CreatedAt = table.Column<DateTime>(type: "datetime2", nullable: false),
                     ApprovedAt = table.Column<DateTime>(type: "datetime2", nullable: true),
                     RejectReason = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    Note = table.Column<string>(type: "nvarchar(max)", nullable: true)
+                    Note = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    Purpose = table.Column<string>(type: "nvarchar(max)", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -417,6 +419,12 @@ namespace QuanLyTaiSan.Migrations
                         column: x => x.AssetId,
                         principalTable: "Assets",
                         principalColumn: "AssetId",
+                        onDelete: ReferentialAction.Restrict);
+                    table.ForeignKey(
+                        name: "FK_AssetTransfer_Department_DepartmentId",
+                        column: x => x.DepartmentId,
+                        principalTable: "Department",
+                        principalColumn: "Id",
                         onDelete: ReferentialAction.Restrict);
                 });
 
@@ -508,6 +516,11 @@ namespace QuanLyTaiSan.Migrations
                 name: "IX_AssetTransfer_CreatedByUserId",
                 table: "AssetTransfer",
                 column: "CreatedByUserId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_AssetTransfer_DepartmentId",
+                table: "AssetTransfer",
+                column: "DepartmentId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_AssetTransfer_FromUserId",

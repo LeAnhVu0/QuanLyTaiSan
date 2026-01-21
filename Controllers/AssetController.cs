@@ -75,8 +75,8 @@ namespace QuanLyTaiSanTest.Controllers
                 return Ok(new ApiResponse<string>
                 {
                     Success = false,
-                    Message = ex.Message,
-                    Errors = new { AssetId = id }
+                    Message = "Lấy dữ liệu thất bại",
+                    Errors = new {Detail= ex.Message }
                 });
             }
             catch (Exception ex)
@@ -94,6 +94,10 @@ namespace QuanLyTaiSanTest.Controllers
         [HttpPost]
         public async Task<IActionResult> Create(CreateAssetDto createAssetDto)
         {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
             try
             {
                 var asset = await _assetService.Create(createAssetDto);
@@ -111,7 +115,8 @@ namespace QuanLyTaiSanTest.Controllers
                 return BadRequest(new ApiResponse<string>
                 {
                     Success = false,
-                    Message = ex.Message
+                    Message = "Thêm tài sản thất bại",
+                    Errors = new { Detail = ex.Message }
                 });
             }
             catch (KeyNotFoundException ex)
@@ -119,7 +124,8 @@ namespace QuanLyTaiSanTest.Controllers
                 return NotFound(new ApiResponse<string>
                 {
                     Success = false,
-                    Message = ex.Message,
+                    Message = "Thêm tài sản  thất bại",
+                    Errors = new { Detail = ex.Message }
                 });
             }
             catch(Exception ex)
@@ -155,7 +161,7 @@ namespace QuanLyTaiSanTest.Controllers
                 return NotFound(new ApiResponse<string>
                 {
                     Success = false,
-                    Message = "Xóa thất bại",
+                    Message = "Xóa tài sản thất bại",
                     Errors = new { Detail = ex.Message }
                 });
             }
@@ -187,7 +193,7 @@ namespace QuanLyTaiSanTest.Controllers
                 return Ok(new ApiResponse<AssetRespondDto>
                 {
                     Success=true,
-                    Message= "Sửa thành công",
+                    Message= "Sửa tài sản thành công",
                     Data = asset
                     
                 });
@@ -197,7 +203,7 @@ namespace QuanLyTaiSanTest.Controllers
                 return NotFound(new ApiResponse<string>
                 {
                     Success = false,
-                    Message = "Sửa thất bại",
+                    Message = "Sửa tài sản thất bại",
                     Errors = new { Detail = ex.Message }
                 });
             }
@@ -221,7 +227,12 @@ namespace QuanLyTaiSanTest.Controllers
             }
             catch (Exception ex)
             {
-                return BadRequest(ex.Message);
+                return Ok(new ApiResponse<string>
+                {
+                    Success = false,
+                    Message = "Lấy dữ liệu thất bại",
+                    Errors = new { Detail = ex.Message }
+                });
             }
         }
     }

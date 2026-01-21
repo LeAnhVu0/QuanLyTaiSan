@@ -1,13 +1,15 @@
 ﻿using QuanLyTaiSanTest.Enum;
+using System.ComponentModel.DataAnnotations;
 
 namespace QuanLyTaiSanTest.Dtos.Asset
 {
     public class CreateAssetDto
     {
 
-
+        [StringLength(50, MinimumLength = 3)]
         public required string AssetName { get; set; }
 
+        [Range(0, double.MaxValue, ErrorMessage = "Giá trị tài sản không được là số âm")]
         public decimal OriginalValue { get; set; }
 
         public DateTime? PurchaseDate { get; set; }
@@ -20,7 +22,7 @@ namespace QuanLyTaiSanTest.Dtos.Asset
         public string? Note { get; set; }
 
         public string? ImageAsset { get; set; }
-        public int CategoryId { get; set; }
-        public int DepartmentId { get; set; }
+        public required int CategoryId { get; set; }
+        public required int DepartmentId { get; set; }
     }
 }

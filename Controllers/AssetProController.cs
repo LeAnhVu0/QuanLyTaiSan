@@ -76,7 +76,7 @@ namespace QuanLyTaiSan.Controllers
                 return NotFound(new ApiResponse<string>
                 {
                     Success = false,
-                    Message = "Tạo phiếu thất bại",
+                    Message = "Tạo phiếu bàn giao thất bại",
                     Errors = new { Detail = ex.Message }
                 });
             }
@@ -86,7 +86,7 @@ namespace QuanLyTaiSan.Controllers
                 {
 
                     Success = false,
-                    Message = "Tạo phiếu thất bại",
+                    Message = "Tạo phiếu bàn giao thất bại",
                     Errors = new { Detail = ex.Message }
                 });
             }
@@ -121,7 +121,7 @@ namespace QuanLyTaiSan.Controllers
                 return NotFound(new ApiResponse<string>
                 {
                     Success = false,
-                    Message = "Tạo phiếu thất bại",
+                    Message = "Tạo phiếu thu hồi thất bại",
                     Errors = new { Detail = ex.Message }
                 });
             }
@@ -131,7 +131,7 @@ namespace QuanLyTaiSan.Controllers
                 {
 
                     Success = false,
-                    Message = "Tạo phiếu thất bại",
+                    Message = "Tạo phiếu thu hồi thất bại",
                     Errors = new { Detail = ex.Message }
                 });
             }

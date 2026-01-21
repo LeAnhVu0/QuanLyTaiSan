@@ -29,6 +29,23 @@ namespace QuanLyTaiSanTest.Controllers
         {
             return Ok(await _reportService.GetCategoryAnalytics());
         }
+        [HttpGet("Department-Analytics")]
+        public async Task<IActionResult> GetDepartmentAnalytics()
+        {
+            return Ok(await _reportService.GetDepartmentAnalytics());
+        }
+        [HttpGet("Status-Analytics")]
+        public async Task<IActionResult> GetStatusAnalytics()
+        {
+            return Ok(await _reportService.GetStatusAnalytics());
+        }
+        [HttpGet("Fluctuation")]
+        public async Task<IActionResult> GetFluctuation([FromQuery] DateTime from, [FromQuery] DateTime to)
+        {
+            var result = await _reportService.GetFluctuation(from, to);
+            return Ok(result);
+        }
+
         [HttpGet("Category-Deltails")]
         public async Task<IActionResult> GetCategoryDeltails()
         {
