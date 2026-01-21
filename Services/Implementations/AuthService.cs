@@ -32,7 +32,8 @@ namespace QuanLyTaiSan.Services.Implementations
                 UserName = dto.Username,
                 Email = dto.Email,
                 PhoneNumber = dto.PhoneNumber,
-                Status=dto.Status,
+                FullName = dto.Fullname,
+                Status =dto.Status,
                 Address = dto.Address,
                 DateOfBirth = dto.DateofBirth,
                 DepartmentId = dto.DepartmentId == 0 ? null : dto.DepartmentId
@@ -52,6 +53,7 @@ namespace QuanLyTaiSan.Services.Implementations
 
                 Username = user.UserName,
                 Email = user.Email,
+                Fullname = user.FullName,
                 PhoneNumber = user.PhoneNumber,
                 Status = user.Status,
                 Address = user.Address,
@@ -74,6 +76,7 @@ namespace QuanLyTaiSan.Services.Implementations
                 {
                     Id = user.Id,
                     Username = user.UserName,
+                    Fullname = user.FullName,
                     Email = user.Email,
                     PhoneNumber = user.PhoneNumber,
                     Status = user.Status,
@@ -126,5 +129,27 @@ namespace QuanLyTaiSan.Services.Implementations
             }
             return "Mật khẩu đã được đặt lại thành công.";
         }
+        public async Task<UserUpdateDto> UpdateUser(string id, UserUpdateDto dto)
+        {
+            var user = await _userManager.FindByIdAsync(id);
+            if (user == null)
+                throw new KeyNotFoundException("Không tìm thấy người dùng");
+
+            user.UserName = dto.Username;
+            user.Email = dto.Email;
+            user.FullName = dto.FullName;
+            user.PhoneNumber = dto.PhoneNumber;
+            user.Address = dto.Address;
+            user.Status = dto.Status;
+
+            var result = await _userManager.UpdateAsync(user);
+            if (!result.Succeeded)
+            {
+                var errors = string.Join(", ", result.Errors.Select(e => e.Description));
+                throw new Exception($"Cập nhật thất bại: {errors}");
+            }
+            return dto;
+        }
+
     }
 }

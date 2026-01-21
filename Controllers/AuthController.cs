@@ -73,6 +73,14 @@ namespace QuanLyTaiSan.Controllers
             await _authService.ResetPasswordAsync(dto);
             return Ok("Mật khẩu đã được cập nhật thành công.");
         }
-
+        [Authorize(Policy =Permissions.UserDelete)]
+        [HttpPatch("update-user")] 
+        public async Task<ActionResult<UserUpdateDto>> UpdateUser(string id,UserUpdateDto dto)
+        {
+            var result= await _authService.UpdateUser(id, dto);
+            if (result == null) return NotFound();
+            
+            return Ok(result);
+        }
     }
 }

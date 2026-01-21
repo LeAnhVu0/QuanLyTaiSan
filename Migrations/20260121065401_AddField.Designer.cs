@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using QuanLyTaiSanTest.Data;
 
@@ -11,9 +12,11 @@ using QuanLyTaiSanTest.Data;
 namespace QuanLyTaiSan.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260121065401_AddField")]
+    partial class AddField
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -267,16 +270,10 @@ namespace QuanLyTaiSan.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(450)");
 
-                    b.Property<int?>("DepartmentId")
-                        .HasColumnType("int");
-
                     b.Property<string>("FromUserId")
                         .HasColumnType("nvarchar(450)");
 
                     b.Property<string>("Note")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("Purpose")
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("RejectReason")
@@ -298,8 +295,6 @@ namespace QuanLyTaiSan.Migrations
                     b.HasIndex("AssetId");
 
                     b.HasIndex("CreatedByUserId");
-
-                    b.HasIndex("DepartmentId");
 
                     b.HasIndex("FromUserId");
 
@@ -696,11 +691,6 @@ namespace QuanLyTaiSan.Migrations
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
-                    b.HasOne("QuanLyTaiSan.Models.Department", "Department")
-                        .WithMany()
-                        .HasForeignKey("DepartmentId")
-                        .OnDelete(DeleteBehavior.Restrict);
-
                     b.HasOne("QuanLyTaiSan.Models.ApplicationUser", "FromUser")
                         .WithMany()
                         .HasForeignKey("FromUserId")
@@ -716,8 +706,6 @@ namespace QuanLyTaiSan.Migrations
                     b.Navigation("Asset");
 
                     b.Navigation("CreatedByUser");
-
-                    b.Navigation("Department");
 
                     b.Navigation("FromUser");
 
