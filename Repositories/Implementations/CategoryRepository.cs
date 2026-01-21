@@ -2,6 +2,7 @@
 using QuanLyTaiSanTest.Data;
 using QuanLyTaiSanTest.Models;
 using QuanLyTaiSanTest.Repositories.Interfaces;
+using System.Globalization;
 
 namespace QuanLyTaiSanTest.Repositories.Implementations
 {
@@ -31,10 +32,26 @@ namespace QuanLyTaiSanTest.Repositories.Implementations
             await _context.SaveChangesAsync();
         }
 
-        public async Task<List<Category>> GetAll()
+        public async Task<List<Category>> GetAll(string? search, string sortBy, bool desc)
         {
-            return await _context.Category.Include(C => C.Assets).ToListAsync();
-
+            var list = _context.Category.Include(h => h.Assets).AsQueryable();
+            if (!string.IsNullOrEmpty(search))
+            {
+                list = list.Where(h => h.CategoryName.Contains(search));
+            }
+            switch (sortBy.ToLower())
+            {
+                case "name":
+                    list = desc ? list.OrderByDescending(h => h.CategoryName) : list.OrderBy(h => h.CategoryName);
+                    break;
+                case "date":
+                    list = desc ? list.OrderByDescending(h => h.CreatedTime) : list.OrderBy(h => h.CreatedTime);
+                    break;
+                default:
+                    list = list.OrderBy(h => h.CategoryName);
+                    break;
+            }
+            return await list.ToListAsync();
         }
 
         public async Task<Category?> GetById(int id)

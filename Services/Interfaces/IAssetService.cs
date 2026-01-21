@@ -1,4 +1,5 @@
 ﻿using QuanLyTaiSan.Dtos.Asset;
+using QuanLyTaiSan.Dtos.AssetTransfer;
 using QuanLyTaiSanTest.Dtos;
 using QuanLyTaiSanTest.Dtos.Asset;
 using QuanLyTaiSanTest.Models;
@@ -6,17 +7,15 @@ namespace QuanLyTaiSanTest.Services.Interfaces
 {
     public interface IAssetService
     {
-        //public Task Handover(int assetId, int userId);
-        //public Task RecallAsset(int assetId);
+        public  Task<AssetFormHandoverDto> CreateFormHandover(CreateFormTransferDto createFormTransferDto);
 
-        public Task<AssetHandoverDto> AssetHandover(int assetId, string userId);
-        public  Task AssetRecall(int assetId);
-
-        public Task<AssetAllDto> GetAll(int pageIndex, int pageSize, string? search, int? categoryId, int? status);
-        public Task<List<AssetRespondDto>> SortAssets(string sortBy, bool desc);
+        public  Task<AssetFormHandoverDto> CreateFormRecall(CreateFormTransferDto createFormTransferDto);
+        public  Task<ProcessTransferResultDto> ProcessApproval(int transferID,ProcessTransferDto processTransferDto);
+        public  Task<List<AssetTransferResponseDto>> GetAllTransfer(int pageIndex, int pageSize, int? status, int? type);
+        public Task<AssetAllDto> GetAll(int pageIndex, int pageSize, string? search, int? categoryId, int? status, string sortBy, bool desc);
         public Task<AssetDto> GetById(int id);
         public Task<AssetRespondDto> Create(CreateAssetDto createAssetDto);
-        public Task Update(UpdateAssetDto updateAssetDto, int id);
+        public Task<AssetRespondDto> Update(UpdateAssetDto updateAssetDto, int id);
         public Task Delete(int id);
     }
 }

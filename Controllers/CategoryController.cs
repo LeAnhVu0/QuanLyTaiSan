@@ -17,11 +17,11 @@ namespace QuanLyTaiSanTest.Controllers
             _categoryService = categoryServicecs;
         }
         [HttpGet]
-        public async Task<IActionResult> GetAll()
+        public async Task<IActionResult> GetAll(string? search, string sortBy = "name", bool desc = true)
         {
             try
             {
-                return Ok(await _categoryService.GetAll());
+                return Ok(await _categoryService.GetAll(search, sortBy, desc));
             }
             catch (Exception ex)
             {

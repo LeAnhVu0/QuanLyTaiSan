@@ -1,9 +1,12 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using QuanLyTaiSan.Enum;
+using QuanLyTaiSan.Models;
 using QuanLyTaiSanTest.Data;
 using QuanLyTaiSanTest.Dtos.Asset;
 using QuanLyTaiSanTest.Enum;
 using QuanLyTaiSanTest.Models;
 using QuanLyTaiSanTest.Repositories.Interfaces;
+using System.Linq.Expressions;
 using static Microsoft.EntityFrameworkCore.DbLoggerCategory;
 
 namespace QuanLyTaiSanTest.Repositories.Implementations
@@ -32,8 +35,11 @@ namespace QuanLyTaiSanTest.Repositories.Implementations
             _context.Assets.Remove(asset);
            await _context.SaveChangesAsync();
         }
-
-        public async Task<(List<Asset> Items, int TotalCount)> GetAll(int pageIndex, int pageSize, string? search, int? categoryId, int? status)
+        public async Task<bool> AnyAsync(Expression<Func<AssetTransfer, bool>> predicate)
+        {
+            return await _context.AssetTransfer.AnyAsync(predicate);
+        }
+        public async Task<(List<Asset> Items, int TotalCount)> GetAll(int pageIndex, int pageSize, string? search, int? categoryId, int? status, string sortBy, bool desc)
         {
             var listAsset =  _context.Assets.Where(h => h.IsDelete == false).Include(h => h.Category).AsQueryable();
             if(!string.IsNullOrEmpty(search))
@@ -47,6 +53,27 @@ namespace QuanLyTaiSanTest.Repositories.Implementations
             if (status!= null)
             {
                 listAsset = listAsset.Where(h => h.Status == (AssetStatus)status);
+            }
+
+            if (string.IsNullOrWhiteSpace(sortBy))
+                sortBy = "name";
+            switch (sortBy.ToLower())
+            {
+                case "name":
+                    listAsset = desc ? listAsset.OrderByDescending(h => h.AssetName) : listAsset.OrderBy(h => h.AssetName);
+                    break;
+
+                case "date":
+                    listAsset = desc ? listAsset.OrderByDescending(h => h.CreatedTime) : listAsset.OrderBy(h => h.CreatedTime);
+                    break;
+
+                case "price":
+                    listAsset = desc ? listAsset.OrderByDescending(h => h.OriginalValue) : listAsset.OrderBy(h => h.OriginalValue);
+                    break;
+
+                default:
+                    listAsset = listAsset.OrderBy(a => a.AssetName);
+                    break;
             }
             var totalCount = await listAsset.CountAsync();
 
@@ -70,31 +97,30 @@ namespace QuanLyTaiSanTest.Repositories.Implementations
                                         .FirstOrDefaultAsync();
         }
 
-        public async Task<List<Asset>> SortAssets(string sortBy, bool desc)
+        public async Task AddTransfer(AssetTransfer assetTransfer)
         {
-            var listAsset = _context.Assets.Where(h => h.IsDelete == false).Include(h => h.Category).AsQueryable();
-            if (string.IsNullOrWhiteSpace(sortBy))
-                sortBy = "name";
-            switch (sortBy.ToLower())
+           _context.AssetTransfer.Add(assetTransfer);
+            await _context.SaveChangesAsync();
+        }
+
+        public async Task<AssetTransfer?> GetTransferById(int transferId)
+        {
+            return await _context.AssetTransfer.Include(h => h.Asset).FirstOrDefaultAsync(h => h.TransferId == transferId);
+        }
+
+        public async Task<List<AssetTransfer>> GetAllTransfer(int pageIndex, int pageSize, int? status , int? type)
+        {
+            var list = _context.AssetTransfer.AsQueryable();
+            if (status != null)
             {
-                case "name":
-                    listAsset = desc ? listAsset.OrderByDescending(h => h.AssetName) : listAsset.OrderBy(h => h.AssetName);
-                    break;
-
-                case "date":
-                    listAsset = desc ? listAsset.OrderByDescending(h => h.CreatedTime) : listAsset.OrderBy(h => h.CreatedTime);
-                    break;
-
-                case "price":
-                    listAsset = desc ? listAsset.OrderByDescending(h => h.OriginalValue) : listAsset.OrderBy(h => h.OriginalValue);
-                    break;
-
-                default:
-                    listAsset = listAsset.OrderBy(a => a.AssetName);
-                    break;
+                list = list.Where(h => h.Status == (AssetTransferStatus)status);
             }
-
-            return await listAsset.ToListAsync();
+            if (status != null)
+            {
+                list = list.Where(h => h.TransferType == (AssetTransferType)type);
+            }
+            var listResult = await list.Skip((pageIndex - 1) * pageSize).Take(pageSize).ToListAsync();
+            return listResult;
         }
     }
 }

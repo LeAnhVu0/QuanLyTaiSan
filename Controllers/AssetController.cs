@@ -23,7 +23,7 @@ namespace QuanLyTaiSanTest.Controllers
             _assetHistoryService = assetHistoryService;
         }
         [HttpGet]
-        public async Task<IActionResult> GetAll(int pageIndex = 1, int pageSize = 5, string? searchName = null, int? status = null, int? categoryId = null)
+        public async Task<IActionResult> GetAll(int pageIndex = 1, int pageSize = 5, string? searchName = null, int? status = null, int? categoryId = null, string sortBy = "date", bool desc = true)
         {
            
             try
@@ -36,20 +36,7 @@ namespace QuanLyTaiSanTest.Controllers
                 {
                     pageSize = 3;
                 }
-                return Ok(await _assetService.GetAll(pageIndex, pageSize,searchName, categoryId,status));
-            }
-            catch (Exception ex)
-            {
-                return BadRequest(ex.Message);
-            }
-        }
-        [HttpGet("sort")]
-        public async Task<IActionResult> Sort(string sortBy = "name" , bool desc = true)
-        {
-
-            try
-            {
-                return Ok(await _assetService.SortAssets(sortBy,desc));
+                return Ok(await _assetService.GetAll(pageIndex, pageSize, searchName, categoryId, status, sortBy, desc));
             }
             catch (Exception ex)
             {
@@ -182,11 +169,13 @@ namespace QuanLyTaiSanTest.Controllers
             }
             try
             {
-                await _assetService.Update(updateAssetDto,id);
-                return Ok(new ApiResponse<string>
+                var asset = await _assetService.Update(updateAssetDto,id);
+                return Ok(new ApiResponse<AssetRespondDto>
                 {
-                    Success=false,
-                    Message= "Sửa thành công"
+                    Success=true,
+                    Message= "Sửa thành công",
+                    Data = asset
+                    
                 });
             }
             catch (KeyNotFoundException ex)

@@ -45,9 +45,9 @@ namespace QuanLyTaiSanTest.Services.Implementations
             }
         }
 
-        public async Task<List<CategoryResponseDto>> GetAll()
+        public async Task<List<CategoryResponseDto>> GetAll(string? search, string sortBy, bool desc)
         {
-            var category = await _repo.GetAll();
+            var category = await _repo.GetAll(search, sortBy, desc);
             return category.Select(c => new CategoryResponseDto
             {
                 CategoryId = c.CategoryId,

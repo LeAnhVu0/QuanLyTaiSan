@@ -21,6 +21,7 @@ namespace QuanLyTaiSanTest.Data
         public DbSet<RefreshToken> RefreshTokens { get; set; }
         public DbSet<Department> Department { get; set; }
         public DbSet<Inventory> Inventory { get; set; }
+        public DbSet<AssetTransfer> AssetTransfer { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -50,6 +51,7 @@ namespace QuanLyTaiSanTest.Data
                 .HasForeignKey(a => a.DepartmentId)
                 .OnDelete(DeleteBehavior.Restrict);
             });
+
 
             modelBuilder.Entity<Inventory>(e =>
             {
@@ -113,6 +115,41 @@ namespace QuanLyTaiSanTest.Data
                     .WithMany(d => d.User)
                     .HasForeignKey(u => u.DepartmentId)
                     .OnDelete(DeleteBehavior.SetNull);
+            });
+            modelBuilder.Entity<AssetTransfer>(entity =>
+            {
+                entity.HasKey(x => x.TransferId);
+
+                entity.HasOne(x => x.Asset)
+                      .WithMany()
+                      .HasForeignKey(x => x.AssetId)
+                      .OnDelete(DeleteBehavior.Restrict);
+
+                entity.HasOne(x => x.FromUser)
+                      .WithMany()
+                      .HasForeignKey(x => x.FromUserId)
+                      .OnDelete(DeleteBehavior.Restrict);
+
+                entity.HasOne(x => x.ToUser)
+                      .WithMany()
+                      .HasForeignKey(x => x.ToUserId)
+                      .OnDelete(DeleteBehavior.Restrict);
+
+                entity.HasOne(x => x.CreatedByUser)
+                      .WithMany()
+                      .HasForeignKey(x => x.CreatedByUserId)
+                      .OnDelete(DeleteBehavior.Restrict);
+
+                entity.HasOne(x => x.ApprovedByUser)
+                      .WithMany()
+                      .HasForeignKey(x => x.ApprovedByUserId)
+                      .OnDelete(DeleteBehavior.Restrict);
+
+                entity.Property(x => x.TransferType)
+                      .HasConversion<int>();
+
+                entity.Property(x => x.Status)
+                      .HasConversion<int>();
             });
         }
     }
