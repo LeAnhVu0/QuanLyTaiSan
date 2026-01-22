@@ -33,6 +33,7 @@ namespace QuanLyTaiSanTest.Dtos.Asset
         public int CategoryId {  get; set; }
         public int DepartmentId { get; set; }
         public string? UserId { get; set; }
+        public UserDto User { get; set; }
 
     }
 }

@@ -23,5 +23,10 @@ namespace QuanLyTaiSanTest.Repositories.Implementations
         {
             return await _context.AssetHistory.Include(h=>h.CreatedByUser).Include(h=>h.AssignedToUser).ToListAsync();
         }
+        public async Task<List<AssetHistory>> GetById(int assetId)
+        {
+            return await _context.AssetHistory.Include(h => h.CreatedByUser).Include(h => h.AssignedToUser)
+                .Where(h => h.Asset.AssetId == assetId).ToListAsync();
+        }
     }
 }

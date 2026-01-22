@@ -1,5 +1,6 @@
 ﻿using QuanLyTaiSan.Dtos.Auth;
 using QuanLyTaiSanTest.Dtos.AssetHistory;
+using QuanLyTaiSanTest.Models;
 using QuanLyTaiSanTest.Repositories.Interfaces;
 using QuanLyTaiSanTest.Services.Interfaces;
 
@@ -42,5 +43,41 @@ namespace QuanLyTaiSanTest.Services.Implementations
                 }
             }).ToList();
         }
+        public async Task<List<AssetHistoryDto>> GetById(int assetId)
+        {
+            var list = await _repo.GetById(assetId);
+            if(list == null)
+            {
+                throw new KeyNotFoundException("Không tồn tại tài sản");
+            }    
+            else
+            {
+                return list.Select(h => new AssetHistoryDto
+                {
+                    HistoryID = h.HistoryID,
+                    ActionType = h.ActionType,
+                    ActionDate = h.ActionDate,
+                    Descriptions = h.Descriptions,
+                    AssetId = h.AssetId,
+                    AssetName = h.AssetName,
+                    Status = h.Status,
+                    CreatedByUserId = new UserDto
+                    {
+                        Id = h.CreatedByUserId,
+                        Username = h.CreatedByUser.UserName
+                        //Email = h.CreatedByUser.Email,
+                        //PhoneNumber = h.CreatedByUser.PhoneNumber
+                    },
+                    AssignedToUserId = h.AssignedToUserId == null ? null : new UserDto
+                    {
+                        Id = h.AssignedToUserId,
+                        Username = h.AssignedToUser.UserName
+                        //Email = h.AssignedToUser.Email,
+                        //PhoneNumber = h.AssignedToUser.PhoneNumber
+                    }
+                }).ToList();
+            }    
+        }
+
     }
 }

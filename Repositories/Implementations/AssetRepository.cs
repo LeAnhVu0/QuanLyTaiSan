@@ -41,7 +41,7 @@ namespace QuanLyTaiSanTest.Repositories.Implementations
         }
         public async Task<(List<Asset> Items, int TotalCount)> GetPageList(int pageIndex, int pageSize, string? search, int? categoryId, int? status, string sortBy, bool desc)
         {
-            var listAsset =  _context.Assets.Where(h => h.IsDelete == false).Include(h => h.Category).AsQueryable();
+            var listAsset =  _context.Assets.Where(h => h.IsDelete == false).Include(h => h.User).Include(h => h.Category).AsQueryable();
             if(!string.IsNullOrEmpty(search))
             {
                 listAsset = listAsset.Where(h=>h.AssetName.Contains(search));
@@ -83,7 +83,7 @@ namespace QuanLyTaiSanTest.Repositories.Implementations
         }
         public async Task<List<Asset>> GetAll()
         {
-            return await _context.Assets.Where(h => h.IsDelete == false).Include(h => h.Category).ToListAsync();
+            return await _context.Assets.Where(h => h.IsDelete == false).Include(h => h.Category).Include(h => h.User).ToListAsync();
         }
         public async Task<Asset?> GetById(int id)
         {
@@ -121,14 +121,14 @@ namespace QuanLyTaiSanTest.Repositories.Implementations
 
         public async Task<(List<AssetTransfer> Items, int TotalCount)> GetAllTransfer(int pageIndex, int pageSize, int? status , int? type)
         {
-            var list = _context.AssetTransfer
-        .Include(t => t.Asset)
-        .Include(t => t.Department)      // Join bảng Phòng ban
-        .Include(t => t.FromUser)        // Join người gửi
-        .Include(t => t.ToUser)          // Join người nhận
-        .Include(t => t.CreatedByUser)   // Join người tạo
-        .Include(t => t.ApprovedByUser)  // Join người duyệt
-        .AsQueryable();
+             var list = _context.AssetTransfer
+                                .Include(t => t.Asset)
+                                .Include(t => t.Department)      // Join bảng Phòng ban
+                                .Include(t => t.FromUser)        // Join người gửi
+                                .Include(t => t.ToUser)          // Join người nhận
+                                .Include(t => t.CreatedByUser)   // Join người tạo
+                                .Include(t => t.ApprovedByUser)  // Join người duyệt
+                                .AsQueryable();
 
             if (status != null)
             {

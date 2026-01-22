@@ -542,7 +542,13 @@ namespace QuanLyTaiSanTest.Services.Implementations
                     UpdatedTime = h.UpdatedTime,
                     CategoryId = h.CategoryId,
                     DepartmentId = h.DepartmentId,
-                    UserId = h.UserId
+                    UserId = h.UserId,
+                    User = h.User == null ? null : new QuanLyTaiSan.Dtos.Auth.UserDto
+                    {
+                        Id = h.UserId,
+                        Username = h.User.UserName,
+                        Fullname = h.User.FullName
+                    }
                 }).ToList();
             }
         }
@@ -574,7 +580,13 @@ namespace QuanLyTaiSanTest.Services.Implementations
                 UpdatedTime = h.UpdatedTime,
                 CategoryId = h.CategoryId,
                 DepartmentId = h.DepartmentId,
-                UserId = h.UserId
+                UserId = h.UserId,
+                User = h.User == null ? null : new QuanLyTaiSan.Dtos.Auth.UserDto
+                {
+                    Id = h.UserId,
+                    Username = h.User.UserName,
+                    Fullname = h.User.FullName
+                }
             }).ToList();
 
             var totalPage = (int)Math.Ceiling(data.TotalCount / (double)pageSize);

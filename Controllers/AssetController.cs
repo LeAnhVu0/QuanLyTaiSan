@@ -5,6 +5,7 @@ using QuanLyTaiSan.Dtos.Asset;
 using QuanLyTaiSan.Dtos.Common;
 using QuanLyTaiSan.Models;
 using QuanLyTaiSanTest.Dtos.Asset;
+using QuanLyTaiSanTest.Dtos.AssetHistory;
 using QuanLyTaiSanTest.Services.Interfaces;
 using System.Threading.Tasks;
 
@@ -292,6 +293,31 @@ namespace QuanLyTaiSanTest.Controllers
             try
             {
                 return Ok( await _assetHistoryService.GetAll());
+            }
+            catch (Exception ex)
+            {
+                return Ok(new ApiResponse<string>
+                {
+                    Success = false,
+                    Message = "Lấy dữ liệu thất bại",
+                    Errors = new { Detail = ex.Message }
+                });
+            }
+        }
+
+        [HttpGet("History/{assetId}")]
+        public async Task<IActionResult> GetHistoryById(int assetId)
+        {
+            try
+            {
+                var asset = await _assetHistoryService.GetById(assetId);
+                return Ok(new ApiResponse<List<AssetHistoryDto>>
+                {
+                    Success = true,
+                    Message = "Lấy lịch sử tài sản thành công",
+                    Data = asset
+
+                });
             }
             catch (Exception ex)
             {
