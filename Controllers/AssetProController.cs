@@ -28,7 +28,7 @@ namespace QuanLyTaiSan.Controllers
             {
                 var list = await _assetService.GetAllTransfer(pageIndex,pageSize,status,type);
 
-                return Ok(new ApiResponse<List<AssetTransferResponseDto>>
+                return Ok(new ApiResponse<AssetTransferAllDto>
                 {
                     Success = true,
                     Message = "Lấy danh sách thành công",

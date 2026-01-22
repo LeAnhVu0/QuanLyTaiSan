@@ -39,7 +39,7 @@ namespace QuanLyTaiSanTest.Repositories.Implementations
         {
             return await _context.AssetTransfer.AnyAsync(predicate);
         }
-        public async Task<(List<Asset> Items, int TotalCount)> GetAll(int pageIndex, int pageSize, string? search, int? categoryId, int? status, string sortBy, bool desc)
+        public async Task<(List<Asset> Items, int TotalCount)> GetPageList(int pageIndex, int pageSize, string? search, int? categoryId, int? status, string sortBy, bool desc)
         {
             var listAsset =  _context.Assets.Where(h => h.IsDelete == false).Include(h => h.Category).AsQueryable();
             if(!string.IsNullOrEmpty(search))
@@ -81,7 +81,10 @@ namespace QuanLyTaiSanTest.Repositories.Implementations
             var list = await listAsset.Skip((pageIndex-1)*pageSize).Take(pageSize).ToListAsync();
             return (list, totalCount);
         }
-
+        public async Task<List<Asset>> GetAll()
+        {
+            return await _context.Assets.Where(h => h.IsDelete == false).Include(h => h.Category).ToListAsync();
+        }
         public async Task<Asset?> GetById(int id)
         {
             return await _context.Assets.Where(h => h.IsDelete == false)
@@ -108,7 +111,7 @@ namespace QuanLyTaiSanTest.Repositories.Implementations
             return await _context.AssetTransfer.Include(h => h.Asset).FirstOrDefaultAsync(h => h.TransferId == transferId);
         }
 
-        public async Task<List<AssetTransfer>> GetAllTransfer(int pageIndex, int pageSize, int? status , int? type)
+        public async Task<(List<AssetTransfer> Items, int TotalCount)> GetAllTransfer(int pageIndex, int pageSize, int? status , int? type)
         {
             var list = _context.AssetTransfer
         .Include(t => t.Asset)
@@ -118,6 +121,7 @@ namespace QuanLyTaiSanTest.Repositories.Implementations
         .Include(t => t.CreatedByUser)   // Join người tạo
         .Include(t => t.ApprovedByUser)  // Join người duyệt
         .AsQueryable();
+
             if (status != null)
             {
                 list = list.Where(h => h.Status == (AssetTransferStatus)status);
@@ -126,8 +130,10 @@ namespace QuanLyTaiSanTest.Repositories.Implementations
             {
                 list = list.Where(h => h.TransferType == (AssetTransferType)type);
             }
+
+            var totalCount = await list.CountAsync();
             var listResult = await list.Skip((pageIndex - 1) * pageSize).Take(pageSize).ToListAsync();
-            return listResult;
+            return (listResult,totalCount);
         }
     }
 }

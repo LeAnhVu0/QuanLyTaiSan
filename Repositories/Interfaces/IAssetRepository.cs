@@ -8,7 +8,8 @@ namespace QuanLyTaiSanTest.Repositories.Interfaces
 {
     public interface IAssetRepository
     {
-        public Task<(List<Asset> Items, int TotalCount)> GetAll(int pageIndex, int pageSize, string? search, int? categoryId, int? status, string sortBy, bool desc);
+        public Task<List<Asset>> GetAll();
+        public Task<(List<Asset> Items, int TotalCount)> GetPageList(int pageIndex, int pageSize, string? search, int? categoryId, int? status, string sortBy, bool desc);
         public Task<Asset?> GetById(int id);
         public Task<Asset> Create(Asset asset);
         public Task Update();
@@ -17,7 +18,7 @@ namespace QuanLyTaiSanTest.Repositories.Interfaces
         public Task<Asset?> GetLatesAssetByCategory(int categoryId);
         public Task AddTransfer(AssetTransfer assetTransfer);
         public Task<AssetTransfer?> GetTransferById(int transferId);
-        public Task<List<AssetTransfer>> GetAllTransfer(int pageIndex, int pageSize, int? status, int? type);
+        public Task<(List<AssetTransfer> Items , int TotalCount)> GetAllTransfer(int pageIndex, int pageSize, int? status, int? type);
 
     }
 }

@@ -20,12 +20,45 @@ namespace QuanLyTaiSanTest.Controllers
         {
             _categoryService = categoryServicecs;
         }
-        [HttpGet]
-        public async Task<IActionResult> GetAll(int pageIndex = 1, int pageSize=5, string? search=null, int? status = null, string sortBy = "name", bool desc = true)
+        [HttpGet("GetPageList")]
+        public async Task<IActionResult> GetPageList(int pageIndex = 1, int pageSize=5, string? search=null, int? status = null, string sortBy = "name", bool desc = true)
         {
             try
             {
-                return Ok(await _categoryService.GetAll(pageIndex, pageSize, search, status, sortBy, desc));
+                return Ok(await _categoryService.GetPageList(pageIndex, pageSize, search, status, sortBy, desc));
+            }
+            catch (KeyNotFoundException ex)
+            {
+                return Ok(new ApiResponse<string>
+                {
+                    Success = false,
+                    Message = "Lấy dữ liệu thất bại",
+                    Errors = new { Detail = ex.Message }
+                });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new ApiResponse<string>
+                {
+                    Success = false,
+                    Message = "Lỗi hệ thống",
+                    Errors = new { Detail = ex.Message }
+                });
+            }
+        }
+        [HttpGet("GetAllCategory")]
+        public async Task<IActionResult> GetAll()
+        {
+
+            try
+            {
+                var listCategory = await _categoryService.GetAll();
+                return Ok(new ApiResponse<List<CategoryResponseDto>>
+                {
+                    Success = true,
+                    Message = "Lấy danh sách thành công",
+                    Data = listCategory
+                });
             }
             catch (KeyNotFoundException ex)
             {

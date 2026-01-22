@@ -12,8 +12,10 @@ using QuanLyTaiSanTest.Models;
 using QuanLyTaiSanTest.Repositories.Interfaces;
 using QuanLyTaiSanTest.Services.Interfaces;
 using System.IdentityModel.Tokens.Jwt;
+using System.Linq;
 using System.Runtime.InteropServices;
 using System.Security.Claims;
+using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace QuanLyTaiSanTest.Services.Implementations
 {
@@ -270,14 +272,14 @@ namespace QuanLyTaiSanTest.Services.Implementations
             };
         }
 
-        public async Task<List<AssetTransferResponseDto>> GetAllTransfer(int pageIndex, int pageSize, int? status, int? type)
+        public async Task<AssetTransferAllDto> GetAllTransfer(int pageIndex, int pageSize, int? status, int? type)
         {
             var list = await _repo.GetAllTransfer(pageIndex, pageSize, status, type);
-            if (list == null)
+            if (list.Items == null || list.TotalCount == 0)
             {
                 throw new KeyNotFoundException("Không có dữ liệu");
             }
-            return list.Select(h => new AssetTransferResponseDto
+            var items = list.Items.Select(h => new AssetTransferResponseDto
             {
                 TransferId = h.TransferId,
                 AssetId = h.AssetId,
@@ -335,6 +337,21 @@ namespace QuanLyTaiSanTest.Services.Implementations
                 Note = h.Note,
                 RejectReason = h.RejectReason
             }).ToList();
+            var totalPage = (int)Math.Ceiling(list.TotalCount / (double)pageSize);
+
+            return new AssetTransferAllDto
+            {
+                ListAsset = items,
+                Type = type,
+                Status = status,
+                PageIndex = pageIndex,
+                PageSize = pageSize,
+                TotalCount = list.TotalCount,
+                TotalPage = totalPage,
+
+                HasPreviousPage = pageIndex > 1,
+                HasNextPage = pageIndex < totalPage
+            };
         }
 
         public async Task<AssetRespondDto> Create(CreateAssetDto createAssetDto)
@@ -485,9 +502,42 @@ namespace QuanLyTaiSanTest.Services.Implementations
             await _repo.Update();
         }
 
-        public async Task<AssetAllDto> GetAll(int pageIndex, int pageSize, string? search, int? categoryId, int? status, string sortBy, bool desc)
+        public async Task<List<AssetRespondDto>> GetAll()
         {
-            var data = await _repo.GetAll(pageIndex, pageSize, search, categoryId, status, sortBy, desc);
+            var lissAsset = await _repo.GetAll();
+            if (lissAsset == null)
+            {
+                throw new KeyNotFoundException("Không có dữ liệu");
+            }
+            else
+            {
+                return lissAsset.Select(h => new AssetRespondDto
+                {
+                    AssetCode = h.AssetCode,
+                    AssetName = h.AssetName,
+                    AssetId = h.AssetId,
+
+                    Descriptions = h.Descriptions,
+                    ImageAsset = h.ImageAsset,
+                    ManufactureYear = h.ManufactureYear,
+
+                    OriginalValue = h.OriginalValue,
+                    PurchaseDate = h.PurchaseDate,
+                    Status = h.Status.ToDisplayName(),
+                    Note = h.Note,
+                    Unit = h.Unit,
+                    CreatedTime = h.CreatedTime,
+                    UpdatedTime = h.UpdatedTime,
+                    CategoryId = h.CategoryId,
+                    DepartmentId = h.DepartmentId,
+                    UserId = h.UserId
+                }).ToList();
+            }
+        }
+
+        public async Task<AssetAllDto> GetPageList(int pageIndex, int pageSize, string? search, int? categoryId, int? status, string sortBy, bool desc)
+        {
+            var data = await _repo.GetPageList(pageIndex, pageSize, search, categoryId, status, sortBy, desc);
             if (data.Items == null || data.Items.Count == 0)
             {
                 throw new KeyNotFoundException("Không có dữ liệu");

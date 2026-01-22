@@ -22,8 +22,43 @@ namespace QuanLyTaiSanTest.Controllers
             _assetService = assetService;
             _assetHistoryService = assetHistoryService;
         }
-        [HttpGet]
-        public async Task<IActionResult> GetAll(int pageIndex = 1, int pageSize = 5, string? searchName = null, int? status = null, int? categoryId = null, string sortBy = "date", bool desc=true )
+
+        [HttpGet("GetAll")]
+        public async Task<IActionResult> GetAll()
+        {
+            try
+            {
+                var asset = await _assetService.GetAll();
+                return Ok(new ApiResponse<List<AssetRespondDto>>
+                {
+                    Success = true,
+                    Message = "Lấy tài sản thành công",
+                    Data = asset
+                });
+            }
+            catch (KeyNotFoundException ex)
+            {
+                return Ok(new ApiResponse<string>
+                {
+                    Success = false,
+                    Message = "Lấy dữ liệu thất bại",
+                    Errors = new { Detail = ex.Message }
+                });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new ApiResponse<string>
+                {
+                    Success = false,
+                    Message = "Lỗi hệ thống",
+                    Errors = new { Detail = ex.Message }
+                });
+            }
+        }
+
+
+        [HttpGet("GetPageList")]
+        public async Task<IActionResult> GetPageList(int pageIndex = 1, int pageSize = 5, string? searchName = null, int? status = null, int? categoryId = null, string sortBy = "date", bool desc=true )
         {
            
             try
@@ -36,7 +71,7 @@ namespace QuanLyTaiSanTest.Controllers
                 {
                     pageSize = 5;
                 }
-                return Ok( await _assetService.GetAll(pageIndex, pageSize, searchName, categoryId, status, sortBy, desc));
+                return Ok( await _assetService.GetPageList(pageIndex, pageSize, searchName, categoryId, status, sortBy, desc));
             }
             catch (KeyNotFoundException ex)
             {

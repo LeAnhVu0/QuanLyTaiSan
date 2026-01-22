@@ -32,8 +32,11 @@ namespace QuanLyTaiSanTest.Repositories.Implementations
             _context.Category.Remove(category);
             await _context.SaveChangesAsync();
         }
-
-        public async Task<(List<Category> Items, int TotalCount)> GetAll(int pageIndex, int pageSize, string? search, int? status, string sortBy, bool desc)
+        public async Task<List<Category>> GetAll()
+        {
+           return await _context.Category.Include(h => h.Assets).ToListAsync();
+        }
+        public async Task<(List<Category> Items, int TotalCount)> GetPageList(int pageIndex, int pageSize, string? search, int? status, string sortBy, bool desc)
         {
             var list = _context.Category.Include(h => h.Assets).AsQueryable();
             if (!string.IsNullOrEmpty(search))

@@ -11,8 +11,10 @@ namespace QuanLyTaiSanTest.Services.Interfaces
 
         public  Task<AssetFormHandoverDto> CreateFormRecall(CreateFormTransferDto createFormTransferDto);
         public  Task<ProcessTransferResultDto> ProcessApproval(int transferID,ProcessTransferDto processTransferDto);
-        public  Task<List<AssetTransferResponseDto>> GetAllTransfer(int pageIndex, int pageSize, int? status, int? type);
-        public Task<AssetAllDto> GetAll(int pageIndex, int pageSize, string? search, int? categoryId, int? status, string sortBy, bool desc);
+        public  Task<AssetTransferAllDto> GetAllTransfer(int pageIndex, int pageSize, int? status, int? type);
+        public Task<AssetAllDto> GetPageList(int pageIndex, int pageSize, string? search, int? categoryId, int? status, string sortBy, bool desc);
+        public Task<List<AssetRespondDto>> GetAll();
+
         public Task<AssetDto> GetById(int id);
         public Task<AssetRespondDto> Create(CreateAssetDto createAssetDto);
         public Task<AssetRespondDto> Update(UpdateAssetDto updateAssetDto, int id);

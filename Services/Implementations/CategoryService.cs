@@ -56,9 +56,9 @@ namespace QuanLyTaiSanTest.Services.Implementations
             }
         }
 
-        public async Task<CategoryAllDtocs> GetAll(int pageIndex, int pageSize, string? search, int? status, string sortBy, bool desc)
+        public async Task<CategoryAllDtocs> GetPageList(int pageIndex, int pageSize, string? search, int? status, string sortBy, bool desc)
         {
-            var category = await _repo.GetAll(pageIndex,pageSize, search, status, sortBy, desc);
+            var category = await _repo.GetPageList(pageIndex,pageSize, search, status, sortBy, desc);
             if (category.Items == null || category.Items.Count == 0)
             {
                 throw new KeyNotFoundException("Không có dữ liệu");
@@ -91,7 +91,28 @@ namespace QuanLyTaiSanTest.Services.Implementations
                 HasNextPage = pageIndex < totalPage
             };
         }
+        public async Task<List<CategoryResponseDto>> GetAll()
+        {
+            var listCategory = await _repo.GetAll();
+            if (listCategory == null)
+            {
+                throw new KeyNotFoundException("Không có dữ liệu");
+            }
+            else
+            {
+                return listCategory.Select(c => new CategoryResponseDto
+                {
+                    CategoryId = c.CategoryId,
+                    CategoryName = c.CategoryName,
+                    Description = c.Description,
+                    Status = c.Status.ToDisplayName(),
+                    CreatedTime = c.CreatedTime,
+                    UpdatedTime = c.UpdatedTime,
+                    AssetIds = c.Assets.Select(a => a.AssetId).ToList()
+                }).ToList();
+            }
 
+        }
         public async Task<CategoryResponseDto> GetById(int id)
         {
             var category = await _repo.GetById(id);
