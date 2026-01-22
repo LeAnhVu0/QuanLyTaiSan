@@ -43,14 +43,20 @@ namespace QuanLyTaiSan.Controllers
             return Ok(result);
         }
         [Authorize(Policy = Permissions.DepartmentUpdate)]
-        [HttpPatch("{id}")]
-        public async Task<ActionResult<DepartmentResponseDto>> UpdateDepartment(int id, DepartmentUpdateDto dto)
+     
+        [HttpPut("{id}")]
+     
+        public async Task<ActionResult<DepartmentResponseDto>> UpdateDepartment(
+    int id, DepartmentUpdateDto dto)
         {
             var result = await _service.UpdateDepartment(id, dto);
             if (result == null)
                 return NotFound();
+
             return Ok(result);
         }
+
+
         [Authorize(Policy = Permissions.DepartmentDelete)]
         [HttpDelete("{id}")]
         public async Task<ActionResult<string>> DeleteDepartment(int id)
