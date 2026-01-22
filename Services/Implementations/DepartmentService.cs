@@ -74,11 +74,27 @@ namespace QuanLyTaiSan.Services.Implementations
             var department = await _repository.GetDepartmentById(id);
             if (department == null)
                 return null;
-            _mapper.Map(dto, department);
+
+            var hasUser = await _userManager.Users
+                .AnyAsync(u => u.DepartmentId == department.Id);
+
+            if (hasUser)
+            {
+                
+                department.DepartmentName = dto.DepartmentName;
+                department.Description = dto.Description;
+               
+            }
+            else
+            {
+         
+                _mapper.Map(dto, department);
+            }
+
             await _repository.SaveAsync();
             return _mapper.Map<DepartmentResponseDto>(department);
-
         }
+
         public async Task<string> DeleteDepartment(int id)
         {
             var department = await _repository.GetDepartmentById(id);
