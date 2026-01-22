@@ -44,7 +44,7 @@ namespace QuanLyTaiSan
                     Scheme = "Bearer",
                     BearerFormat = "JWT",
                     In = ParameterLocation.Header,
-                    Description = "Nhập JWT theo dạng: Bearer {token}"
+                    Description = "Nhập JWT : "
                 });
 
                 //  Áp dụng cho các API có [Authorize]

@@ -92,7 +92,7 @@ namespace QuanLyTaiSanTest.Controllers
                 });
             }
         }
-        [HttpGet("{id}")]
+        [HttpGet("{id:int}")]
         public async Task<IActionResult> GetById(int id)
         {
             try
@@ -112,6 +112,39 @@ namespace QuanLyTaiSanTest.Controllers
                     Success = false,
                     Message = "Lấy dữ liệu thất bại",
                     Errors = new {Detail= ex.Message }
+                });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new ApiResponse<string>
+                {
+                    Success = false,
+                    Message = "Lỗi hệ thống",
+                    Errors = new { Detail = ex.Message }
+                });
+            }
+        }
+
+        [HttpGet("{code}")]
+        public async Task<IActionResult> GetByCode(string code)
+        {
+            try
+            {
+                var asset = await _assetService.GetByCode(code);
+                return Ok(new ApiResponse<AssetDto>
+                {
+                    Success = true,
+                    Message = "Lấy tài sản thành công",
+                    Data = asset
+                });
+            }
+            catch (KeyNotFoundException ex)
+            {
+                return Ok(new ApiResponse<string>
+                {
+                    Success = false,
+                    Message = "Lấy dữ liệu thất bại",
+                    Errors = new { Detail = ex.Message }
                 });
             }
             catch (Exception ex)

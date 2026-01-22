@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using QuanLyTaiSan.Dtos.Asset;
+using QuanLyTaiSan.Dtos.Category;
 using QuanLyTaiSan.Dtos.Common;
 using QuanLyTaiSanTest.Dtos.Asset;
 using QuanLyTaiSanTest.Dtos.Category;
@@ -86,7 +87,7 @@ namespace QuanLyTaiSanTest.Controllers
             try
             {
                 var category = await _categoryService.GetById(id);
-                return Ok(new ApiResponse<CategoryResponseDto>
+                return Ok(new ApiResponse<CategoryDetailDtocs>
                 {
                     Success = true,
                     Message = "Lấy tài sản thành công",

@@ -16,6 +16,7 @@ namespace QuanLyTaiSanTest.Services.Interfaces
         public Task<List<AssetRespondDto>> GetAll();
 
         public Task<AssetDto> GetById(int id);
+        public Task<AssetDto> GetByCode(string code);
         public Task<AssetRespondDto> Create(CreateAssetDto createAssetDto);
         public Task<AssetRespondDto> Update(UpdateAssetDto updateAssetDto, int id);
         public Task Delete(int id);

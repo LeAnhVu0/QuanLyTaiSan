@@ -113,7 +113,7 @@ namespace QuanLyTaiSanTest.Services.Implementations
             }
 
         }
-        public async Task<CategoryResponseDto> GetById(int id)
+        public async Task<CategoryDetailDtocs> GetById(int id)
         {
             var category = await _repo.GetById(id);
             if (category == null)
@@ -122,7 +122,7 @@ namespace QuanLyTaiSanTest.Services.Implementations
             }
             else
             {
-                return new CategoryResponseDto
+                return new CategoryDetailDtocs
                 {
                     CategoryId = category.CategoryId,
                     CategoryName = category.CategoryName,
@@ -130,7 +130,12 @@ namespace QuanLyTaiSanTest.Services.Implementations
                     Status = category.Status.ToDisplayName(),
                     CreatedTime = category.CreatedTime,
                     UpdatedTime = category.UpdatedTime,
-                    AssetIds = category.Assets.Select(x => x.AssetId).ToList()
+                    Assets = category.Assets.Where(h => h.IsDelete == false).Select(h => new AssetNameDtp
+                    { 
+                        AssetId = h.AssetId,
+                        AssetCode = h.AssetCode,
+                        AssetName = h.AssetName
+                    }).ToList()
                 };
             }
 

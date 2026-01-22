@@ -34,11 +34,11 @@ namespace QuanLyTaiSanTest.Repositories.Implementations
         }
         public async Task<List<Category>> GetAll()
         {
-           return await _context.Category.Include(h => h.Assets).ToListAsync();
+           return await _context.Category.Include(h => h.Assets.Where(a => a.IsDelete == false)).ToListAsync();
         }
         public async Task<(List<Category> Items, int TotalCount)> GetPageList(int pageIndex, int pageSize, string? search, int? status, string sortBy, bool desc)
         {
-            var list = _context.Category.Include(h => h.Assets).AsQueryable();
+            var list = _context.Category.Include(h => h.Assets.Where(a => a.IsDelete == false)).AsQueryable();
             if (!string.IsNullOrEmpty(search))
             {
                 list = list.Where(h => h.CategoryName.Contains(search));
@@ -68,7 +68,6 @@ namespace QuanLyTaiSanTest.Repositories.Implementations
         {
             return await _context.Category.Include(C=>C.Assets).FirstOrDefaultAsync(c => c.CategoryId == id);
         }
-
         public async Task Update()
         {
             await _context.SaveChangesAsync();

@@ -93,6 +93,14 @@ namespace QuanLyTaiSanTest.Repositories.Implementations
                                         .Include(h => h.User)
                                         .FirstOrDefaultAsync(h=>h.AssetId==id);
         }
+        public async Task<Asset?> GetByCode(string code)
+        {
+            return await _context.Assets.Where(h => h.IsDelete == false)
+                                        .Include(h => h.Category)
+                                        .Include(h => h.Department)
+                                        .Include(h => h.User)
+                                        .FirstOrDefaultAsync(h => h.AssetCode == code);
+        }
         public async Task<Asset?> GetLatesAssetByCategory(int categoryId)
         {
             return await _context.Assets.Where(h => h.CategoryId == categoryId && h.IsDelete == false)
