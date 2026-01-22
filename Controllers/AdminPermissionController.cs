@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 using QuanLyTaiSan.Dtos.Auth;
 using QuanLyTaiSan.Models;
 using QuanLyTaiSan.Services.Interfaces;
+using System.Runtime.InteropServices;
 
 namespace QuanLyTaiSan.Controllers
 {
@@ -26,7 +27,7 @@ namespace QuanLyTaiSan.Controllers
             await _permissionService
                 .GrantPermissionAsync(dto.UserId, dto.Permission);
 
-            return Ok();
+            return Ok("Them quyen thanh cong");
         }
 
       
@@ -37,7 +38,7 @@ namespace QuanLyTaiSan.Controllers
             await _permissionService
                 .RevokePermissionAsync(dto.UserId, dto.Permission);
 
-            return Ok();
+            return Ok("Them quyen thanh cong");
         }
 
    
@@ -48,7 +49,7 @@ namespace QuanLyTaiSan.Controllers
             await _permissionService
                 .GrantPermissionsAsync(dto.UserId, dto.Permissions);
 
-            return Ok();
+            return Ok("Them quyen thanh cong");
         }
 
      

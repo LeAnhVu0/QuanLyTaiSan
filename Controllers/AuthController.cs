@@ -82,5 +82,13 @@ namespace QuanLyTaiSan.Controllers
             
             return Ok(result);
         }
+
+        [Authorize(Policy = Permissions.UserGet)]
+        [HttpGet("paged")]
+        public async Task<ActionResult> GetUserPagedAsync(  [FromQuery] string? search, int pageIndex = 1, int pageSize = 5)
+        {
+            var result = await _authService.GetUserAsync(pageIndex, pageSize, search);
+            return Ok(result);
+        }
     }
 }

@@ -55,7 +55,12 @@ namespace QuanLyTaiSan.Controllers
         [HttpDelete("{id}")]
         public async Task<ActionResult<string>> DeleteDepartment(int id)
         {
-            await _service.DeleteDepartment(id);
+            var result =await _service.DeleteDepartment(id);
+            if (result == null)
+                return NotFound("Department not found");
+
+            if (result == "Cannot delete department with assigned users")
+                return BadRequest(result);
             return Ok("Xoa thanh cong");
         }
     }

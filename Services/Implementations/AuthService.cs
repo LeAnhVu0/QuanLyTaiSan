@@ -1,10 +1,13 @@
 ﻿using AutoMapper;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.EntityFrameworkCore;
 using QuanLyTaiSan.Dtos.Auth;
+using QuanLyTaiSan.Dtos.Department;
 using QuanLyTaiSan.Enum;
 using QuanLyTaiSan.Models;
 using QuanLyTaiSan.Services.Interfaces;
+using System.Data;
 using System.Runtime.ConstrainedExecution;
 namespace QuanLyTaiSan.Services.Implementations
 {
@@ -50,7 +53,7 @@ namespace QuanLyTaiSan.Services.Implementations
 
             return new UserResponseDto
             {
-
+                Id = user.Id,
                 Username = user.UserName,
                 Email = user.Email,
                 Fullname = user.FullName,
@@ -89,6 +92,67 @@ namespace QuanLyTaiSan.Services.Implementations
 
             return result;
         }
+        public async Task<PagedResult<UserResponseDto>> GetUserAsync(
+    int pageIndex,
+    int pageSize,
+    string? search)
+        {
+            var query = _userManager.Users.AsQueryable();
+
+        
+            if (!string.IsNullOrWhiteSpace(search))
+            {
+                query = query.Where(u =>
+                    u.UserName.Contains(search) ||
+                    u.FullName.Contains(search) ||
+                    u.Email.Contains(search) ||
+                    u.PhoneNumber.Contains(search));
+            }
+
+          
+            var totalCount = await query.CountAsync();
+
+            var totalPage = (int)Math.Ceiling(totalCount / (double)pageSize);
+
+            // Paging
+            var users = await query
+                .OrderBy(u => u.UserName) // nên có OrderBy
+                .Skip((pageIndex - 1) * pageSize)
+                .Take(pageSize)
+                .ToListAsync();
+
+            var items = new List<UserResponseDto>();
+
+            foreach (var user in users)
+            {
+                var roles = await _userManager.GetRolesAsync(user);
+
+                items.Add(new UserResponseDto
+                {
+                    Id = user.Id,
+                    Username = user.UserName,
+                    Fullname = user.FullName,
+                    Email = user.Email,
+                    PhoneNumber = user.PhoneNumber,
+                    Status = user.Status,
+                    Address = user.Address,
+                    DateOfBirth = user.DateOfBirth,
+                    DepartmentId = user.DepartmentId,
+                    Role = roles.FirstOrDefault()
+                });
+            }
+
+            return new PagedResult<UserResponseDto>
+            {
+                PageIndex = pageIndex,
+                PageSize = pageSize,
+                TotalCount = totalCount,
+                TotalPage = totalPage,
+                Items = items
+            };
+        }
+
+
         public async Task<UserResponseDto> GetUserById(string id)
         {
             var user = await _userManager.FindByIdAsync(id);

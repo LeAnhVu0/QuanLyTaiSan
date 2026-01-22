@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using QuanLyTaiSan.Dtos.Auth;
 using QuanLyTaiSan.Dtos.Department;
@@ -12,10 +13,12 @@ namespace QuanLyTaiSan.Services.Implementations
     {
         private readonly IDepartmentRepository _repository;
         private readonly IMapper _mapper;
-        public DepartmentService(IDepartmentRepository repository, IMapper mapper)
+        private readonly UserManager<ApplicationUser> _userManager;
+        public DepartmentService(IDepartmentRepository repository, IMapper mapper, UserManager<ApplicationUser> userManager)
         {
             _mapper = mapper;
             _repository = repository;
+            _userManager = userManager;
         }
         public async Task<PagedResult<DepartmentResponseDto>> GetDepartmentsAsync(int pageIndex, int pageSize)
         {
@@ -54,7 +57,7 @@ namespace QuanLyTaiSan.Services.Implementations
                 Users = department.User.Select(u => new UserInDepartmentDto
                 {
                     Id = u.Id,
-                    FullName = u.UserName,
+                    FullName = u.FullName,
                     Email = u.Email
                 }).ToList()
             };
@@ -81,6 +84,13 @@ namespace QuanLyTaiSan.Services.Implementations
             var department = await _repository.GetDepartmentById(id);
             if (department == null)
                 return null;
+            var hasUser = await _userManager.Users
+     .AnyAsync(u => u.DepartmentId == department.Id);
+
+            if (hasUser)
+            {
+                return "Cannot delete department with assigned users";
+            }
             _repository.DeleteDepartment(department);
             await _repository.SaveAsync();
             return $"{department.Id} deleted";

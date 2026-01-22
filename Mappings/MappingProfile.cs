@@ -13,7 +13,7 @@ namespace QuanLyTaiSan.Mappings
             CreateMap<DepartmentUpdateDto, Department>();
             CreateMap<ApplicationUser, UserResponseDto>();
             CreateMap<ApplicationUser, UserUpdateDto>();
-
+            CreateMap<ApplicationUser, UserInDepartmentDto>();
         }
     }
 }
