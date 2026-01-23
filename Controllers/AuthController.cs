@@ -80,6 +80,8 @@ namespace QuanLyTaiSan.Controllers
         public async Task<ActionResult<string>> DeleteUserAsync(string id)
         {
             var result = await _authService.GetUserById(id);
+            var userId = User.FindFirstValue("sub");
+            if (userId == id) return NotFound("Không thể ngừng hoạt động của chính bạn");
             if (result == null) return NotFound("Change status false");
             await _authService.DeleteUser(id);
             return Ok("Change status done ");
