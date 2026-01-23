@@ -1,4 +1,5 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
 using QuanLyTaiSan.Dtos.Asset;
 using QuanLyTaiSan.Dtos.AssetTransfer;
 using QuanLyTaiSan.Enum;
@@ -27,9 +28,10 @@ namespace QuanLyTaiSanTest.Services.Implementations
         private readonly IAuthService _authService;
         private readonly IDepartmentService _departmentService;
         private readonly IHttpContextAccessor _httpContextAccessor;
+        private readonly UserManager<ApplicationUser> _userManager;
 
         public AssetService(IAssetRepository repo, ICategoryRepository repoCate, IAssetHistoryRepository repoHistory,
-            IAuthService authService, IDepartmentService departmentService, IHttpContextAccessor httpContextAccessor)
+            IAuthService authService, IDepartmentService departmentService, IHttpContextAccessor httpContextAccessor, UserManager<ApplicationUser> userManager)
         {
             _repo = repo;
             _repoCate = repoCate;
@@ -37,6 +39,7 @@ namespace QuanLyTaiSanTest.Services.Implementations
             _authService = authService;
             _departmentService = departmentService;
             _httpContextAccessor = httpContextAccessor;
+            _userManager = userManager;
         }
         public async Task<AssetFormHandoverDto> CreateFormHandover(CreateFormTransferDto createFormTransferDto)
         {
@@ -454,6 +457,24 @@ namespace QuanLyTaiSanTest.Services.Implementations
             {
                 throw new KeyNotFoundException("Không tồn tại phòng ban có id = " + updateAssetDto.DepartmentId);
             }
+
+            //Chặn đổi phòng ban khi đang chờ xác nhận phiếu hoặc có người sở hữu
+            bool isChangeDepartment = h.DepartmentId != updateAssetDto.DepartmentId;
+            if(isChangeDepartment)
+            {
+                // Check đang có phiếu bàn giao/thu hồi Pending không
+                bool hasPendingTransfer = await _repo.AnyAsync(x => x.AssetId == h.AssetId && x.Status == AssetTransferStatus.Pending);
+                if(hasPendingTransfer)
+                {
+                    throw new InvalidOperationException("Không thể thay đổi phòng ban khi tài sản đang có phiếu bàn giao/thu hồi chờ duyệt");
+                }
+
+                // Check tài sản đã có người sử dụng chưa
+                if (!string.IsNullOrEmpty(h.UserId))
+                {
+                    throw new InvalidOperationException("Không thể thay đổi phòng ban khi tài sản đang được cấp cho nhân viên");
+                }
+            }    
             else
             {
                 h.AssetName = updateAssetDto.AssetName;
@@ -523,7 +544,69 @@ namespace QuanLyTaiSanTest.Services.Implementations
             }
             else
             {
-                return lissAsset.Select(h => new AssetRespondDto
+                var list = new List<AssetRespondDto>();
+                foreach (var h in lissAsset)
+                {
+                    string roleName = null;
+
+                    if (h.User != null)
+                    {
+                        var roles = await _userManager.GetRolesAsync(h.User);
+                        roleName = roles.FirstOrDefault();
+                    }
+                    list.Add(new AssetRespondDto
+                    {
+                        AssetCode = h.AssetCode,
+                        AssetName = h.AssetName,
+                        AssetId = h.AssetId,
+
+                        Descriptions = h.Descriptions,
+                        ImageAsset = h.ImageAsset,
+                        ManufactureYear = h.ManufactureYear,
+
+                        OriginalValue = h.OriginalValue,
+                        PurchaseDate = h.PurchaseDate,
+                        Status = h.Status.ToDisplayName(),
+                        Note = h.Note,
+                        Unit = h.Unit,
+                        CreatedTime = h.CreatedTime,
+                        UpdatedTime = h.UpdatedTime,
+                        CategoryId = h.CategoryId,
+                        DepartmentId = h.DepartmentId,
+                        UserId = h.UserId,
+                        User = h.User == null ? null : new QuanLyTaiSan.Dtos.Auth.UserDto
+                        {
+                            Id = h.UserId,
+                            Username = h.User.UserName,
+                            Fullname = h.User.FullName,
+                            Role = roleName
+                        }
+                    });
+
+                }
+
+                return list.ToList();
+            }
+        }
+
+        public async Task<AssetAllDto> GetPageList(int pageIndex, int pageSize, string? search, int? categoryId, string? userId, int? status, string sortBy, bool desc)
+        {
+            var data = await _repo.GetPageList(pageIndex, pageSize, search, categoryId, userId, status, sortBy, desc);
+            if (data.Items == null || data.Items.Count == 0)
+            {
+                throw new KeyNotFoundException("Không có dữ liệu");
+            }
+            var item = new List<AssetRespondDto>();
+            foreach(var h in data.Items)
+            {
+                string roleName = null;
+
+                if (h.User != null)
+                {
+                    var roles = await _userManager.GetRolesAsync(h.User);
+                    roleName = roles.FirstOrDefault();
+                }
+                item.Add(new AssetRespondDto
                 {
                     AssetCode = h.AssetCode,
                     AssetName = h.AssetName,
@@ -547,53 +630,17 @@ namespace QuanLyTaiSanTest.Services.Implementations
                     {
                         Id = h.UserId,
                         Username = h.User.UserName,
-                        Fullname = h.User.FullName
+                        Fullname = h.User.FullName,
+                        Role = roleName
                     }
-                }).ToList();
-            }
-        }
-
-        public async Task<AssetAllDto> GetPageList(int pageIndex, int pageSize, string? search, int? categoryId, int? status, string sortBy, bool desc)
-        {
-            var data = await _repo.GetPageList(pageIndex, pageSize, search, categoryId, status, sortBy, desc);
-            if (data.Items == null || data.Items.Count == 0)
-            {
-                throw new KeyNotFoundException("Không có dữ liệu");
-            }
-
-            var items = data.Items.Select(h => new AssetRespondDto
-            {
-                AssetCode = h.AssetCode,
-                AssetName = h.AssetName,
-                AssetId = h.AssetId,
-
-                Descriptions = h.Descriptions,
-                ImageAsset = h.ImageAsset,
-                ManufactureYear = h.ManufactureYear,
-
-                OriginalValue = h.OriginalValue,
-                PurchaseDate = h.PurchaseDate,
-                Status = h.Status.ToDisplayName(),
-                Note = h.Note,
-                Unit = h.Unit,
-                CreatedTime = h.CreatedTime,
-                UpdatedTime = h.UpdatedTime,
-                CategoryId = h.CategoryId,
-                DepartmentId = h.DepartmentId,
-                UserId = h.UserId,
-                User = h.User == null ? null : new QuanLyTaiSan.Dtos.Auth.UserDto
-                {
-                    Id = h.UserId,
-                    Username = h.User.UserName,
-                    Fullname = h.User.FullName
-                }
-            }).ToList();
+                });
+            }    
 
             var totalPage = (int)Math.Ceiling(data.TotalCount / (double)pageSize);
 
             return new AssetAllDto
             {
-                ListAsset = items,
+                ListAsset = item,
                 categoryId = categoryId,
                 SearchName = search,
                 Status = status,
@@ -617,6 +664,21 @@ namespace QuanLyTaiSanTest.Services.Implementations
             }
             else
             {
+                string roleName = null;
+                var userEntity = h.User;
+                if (h.UserId != null)
+                {
+                    if (userEntity == null)
+                    {
+                        userEntity = await _userManager.FindByIdAsync(h.UserId);
+                    }
+
+                    if (userEntity != null)
+                    {
+                        var roles = await _userManager.GetRolesAsync(userEntity);
+                        roleName = roles.FirstOrDefault(); 
+                    }
+                }
                 return new AssetDto
                 {
                     AssetCode = h.AssetCode,
@@ -653,7 +715,8 @@ namespace QuanLyTaiSanTest.Services.Implementations
                     {
                         Id = h.UserId,
                         Username = h.User.UserName,
-                        Fullname = h.User.FullName
+                        Fullname = h.User.FullName,
+                        Role = roleName
                         //Email = h.User.Email,
                         //PhoneNumber = h.User.PhoneNumber
                     }

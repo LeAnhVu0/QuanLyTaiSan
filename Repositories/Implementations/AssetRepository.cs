@@ -39,7 +39,7 @@ namespace QuanLyTaiSanTest.Repositories.Implementations
         {
             return await _context.AssetTransfer.AnyAsync(predicate);
         }
-        public async Task<(List<Asset> Items, int TotalCount)> GetPageList(int pageIndex, int pageSize, string? search, int? categoryId, int? status, string sortBy, bool desc)
+        public async Task<(List<Asset> Items, int TotalCount)> GetPageList(int pageIndex, int pageSize, string? search, int? categoryId, string? userId, int? status, string sortBy, bool desc)
         {
             var listAsset =  _context.Assets.Where(h => h.IsDelete == false).Include(h => h.User).Include(h => h.Category).AsQueryable();
             if(!string.IsNullOrEmpty(search))
@@ -54,6 +54,10 @@ namespace QuanLyTaiSanTest.Repositories.Implementations
             {
                 listAsset = listAsset.Where(h => h.Status == (AssetStatus)status);
             }
+            if(!string.IsNullOrEmpty(userId))
+            {
+                listAsset = listAsset.Where(h => h.UserId == userId);
+            }    
 
             if (string.IsNullOrWhiteSpace(sortBy))
                 sortBy = "name";
@@ -83,7 +87,10 @@ namespace QuanLyTaiSanTest.Repositories.Implementations
         }
         public async Task<List<Asset>> GetAll()
         {
-            return await _context.Assets.Where(h => h.IsDelete == false).Include(h => h.Category).Include(h => h.User).ToListAsync();
+            return await _context.Assets.Where(h => h.IsDelete == false)
+                                        .Include(h => h.Category)
+                                        .Include(h => h.User)
+                                        .ToListAsync();
         }
         public async Task<Asset?> GetById(int id)
         {

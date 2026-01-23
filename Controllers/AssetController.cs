@@ -59,7 +59,7 @@ namespace QuanLyTaiSanTest.Controllers
 
 
         [HttpGet("GetPageList")]
-        public async Task<IActionResult> GetPageList(int pageIndex = 1, int pageSize = 5, string? searchName = null, int? status = null, int? categoryId = null, string sortBy = "date", bool desc=true )
+        public async Task<IActionResult> GetPageList(int pageIndex = 1, int pageSize = 5, string? searchName = null, int? status = null, int? categoryId = null, string? userId = null, string sortBy = "date", bool desc=true )
         {
            
             try
@@ -72,7 +72,7 @@ namespace QuanLyTaiSanTest.Controllers
                 {
                     pageSize = 5;
                 }
-                return Ok( await _assetService.GetPageList(pageIndex, pageSize, searchName, categoryId, status, sortBy, desc));
+                return Ok( await _assetService.GetPageList(pageIndex, pageSize, searchName, categoryId, userId , status, sortBy, desc));
             }
             catch (KeyNotFoundException ex)
             {
