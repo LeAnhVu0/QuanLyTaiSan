@@ -1,4 +1,5 @@
-﻿using QuanLyTaiSan.Dtos.Auth;
+﻿using QuanLyTaiSan.Dtos.Asset;
+using QuanLyTaiSan.Dtos.Auth;
 using QuanLyTaiSan.Enum;
 
 namespace QuanLyTaiSan.Dtos.Department
@@ -11,5 +12,6 @@ namespace QuanLyTaiSan.Dtos.Department
         public string? Description { get; set; }
         public DepartmentStatus? DepartmentStatus { get; set; }
         public List<UserInDepartmentDto> Users { get; set; }
+        public List<AssetNameDtp> Assets { get; set; }
     }
 }

@@ -43,18 +43,24 @@ namespace QuanLyTaiSan.Controllers
             return Ok(result);
         }
         [Authorize(Policy = Permissions.DepartmentUpdate)]
-     
         [HttpPut("{id}")]
-     
         public async Task<ActionResult<DepartmentResponseDto>> UpdateDepartment(
     int id, DepartmentUpdateDto dto)
         {
-            var result = await _service.UpdateDepartment(id, dto);
-            if (result == null)
-                return NotFound();
+            try
+            {
+                var result = await _service.UpdateDepartment(id, dto);
+                if (result == null)
+                    return NotFound("update k thanh cong");
 
-            return Ok(result);
+                return Ok(result);
+            }
+            catch (InvalidOperationException ex)
+            {
+                return BadRequest(ex.Message);
+            }
         }
+
 
 
         [Authorize(Policy = Permissions.DepartmentDelete)]

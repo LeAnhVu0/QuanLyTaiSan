@@ -1,11 +1,14 @@
 ﻿using AutoMapper;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using QuanLyTaiSan.Dtos.Asset;
 using QuanLyTaiSan.Dtos.Auth;
 using QuanLyTaiSan.Dtos.Department;
+using QuanLyTaiSan.Enum;
 using QuanLyTaiSan.Models;
 using QuanLyTaiSan.Repositories.Interfaces;
 using QuanLyTaiSan.Services.Interfaces;
+using QuanLyTaiSanTest.Repositories.Interfaces;
 using static Microsoft.EntityFrameworkCore.DbLoggerCategory;
 namespace QuanLyTaiSan.Services.Implementations
 {
@@ -14,11 +17,13 @@ namespace QuanLyTaiSan.Services.Implementations
         private readonly IDepartmentRepository _repository;
         private readonly IMapper _mapper;
         private readonly UserManager<ApplicationUser> _userManager;
-        public DepartmentService(IDepartmentRepository repository, IMapper mapper, UserManager<ApplicationUser> userManager)
+        private readonly IAssetRepository _assetRepository;
+        public DepartmentService(IDepartmentRepository repository, IMapper mapper, UserManager<ApplicationUser> userManager,IAssetRepository assetRepository)
         {
             _mapper = mapper;
             _repository = repository;
             _userManager = userManager;
+            _assetRepository = assetRepository;
         }
         public async Task<PagedResult<DepartmentResponseDto>> GetDepartmentsAsync(int pageIndex, int pageSize)
         {
@@ -54,11 +59,19 @@ namespace QuanLyTaiSan.Services.Implementations
             {
                 Id = department.Id,
                 DepartmentName = department.DepartmentName,
+                Description=department.Description,
+                DepartmentStatus=department.DepartmentStatus,
                 Users = department.User.Select(u => new UserInDepartmentDto
                 {
                     Id = u.Id,
                     FullName = u.FullName,
                     Email = u.Email
+                }).ToList(),
+                Assets=department.Assets.Select(a=>new AssetNameDtp
+                {
+                    AssetId=a.AssetId,
+                    AssetCode=a.AssetCode,
+                    AssetName=a.AssetName
                 }).ToList()
             };
         }
@@ -69,31 +82,43 @@ namespace QuanLyTaiSan.Services.Implementations
             await _repository.SaveAsync();
             return _mapper.Map<DepartmentResponseDto>(department);
         }
-        public async Task<DepartmentResponseDto> UpdateDepartment(int id, DepartmentUpdateDto dto)
+        
+            public async Task<DepartmentResponseDto> UpdateDepartment(int id, DepartmentUpdateDto dto)
         {
             var department = await _repository.GetDepartmentById(id);
             if (department == null)
                 return null;
 
-            var hasUser = await _userManager.Users
-                .AnyAsync(u => u.DepartmentId == department.Id);
+            if (department.DepartmentStatus == DepartmentStatus.Active 
+                )
+            {
+                var hasUser = await _userManager.Users
+                    .AnyAsync(u => u.DepartmentId == department.Id);
 
-            if (hasUser)
-            {
-                
-                department.DepartmentName = dto.DepartmentName;
-                department.Description = dto.Description;
-               
+                var hasAsset = await _assetRepository
+                    .AnyAssetAsync(a => a.DepartmentId == department.Id);
+
+                if (hasUser || hasAsset)
+                    throw new InvalidOperationException(
+                        "Không thể ngừng sử dụng phòng ban đang có nhân viên hoặc tài sản");
             }
-            else
-            {
-         
-                _mapper.Map(dto, department);
-            }
+
+           
+            if (dto.DepartmentStatus == DepartmentStatus.Deleted)
+                throw new InvalidOperationException("Không thể cập nhật trạng thái Deleted");
+
+            // update bình thường
+            department.DepartmentName = dto.DepartmentName;
+            department.Description = dto.Description;
+            department.DepartmentStatus = dto.DepartmentStatus;
 
             await _repository.SaveAsync();
+
             return _mapper.Map<DepartmentResponseDto>(department);
         }
+
+
+
 
         public async Task<string> DeleteDepartment(int id)
         {

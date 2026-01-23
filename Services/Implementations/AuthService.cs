@@ -8,6 +8,8 @@ using QuanLyTaiSan.Enum;
 using QuanLyTaiSan.Models;
 using QuanLyTaiSan.Services.Interfaces;
 using System.Data;
+using System.Net;
+using System.Net.NetworkInformation;
 using System.Runtime.ConstrainedExecution;
 namespace QuanLyTaiSan.Services.Implementations
 {
@@ -156,8 +158,23 @@ namespace QuanLyTaiSan.Services.Implementations
         public async Task<UserResponseDto> GetUserById(string id)
         {
             var user = await _userManager.FindByIdAsync(id);
+            
+
             if (user == null) return null;
-            return _mapper.Map<UserResponseDto>(user);
+            var roles = await _userManager.GetRolesAsync(user);
+            return new UserResponseDto
+            {
+                Id = user.Id,
+                Username = user.UserName,
+                Fullname = user.FullName,
+                Email = user.Email,
+                PhoneNumber = user.PhoneNumber,
+                Status = user.Status,
+                Address = user.Address,
+                DateOfBirth = user.DateOfBirth,
+                DepartmentId = user.DepartmentId,
+                Role = roles.FirstOrDefault()
+            };
         }
         public async Task<string> DeleteUser(string id)
         {
@@ -205,6 +222,7 @@ namespace QuanLyTaiSan.Services.Implementations
             user.PhoneNumber = dto.PhoneNumber;
             user.Address = dto.Address;
             user.Status = dto.Status;
+            user.DepartmentId = dto.DepartmentId;
 
             var result = await _userManager.UpdateAsync(user);
             if (!result.Succeeded)

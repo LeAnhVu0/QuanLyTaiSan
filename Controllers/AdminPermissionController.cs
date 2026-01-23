@@ -38,7 +38,7 @@ namespace QuanLyTaiSan.Controllers
             await _permissionService
                 .RevokePermissionAsync(dto.UserId, dto.Permission);
 
-            return Ok("Them quyen thanh cong");
+            return Ok("Xoa quyen thanh cong");
         }
 
    

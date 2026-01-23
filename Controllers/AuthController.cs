@@ -23,6 +23,11 @@ namespace QuanLyTaiSan.Controllers
         public async Task<ActionResult<LoginResponeDto>> Login([FromBody] UserLoginDto request)
         {
             var result = await _jwtService.Authenticate(request);
+            if (result == null)
+                return Unauthorized("Sai username hoặc password");
+
+            if (!string.IsNullOrEmpty(result.Message))
+                return BadRequest(result.Message);
             return result is not null ? Ok(result) : Unauthorized();
         }
         [Authorize]

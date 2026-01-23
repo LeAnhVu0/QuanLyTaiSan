@@ -20,8 +20,10 @@ namespace QuanLyTaiSan.Repositories.Implementations
         {
             return await _appDbContext.Department
                 .Include(d => d.User)
+                .Include(d => d.Assets)
                 .FirstOrDefaultAsync(d => d.Id == id);
         }
+
 
         public async Task<Department> AddDepartment(Department department)
         {

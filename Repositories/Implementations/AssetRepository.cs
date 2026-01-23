@@ -143,5 +143,11 @@ namespace QuanLyTaiSanTest.Repositories.Implementations
             var listResult = await list.Skip((pageIndex - 1) * pageSize).Take(pageSize).ToListAsync();
             return (listResult,totalCount);
         }
+        // AssetRepository
+        public async Task<bool> AnyAssetAsync(Expression<Func<Asset, bool>> predicate)
+        {
+            return await _context.Assets.AnyAsync(predicate);
+        }
+
     }
 }
