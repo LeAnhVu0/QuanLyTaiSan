@@ -82,40 +82,47 @@ namespace QuanLyTaiSan.Services.Implementations
             await _repository.SaveAsync();
             return _mapper.Map<DepartmentResponseDto>(department);
         }
-        
-            public async Task<DepartmentResponseDto> UpdateDepartment(int id, DepartmentUpdateDto dto)
+
+        public async Task<DepartmentResponseDto> UpdateDepartment(
+ int id, DepartmentUpdateDto dto)
         {
             var department = await _repository.GetDepartmentById(id);
             if (department == null)
                 return null;
 
-            if (department.DepartmentStatus == DepartmentStatus.Active 
-                )
-            {
-                var hasUser = await _userManager.Users
-                    .AnyAsync(u => u.DepartmentId == department.Id);
-
-                var hasAsset = await _assetRepository
-                    .AnyAssetAsync(a => a.DepartmentId == department.Id);
-
-                if (hasUser || hasAsset)
-                    throw new InvalidOperationException(
-                        "Không thể ngừng sử dụng phòng ban đang có nhân viên hoặc tài sản");
-            }
-
-           
+            // ❌ Không cho set status = Deleted
             if (dto.DepartmentStatus == DepartmentStatus.Deleted)
                 throw new InvalidOperationException("Không thể cập nhật trạng thái Deleted");
 
-            // update bình thường
+            // 👉 CHỈ kiểm tra khi có ý định đổi status
+            if (dto.DepartmentStatus != department.DepartmentStatus)
+            {
+                // Ví dụ: đổi từ Active → Inactive
+                if (dto.DepartmentStatus == DepartmentStatus.Inactive)
+                {
+                    var hasUser = await _userManager.Users
+                        .AnyAsync(u => u.DepartmentId == department.Id);
+
+                    var hasAsset = await _assetRepository
+                        .AnyAssetAsync(a => a.DepartmentId == department.Id);
+
+                    if (hasUser || hasAsset)
+                        throw new InvalidOperationException(
+                            "Không thể ngừng sử dụng phòng ban đang có nhân viên hoặc tài sản");
+                }
+
+                department.DepartmentStatus = dto.DepartmentStatus;
+            }
+
+            // ✅ update các field khác bình thường
             department.DepartmentName = dto.DepartmentName;
             department.Description = dto.Description;
-            department.DepartmentStatus = dto.DepartmentStatus;
 
             await _repository.SaveAsync();
 
             return _mapper.Map<DepartmentResponseDto>(department);
         }
+
 
 
 

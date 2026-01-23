@@ -32,26 +32,34 @@ namespace QuanLyTaiSan.Services.Implementations
         }
         public async Task<UserResponseDto> RegisterAsync(UserRegisterDto dto)
         {
+            if (await _userManager.FindByNameAsync(dto.Username) != null)
+                throw new InvalidOperationException("Username đã tồn tại");
+
+            if (await _userManager.FindByEmailAsync(dto.Email) != null)
+                throw new InvalidOperationException("Email đã tồn tại");
+
             var user = new ApplicationUser
             {
                 UserName = dto.Username,
                 Email = dto.Email,
                 PhoneNumber = dto.PhoneNumber,
                 FullName = dto.Fullname,
-                Status =dto.Status,
+                Status = dto.Status,
                 Address = dto.Address,
                 DateOfBirth = dto.DateofBirth,
                 DepartmentId = dto.DepartmentId == 0 ? null : dto.DepartmentId
             };
 
             var result = await _userManager.CreateAsync(user, dto.Password);
-            var role = dto.IsAdmin ? "Admin" : "User";
-            await _userManager.AddToRoleAsync(user, role);
+
             if (!result.Succeeded)
             {
-                var errors = string.Join(", ", result.Errors.Select(e => e.Description));
-                throw new Exception($"Register failed: {errors}");
+                var errors = result.Errors.Select(e => e.Description);
+                throw new InvalidOperationException(string.Join(", ", errors));
             }
+
+            var role = dto.IsAdmin ? "Admin" : "User";
+            await _userManager.AddToRoleAsync(user, role);
 
             return new UserResponseDto
             {
@@ -63,10 +71,11 @@ namespace QuanLyTaiSan.Services.Implementations
                 Status = user.Status,
                 Address = user.Address,
                 DateOfBirth = user.DateOfBirth,
-                DepartmentId = dto.DepartmentId,
+                DepartmentId = user.DepartmentId,
                 Role = role
             };
         }
+
         public async Task<List<UserResponseDto>> GetAllUser()
         {
             var users = await _userManager.Users.ToListAsync();
@@ -190,26 +199,30 @@ namespace QuanLyTaiSan.Services.Implementations
             await _userManager.UpdateAsync(user);
             return $"User {user.Id} change status";
         }
-        public async Task<string> ResetPasswordAsync(ResetPasswordDto dto)
+        public async Task<string> ChangePasswordAsync(
+    string userId,
+    ResetPasswordDto dto)
         {
-            var user = await _userManager.FindByIdAsync(dto.UserId);
-            if (user == null) return null;
+            var user = await _userManager.FindByIdAsync(userId);
+            if (user == null)
+                throw new InvalidOperationException("User không tồn tại");
 
-
-            string decodedToken = System.Net.WebUtility.UrlDecode(dto.Token);
-
-
-            string cleanToken = decodedToken.Replace(" ", "+");
-
-            var result = await _userManager.ResetPasswordAsync(user, cleanToken, dto.NewPassword);
+            var result = await _userManager.ChangePasswordAsync(
+                user,
+                dto.CurrentPassword,
+                dto.NewPassword
+            );
 
             if (!result.Succeeded)
             {
                 var errors = string.Join(", ", result.Errors.Select(e => e.Description));
-                throw new Exception($"Lỗi: {errors}");
+                throw new InvalidOperationException(errors);
             }
-            return "Mật khẩu đã được đặt lại thành công.";
+
+            return "Đổi mật khẩu thành công";
         }
+    
+
         public async Task<UserUpdateDto> UpdateUser(string id, UserUpdateDto dto)
         {
             var user = await _userManager.FindByIdAsync(id);

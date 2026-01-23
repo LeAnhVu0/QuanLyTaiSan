@@ -16,7 +16,7 @@ namespace QuanLyTaiSan.Controllers
         {
             _service = service;
         }
-        [Authorize(Policy = Permissions.DepartmentGet)]
+       
         [HttpGet]
         public async Task<IActionResult> GetDepartments(
     int pageIndex = 1,
@@ -32,7 +32,7 @@ namespace QuanLyTaiSan.Controllers
         {
             var result = await _service.GetDepartmentById(id);
             if (result == null)
-                return NotFound();
+                return NotFound("Lấy phòng ban k thành công");
             return Ok(result);
         }
         [Authorize(Policy = Permissions.DepartmentCreate)]
