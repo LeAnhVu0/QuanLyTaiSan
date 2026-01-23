@@ -1,9 +1,14 @@
-﻿namespace QuanLyTaiSan.Dtos.Auth
+﻿using System.ComponentModel.DataAnnotations;
+
+namespace QuanLyTaiSan.Dtos.Auth
 {
     public class ResetPasswordDto
     {
-        public string? UserId { get; set; }
-        public string? Token { get; set; }
-        public string? NewPassword { get; set; }
+        [Required]
+        public string CurrentPassword { get; set; }
+
+        [Required]
+        [MinLength(6)]
+        public string NewPassword { get; set; }
     }
 }

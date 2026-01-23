@@ -16,7 +16,7 @@ namespace QuanLyTaiSan.Controllers
         {
             _service = service;
         }
-        [Authorize(Policy = Permissions.DepartmentGet)]
+       
         [HttpGet]
         public async Task<IActionResult> GetDepartments(
     int pageIndex = 1,
@@ -32,7 +32,7 @@ namespace QuanLyTaiSan.Controllers
         {
             var result = await _service.GetDepartmentById(id);
             if (result == null)
-                return NotFound();
+                return NotFound("Lấy phòng ban k thành công");
             return Ok(result);
         }
         [Authorize(Policy = Permissions.DepartmentCreate)]
@@ -43,18 +43,24 @@ namespace QuanLyTaiSan.Controllers
             return Ok(result);
         }
         [Authorize(Policy = Permissions.DepartmentUpdate)]
-     
         [HttpPut("{id}")]
-     
         public async Task<ActionResult<DepartmentResponseDto>> UpdateDepartment(
     int id, DepartmentUpdateDto dto)
         {
-            var result = await _service.UpdateDepartment(id, dto);
-            if (result == null)
-                return NotFound();
+            try
+            {
+                var result = await _service.UpdateDepartment(id, dto);
+                if (result == null)
+                    return NotFound("update k thanh cong");
 
-            return Ok(result);
+                return Ok(result);
+            }
+            catch (InvalidOperationException ex)
+            {
+                return BadRequest(ex.Message);
+            }
         }
+
 
 
         [Authorize(Policy = Permissions.DepartmentDelete)]

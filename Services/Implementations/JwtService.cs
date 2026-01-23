@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Identity;
 using Microsoft.IdentityModel.Tokens;
 using QuanLyTaiSan.Dtos.Auth;
+using QuanLyTaiSan.Enum;
 using QuanLyTaiSan.Models;
 using QuanLyTaiSan.Repositories.Interfaces;
 using System.IdentityModel.Tokens.Jwt;
@@ -19,17 +20,31 @@ namespace QuanLyTaiSan.Services.Implementations
             _userManager = userManager;
             _refreshTokenRepository = refreshTokenRepository;
         }
-        public async Task<LoginResponeDto> Authenticate(UserLoginDto request)
+        public async Task<LoginResponeDto?> Authenticate(UserLoginDto request)
         {
-            if (string.IsNullOrWhiteSpace(request.Username) || string.IsNullOrWhiteSpace(request.Password))
+            if (string.IsNullOrWhiteSpace(request.Username) ||
+                string.IsNullOrWhiteSpace(request.Password))
                 return null;
+
             var user = await _userManager.FindByNameAsync(request.Username);
+            if (user == null)
+                return null;
+
+            if (user.Status == UserStatus.inactive)
+            {
+                return new LoginResponeDto
+                {
+                    Message = "Tài khoản đã bị ngưng sử dụng"
+                };
+            }
+
             var isPasswordValid = await _userManager.CheckPasswordAsync(user, request.Password);
             if (!isPasswordValid)
                 return null;
-            return await GenerateToken(user);
 
+            return await GenerateToken(user);
         }
+
         public async Task<LoginResponeDto> ValidateRefreshToken(string token)
         {
             var refreshToken = await _refreshTokenRepository.GetByTokenAsync(token);

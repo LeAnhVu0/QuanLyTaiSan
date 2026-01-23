@@ -16,6 +16,7 @@ namespace QuanLyTaiSanTest.Repositories.Interfaces
         public Task Update();
         public Task Delete(Asset asset);
         public Task<bool> AnyAsync(Expression<Func<AssetTransfer, bool>> predicate);
+        public Task<bool> AnyAssetAsync(Expression<Func<Asset, bool>> predicate);
         public Task<Asset?> GetLatesAssetByCategory(int categoryId);
         public Task AddTransfer(AssetTransfer assetTransfer);
         public Task<AssetTransfer?> GetTransferById(int transferId);

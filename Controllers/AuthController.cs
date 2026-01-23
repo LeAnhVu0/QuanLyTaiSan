@@ -4,6 +4,7 @@ using QuanLyTaiSan.Dtos.Auth;
 using QuanLyTaiSan.Models;
 using QuanLyTaiSan.Services.Implementations;
 using QuanLyTaiSan.Services.Interfaces;
+using System.Security.Claims;
 
 namespace QuanLyTaiSan.Controllers
 {
@@ -23,6 +24,11 @@ namespace QuanLyTaiSan.Controllers
         public async Task<ActionResult<LoginResponeDto>> Login([FromBody] UserLoginDto request)
         {
             var result = await _jwtService.Authenticate(request);
+            if (result == null)
+                return Unauthorized("Sai username hoặc password");
+
+            if (!string.IsNullOrEmpty(result.Message))
+                return BadRequest(result.Message);
             return result is not null ? Ok(result) : Unauthorized();
         }
         [Authorize]
@@ -36,12 +42,24 @@ namespace QuanLyTaiSan.Controllers
         }
         [AllowAnonymous]
         [HttpPost("Register")]
-        public async Task<ActionResult<UserResponseDto>> Register([FromBody] UserRegisterDto request)
+       
+        public async Task<ActionResult<UserResponseDto>> Register(
+    [FromBody] UserRegisterDto request)
         {
-            var user = await _authService.RegisterAsync(request);
-            return Ok(user);
-
+            try
+            {
+                var user = await _authService.RegisterAsync(request);
+                return Ok(user);
+            }
+            catch (InvalidOperationException ex)
+            {
+                return BadRequest(new
+                {
+                    message = ex.Message
+                });
+            }
         }
+
         [Authorize(Policy = Permissions.UserGet)]
         [HttpGet]
         public async Task<ActionResult<List<UserResponseDto>>> GetAllUser()
@@ -54,7 +72,7 @@ namespace QuanLyTaiSan.Controllers
         public async Task<ActionResult<UserResponseDto>> GetUserById(string id)
         {
             var result = await _authService.GetUserById(id);
-            if (result == null) return NotFound();
+            if (result == null) return NotFound("User k tồn tại");
             return Ok(result);
         }
         [Authorize(Policy = Permissions.UserDelete)]
@@ -62,17 +80,30 @@ namespace QuanLyTaiSan.Controllers
         public async Task<ActionResult<string>> DeleteUserAsync(string id)
         {
             var result = await _authService.GetUserById(id);
-            if (result == null) return NotFound();
+            if (result == null) return NotFound("Change status false");
             await _authService.DeleteUser(id);
             return Ok("Change status done ");
         }
-
-        [HttpPatch("reset-password")]
-        public async Task<ActionResult<string>> ResetPassword(ResetPasswordDto dto)
+      
+        [Authorize]
+        [HttpPost("change-password")]
+        public async Task<IActionResult> ChangePassword(
+    [FromBody] ResetPasswordDto dto)
         {
-            await _authService.ResetPasswordAsync(dto);
-            return Ok("Mật khẩu đã được cập nhật thành công.");
+            try
+            {
+                var userId = User.FindFirstValue("sub");
+
+                var message = await _authService.ChangePasswordAsync(userId, dto);
+                return Ok(new { message });
+            }
+            catch (InvalidOperationException ex)
+            {
+                return BadRequest(new { message = ex.Message });
+            }
         }
+
+
         [Authorize(Policy =Permissions.UserDelete)]
         [HttpPatch("update-user")] 
         public async Task<ActionResult<UserUpdateDto>> UpdateUser(string id,UserUpdateDto dto)

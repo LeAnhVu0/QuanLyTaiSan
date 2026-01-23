@@ -9,6 +9,6 @@ namespace QuanLyTaiSan.Dtos.Department
 
         public string? Description { get; set; }
         [EnumDataType(typeof(DepartmentStatus))]
-        public DepartmentStatus? DepartmentStatus { get; set; }
+        public DepartmentStatus DepartmentStatus { get; set; }
     }
 }
