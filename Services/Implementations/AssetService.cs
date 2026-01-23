@@ -381,7 +381,7 @@ namespace QuanLyTaiSanTest.Services.Implementations
 
             if ((await _departmentService.GetDepartmentById(createAssetDto.DepartmentId)) == null)
             {
-                throw new KeyNotFoundException("Không tồn tại phòng ban có id = " + createAssetDto.DepartmentId);
+                throw new KeyNotFoundException("Không tồn tại phòng ban");
             }
 
             var words = category.CategoryName.Split(' ', StringSplitOptions.RemoveEmptyEntries);
@@ -474,25 +474,71 @@ namespace QuanLyTaiSanTest.Services.Implementations
                 {
                     throw new InvalidOperationException("Không thể thay đổi phòng ban khi tài sản đang được cấp cho nhân viên");
                 }
-            }    
-            else
-            {
-                h.AssetName = updateAssetDto.AssetName;
-                h.Descriptions = updateAssetDto.Descriptions;
-                h.ImageAsset = updateAssetDto.ImageAsset;
-                h.ManufactureYear = updateAssetDto.ManufactureYear;
-                h.OriginalValue = updateAssetDto.OriginalValue;
-                h.PurchaseDate = updateAssetDto.PurchaseDate;
-                h.Status = (AssetStatus)updateAssetDto.Status;
-                h.Note = updateAssetDto.Note;
-                h.Unit = updateAssetDto.Unit;
-                h.CategoryId = updateAssetDto.CategoryId;
-                h.UpdatedTime = DateTime.Now;
-                h.DepartmentId = updateAssetDto.DepartmentId;
-                await _repo.Update();
-                string currentUserId = GetCurrentUserId();
-                await SaveHistory(h, "UPDATE", "Người dùng cập nhật thông tin tài sản ID : " + id, currentUserId);
             }
+
+            // So sánh để tạo log
+            var changes = new List<string>();
+
+            if (h.AssetName != updateAssetDto.AssetName)
+                changes.Add($"Tên: '{h.AssetName}' -> '{updateAssetDto.AssetName}'");
+
+            if (h.Descriptions != updateAssetDto.Descriptions)
+                changes.Add($"Mô tả thay đổi");
+
+            // So sánh giá tiền 
+            if (h.OriginalValue != updateAssetDto.OriginalValue)
+                changes.Add($"Nguyên giá: {h.OriginalValue:N0} -> {updateAssetDto.OriginalValue:N0}");
+
+            // So sánh ngày tháng
+            if (h.PurchaseDate != updateAssetDto.PurchaseDate)
+                changes.Add($"Ngày mua: {h.PurchaseDate:dd/MM/yyyy} -> {updateAssetDto.PurchaseDate:dd/MM/yyyy}");
+
+            if (h.ManufactureYear != updateAssetDto.ManufactureYear)
+                changes.Add($"Năm SX: {h.ManufactureYear} -> {updateAssetDto.ManufactureYear}");
+
+            if ((int)h.Status != updateAssetDto.Status)
+                changes.Add($"Trạng thái thay đổi "); 
+
+            if (h.Note != updateAssetDto.Note)
+                changes.Add($"Ghi chú thay đổi");
+
+            if (h.Unit != updateAssetDto.Unit)
+                changes.Add($"Đơn vị tính: {h.Unit} -> {updateAssetDto.Unit}");
+
+            if (h.CategoryId != updateAssetDto.CategoryId)
+                changes.Add($"Loại tài sản ID: {h.CategoryId} -> {updateAssetDto.CategoryId}");
+
+            if (isChangeDepartment)
+                changes.Add($"Phòng ban ID: {h.DepartmentId} -> {updateAssetDto.DepartmentId}");
+
+            // Tạo chuỗi nội dung log
+            string historyAction = changes.Count > 0
+                ? "Cập nhật các trường: " + string.Join("; ", changes)
+                : "Cập nhật thông tin (Không có thay đổi thực tế)";
+         
+
+
+            //  Thực hiện Update (
+            h.AssetName = updateAssetDto.AssetName;
+            h.Descriptions = updateAssetDto.Descriptions;
+            h.ImageAsset = updateAssetDto.ImageAsset;
+            h.ManufactureYear = updateAssetDto.ManufactureYear;
+            h.OriginalValue = updateAssetDto.OriginalValue;
+            h.PurchaseDate = updateAssetDto.PurchaseDate;
+            h.Status = (AssetStatus)updateAssetDto.Status;
+            h.Note = updateAssetDto.Note;
+            h.Unit = updateAssetDto.Unit;
+            h.CategoryId = updateAssetDto.CategoryId;
+            h.DepartmentId = updateAssetDto.DepartmentId;
+
+            h.UpdatedTime = DateTime.Now;
+
+            await _repo.Update();
+
+            // Ghi lịch sử với nội dung chi tiết đã tạo ở trên
+            string currentUserId = GetCurrentUserId();
+            await SaveHistory(h, "UPDATE", historyAction, currentUserId);
+
             return new AssetRespondDto
             {
                 AssetId = h.AssetId,
@@ -660,7 +706,7 @@ namespace QuanLyTaiSanTest.Services.Implementations
             var h = await _repo.GetById(id);
             if (h == null)
             {
-                throw new KeyNotFoundException("Không tồn tại tài sản có id = " + id);
+                throw new KeyNotFoundException("Không tồn tại tài sản " );
             }
             else
             {
