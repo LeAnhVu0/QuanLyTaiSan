@@ -12,6 +12,6 @@ namespace QuanLyTaiSan.Dtos.Department
         public string? Description { get; set; }
         public DepartmentStatus? DepartmentStatus { get; set; }
         public List<UserInDepartmentDto> Users { get; set; }
-        public List<AssetNameDtp> Assets { get; set; }
+        public List<AssetNameDto> Assets { get; set; }
     }
 }

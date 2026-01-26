@@ -93,8 +93,8 @@ namespace QuanLyTaiSanTest.Controllers
                 });
             }
         }
-       
-        [HttpGet("{id:int}")]
+        [Authorize]
+         [HttpGet("{id:int}")]
         public async Task<IActionResult> GetById(int id)
         {
             try
@@ -126,7 +126,8 @@ namespace QuanLyTaiSanTest.Controllers
                 });
             }
         }
-
+      
+        [Authorize]
         [HttpGet("{code}")]
         public async Task<IActionResult> GetByCode(string code)
         {
@@ -318,6 +319,7 @@ namespace QuanLyTaiSanTest.Controllers
             }
         }
 
+        [Authorize]
         [HttpGet("History/{assetId}")]
         public async Task<IActionResult> GetHistoryById(int assetId)
         {

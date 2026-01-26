@@ -1,6 +1,6 @@
 ﻿namespace QuanLyTaiSan.Dtos.Asset
 {
-    public class AssetNameDtp
+    public class AssetNameDto
     {
         public int AssetId { get; set; }
 

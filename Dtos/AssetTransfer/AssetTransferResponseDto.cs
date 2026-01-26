@@ -11,7 +11,7 @@ namespace QuanLyTaiSan.Dtos.AssetTransfer
         public int TransferId { get; set; }
         public int AssetId { get; set; }
         public Guid? BatchId { get; set; }
-        public AssetNameDtp Asset { get; set; }
+        public AssetNameDto Asset { get; set; }
         public string TransferType { get; set; }
         public string Status { get; set; }
 

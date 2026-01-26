@@ -11,6 +11,6 @@ namespace QuanLyTaiSan.Dtos.Category
         public string Status { get; set; }
         public DateTime? CreatedTime { get; set; }
         public DateTime? UpdatedTime { get; set; }
-        public List<AssetNameDtp> Assets { get; set; } = new List<AssetNameDtp>();
+        public List<AssetNameDto> Assets { get; set; } = new List<AssetNameDto>();
     }
 }

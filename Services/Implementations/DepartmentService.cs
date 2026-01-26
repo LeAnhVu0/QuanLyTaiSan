@@ -71,7 +71,7 @@ namespace QuanLyTaiSan.Services.Implementations
                     Email = u.Email,
                     Status = u.Status.ToFriendlyString()
                 }).ToList(),
-                Assets=department.Assets.Select(a=>new AssetNameDtp
+                Assets=department.Assets.Select(a=>new AssetNameDto
                 {
                     AssetId=a.AssetId,
                     AssetCode=a.AssetCode,

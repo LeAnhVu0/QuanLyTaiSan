@@ -130,7 +130,7 @@ namespace QuanLyTaiSanTest.Services.Implementations
                     Status = category.Status.ToDisplayName(),
                     CreatedTime = category.CreatedTime,
                     UpdatedTime = category.UpdatedTime,
-                    Assets = category.Assets.Where(h => h.IsDelete == false).Select(h => new AssetNameDtp
+                    Assets = category.Assets.Where(h => h.IsDelete == false).Select(h => new AssetNameDto
                     { 
                         AssetId = h.AssetId,
                         AssetCode = h.AssetCode,
