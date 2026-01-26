@@ -7,9 +7,13 @@ namespace QuanLyTaiSan.Dtos.AssetTransfer
     {
         public int TransferId { get; set; }
         public int AssetId { get; set; }
-        public int? DepartmentId { get; set; }
+        public Guid? BatchId { get; set; }
 
         public string? TransferType { get; set; }
+
+        public int? FromDepartmentId { get; set; }
+
+        public int? ToDepartmentId { get; set; }
 
         public string? FromUserId { get; set; }
 

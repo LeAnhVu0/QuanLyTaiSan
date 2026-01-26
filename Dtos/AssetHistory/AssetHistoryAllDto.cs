@@ -1,13 +1,14 @@
 ﻿using QuanLyTaiSanTest.Dtos.Asset;
+using QuanLyTaiSanTest.Dtos.AssetHistory;
 
-namespace QuanLyTaiSan.Dtos.AssetTransfer
+namespace QuanLyTaiSan.Dtos.AssetHistory
 {
-    public class AssetTransferAllDto
+    public class AssetHistoryAllDto
     {
-        public List<AssetTransferBatchResponseDto> ListBatches { get; set; } = new List<AssetTransferBatchResponseDto>();
+        public List<AssetHistoryDto> ListAssetHistory { get; set; } = new List<AssetHistoryDto>();
 
-        public int? Type { get; set; }
-        public int? Status { get; set; }
+        public string? SearchName { get; set; }
+        public string? ActionType { get; set; }
         public int PageIndex { get; set; }
         public int PageSize { get; set; }
         public int TotalPage { get; set; }

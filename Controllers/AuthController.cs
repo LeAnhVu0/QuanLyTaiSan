@@ -67,7 +67,7 @@ namespace QuanLyTaiSan.Controllers
             var result = await _authService.GetAllUser();
             return Ok(result);
         }
-        [Authorize(Policy = Permissions.UserGet)]
+        [Authorize]
         [HttpGet("{id}")]
         public async Task<ActionResult<UserResponseDto>> GetUserById(string id)
         {

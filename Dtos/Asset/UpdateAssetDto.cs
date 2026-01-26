@@ -22,7 +22,5 @@
 
         public string? ImageAsset { get; set; }
         public int CategoryId { get; set; }
-        public int DepartmentId { get; set; }
-
     }
 }

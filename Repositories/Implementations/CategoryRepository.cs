@@ -66,7 +66,7 @@ namespace QuanLyTaiSanTest.Repositories.Implementations
 
         public async Task<Category?> GetById(int id)
         {
-            return await _context.Category.Include(C=>C.Assets).FirstOrDefaultAsync(c => c.CategoryId == id);
+            return await _context.Category.Include(C=>C.Assets.Where(a => a.IsDelete == false)).FirstOrDefaultAsync(c => c.CategoryId == id);
         }
         public async Task Update()
         {

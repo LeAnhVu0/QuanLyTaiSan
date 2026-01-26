@@ -7,11 +7,22 @@ namespace QuanLyTaiSanTest.Services.Interfaces
 {
     public interface IAssetService
     {
-        public  Task<AssetFormHandoverDto> CreateFormHandover(CreateFormTransferDto createFormTransferDto);
+        //public  Task<AssetFormHandoverDto> CreateFormHandover(CreateAssetFormTransferDto createFormTransferDto);
 
-        public  Task<AssetFormHandoverDto> CreateFormRecall(CreateFormTransferDto createFormTransferDto);
-        public  Task<ProcessTransferResultDto> ProcessApproval(int transferID,ProcessTransferDto processTransferDto);
-        public  Task<AssetTransferAllDto> GetAllTransfer(int pageIndex, int pageSize, int? status, int? type);
+        //public  Task<AssetFormHandoverDto> CreateFormRecall(CreateAssetFormTransferDto createFormTransferDto);
+        //public  Task<AssetFormHandoverDto> CreateFormDepartmentMove(CreateDepartmentFormTransferDto createDepartmentFormTransferDto);
+        //public  Task<ProcessTransferResultDto> ProcessApproval(int transferID,ProcessTransferDto processTransferDto);
+
+
+        public Task<List<AssetFormHandoverDto>> CreateMultiFormHandover(CreateMultiFormTransferDto createMultiFormHandoverDto);
+        public Task<List<AssetFormHandoverDto>> CreateMultiFormRecall(CreateMultiFormTransferDto createMultiFormRecallDto);
+        public Task<List<AssetFormHandoverDto>> CreateMultiFormDepartmentMove(CreateMultiDepartmentFormTransferDto createMultiDepartmentFormTransferDto);
+
+        public Task<List<ProcessTransferResultDto>> ProcessMultiApproval(ProcessMultiTransferDto processMultiTransferDto);
+
+
+
+        public Task<AssetTransferAllDto> GetAllTransfer(int pageIndex, int pageSize, int? status, int? type);
         public Task<AssetAllDto> GetPageList(int pageIndex, int pageSize, string? search, int? categoryId, string? userId, int? status, string sortBy, bool desc);
         public Task<List<AssetRespondDto>> GetAll();
 

@@ -19,8 +19,8 @@ namespace QuanLyTaiSanTest.Dtos.AssetHistory
 
         // Khóa ngoại
         public int AssetId { get; set; }
-        public UserDto? AssignedToUserId { get; set; }
-        public UserDto? CreatedByUserId { get; set; } 
+        public UserDto? AssignedToUser { get; set; }
+        public UserDto? CreatedByUser { get; set; } 
 
     }
 }

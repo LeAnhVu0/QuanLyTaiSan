@@ -41,222 +41,738 @@ namespace QuanLyTaiSanTest.Services.Implementations
             _httpContextAccessor = httpContextAccessor;
             _userManager = userManager;
         }
-        public async Task<AssetFormHandoverDto> CreateFormHandover(CreateFormTransferDto createFormTransferDto)
+
+        ////Tạo phiếu bàn giao
+        //public async Task<AssetFormHandoverDto> CreateFormHandover(CreateAssetFormTransferDto createFormTransferDto)
+        //{
+        //    //Kiểm tra đầu vào null không
+        //    if (createFormTransferDto == null)
+        //        throw new ArgumentNullException(nameof(createFormTransferDto));
+
+        //    if (string.IsNullOrEmpty(createFormTransferDto.ToUserId))
+        //        throw new ArgumentException("Vui lòng chọn nhân viên nhận bàn giao");
+
+        //    if (createFormTransferDto.DepartmentId == null)
+        //        throw new ArgumentException("Vui lòng chọn phòng ban nhận bàn giao");
+
+        //    //Kiêm tra tài sản có tồn tại hay không
+        //    var asset = await _repo.GetById(createFormTransferDto.AssetId);
+        //    if (asset == null) throw new KeyNotFoundException("Tài sản không tồn tại");
+
+        //    //Check xung đột phiếu
+        //    bool isPending = await _repo.AnyAsync(x =>x.AssetId == asset.AssetId &&x.Status == AssetTransferStatus.Pending);
+        //    if (isPending)
+        //    {
+        //        throw new InvalidOperationException("Tài sản này đang có phiếu bàn giao/thu hồi chờ duyệt");
+        //    }
+
+        //    //Check xem tài sản đã được bàn giao hay chưa
+
+        //    if (!string.IsNullOrEmpty(asset.UserId))
+        //    {
+        //        throw new InvalidOperationException("Tài sản đang được giữ bởi người khác. Phải thu hồi trước");
+        //    }
+
+        //    //Check trạng thái tài sản
+        //    if (asset.Status != AssetStatus.SanSang)
+        //    {
+        //        throw new InvalidOperationException("Tài sản không ở trạng thái sẵn sàng để bàn giao");
+        //    }
+
+        //    //Kiểm tra người dùng có tồn tại hay không
+        //    var user = await _authService.GetUserById(createFormTransferDto.ToUserId);
+        //    if (user == null)
+        //    {
+        //        throw new KeyNotFoundException($"Không tồn tại tài khoản có id = {createFormTransferDto.ToUserId}");
+        //    }
+
+        //    //Kiểm tra phòng ban có tồn tại hay không
+        //    var department = await _departmentService.GetDepartmentById(createFormTransferDto.DepartmentId.Value);
+
+        //    if (department == null)
+        //        throw new KeyNotFoundException("Phòng ban không tồn tại");
+
+
+        //    //check xem tài sản , nhân viên có cùng thuộc 1 phòng ban không
+        //    if (asset.DepartmentId != createFormTransferDto.DepartmentId)
+        //    {
+        //        throw new InvalidOperationException($"Tài sản ID = {asset.AssetId} không thuộc về phòng ban ID = {createFormTransferDto.DepartmentId}");
+        //    }
+        //    if (user.DepartmentId != createFormTransferDto.DepartmentId)
+        //    {
+        //        throw new InvalidOperationException($"Nhân viên không thuộc về phòng ban ID = {createFormTransferDto.DepartmentId}");
+        //    }
+        //    if (asset.DepartmentId != user.DepartmentId)
+        //    {
+        //        throw new InvalidOperationException("Tài sản và nhân viên không cùng thuộc 1 phòng ban");
+        //    }
+
+        //    var transfer = new AssetTransfer
+        //    {
+        //        AssetId = asset.AssetId,
+        //        TransferType = QuanLyTaiSan.Enum.AssetTransferType.Handover,
+        //        Status = QuanLyTaiSan.Enum.AssetTransferStatus.Pending,
+        //        FromDepartmentId = createFormTransferDto.DepartmentId,
+        //        ToDepartmentId = null,
+        //        FromUserId = null,
+        //        ToUserId = createFormTransferDto.ToUserId,
+        //        CreatedByUserId = GetCurrentUserId(),
+        //        CreatedAt = DateTime.Now,
+        //        Purpose = createFormTransferDto.Purpose,
+        //        Note = createFormTransferDto.Note
+        //    };
+        //    await _repo.AddTransfer(transfer);
+        //    return new AssetFormHandoverDto
+        //    {
+        //        TransferId = transfer.TransferId,
+        //        AssetId = transfer.AssetId,
+        //        TransferType = transfer.TransferType.ToDisplayName(),
+        //        Status = transfer.Status.ToDisplayName(),
+        //        FromDepartmentId = transfer.FromDepartmentId,
+        //        ToDepartmentId = transfer.ToDepartmentId,
+        //        FromUserId = transfer.FromUserId,
+        //        ToUserId = transfer.ToUserId,
+        //        CreatedByUserId = transfer.CreatedByUserId,
+        //        Purpose = transfer.Purpose,
+        //        Note = transfer.Note,
+        //        CreatedAt = transfer.CreatedAt
+        //    };
+        //}
+
+        //// Tạo phiếu thu hồi
+        //public async Task<AssetFormHandoverDto> CreateFormRecall(CreateAssetFormTransferDto createFormTransferDto)
+        //{
+        //    // kiểm tra xem nhân viên và tài sản có tồn tại không
+        //    var asset = await _repo.GetById(createFormTransferDto.AssetId);
+        //    if (asset == null) throw new KeyNotFoundException("Tài sản không tồn tại");
+
+        //    var user = await _authService.GetUserById(createFormTransferDto.ToUserId);
+        //    if (user == null) throw new KeyNotFoundException("Nhân viên không tồn tại");
+
+        //    //Check xung đột phiếu
+        //    bool isPending = await _repo.AnyAsync(x =>x.AssetId == asset.AssetId &&x.Status == AssetTransferStatus.Pending);
+        //    if (isPending)
+        //    {
+        //        throw new InvalidOperationException("Tài sản này đang có phiếu chờ duyệt");
+        //    }
+
+        //    // kiểm tra xem tài sản có đang được sử dụng không 
+        //    if (string.IsNullOrEmpty(asset.UserId))
+        //        throw new InvalidOperationException("Tài sản chưa được cấp phát, không thể thu hồi");
+
+        //    // kiểm tra xem nhân viên có sở hữu  tài sản này không 
+        //    if (asset.UserId != createFormTransferDto.ToUserId)
+        //        throw new InvalidOperationException("Nhân viên không sở hữu tài sản này");
+
+        //    var transfer = new AssetTransfer
+        //    {
+        //        AssetId = createFormTransferDto.AssetId,
+        //        TransferType = QuanLyTaiSan.Enum.AssetTransferType.Recall,
+        //        Status = QuanLyTaiSan.Enum.AssetTransferStatus.Pending,
+        //        FromDepartmentId = createFormTransferDto.DepartmentId,
+        //        ToDepartmentId = null,
+        //        FromUserId = asset.UserId,
+        //        ToUserId = null,
+        //        CreatedByUserId = GetCurrentUserId(),
+        //        CreatedAt = DateTime.Now,
+        //        Purpose = createFormTransferDto.Purpose,
+        //        Note = createFormTransferDto.Note
+        //    };
+        //    await _repo.AddTransfer(transfer);
+        //    return new AssetFormHandoverDto
+        //    {
+        //        TransferId = transfer.TransferId,
+        //        AssetId = transfer.AssetId,
+        //        TransferType = transfer.TransferType.ToDisplayName(),
+        //        Status = transfer.Status.ToDisplayName(),
+        //        FromDepartmentId = createFormTransferDto.DepartmentId,
+        //        ToDepartmentId = null,
+
+        //        FromUserId = transfer.FromUserId,
+        //        ToUserId = transfer.ToUserId,
+        //        CreatedByUserId = transfer.CreatedByUserId,
+        //        Note = transfer.Note,
+        //        Purpose = transfer.Purpose,
+        //        CreatedAt = transfer.CreatedAt
+        //    };
+
+        //}
+        //// Tạo phiếu điều chuyển phòng ban
+        //public async Task<AssetFormHandoverDto> CreateFormDepartmentMove( CreateDepartmentFormTransferDto createDepartmentFormTransferDto)
+        //{
+        //    //Kiểm tra đầu vào null không
+        //    if (createDepartmentFormTransferDto == null)
+        //        throw new ArgumentNullException(nameof(createDepartmentFormTransferDto));
+
+        //    if (createDepartmentFormTransferDto.ToDepartmentId == null)
+        //        throw new ArgumentException("Vui lòng chọn phòng ban nhận bàn giao");
+
+
+        //    //Kiêm tra tài sản có tồn tại hay không
+        //    var asset = await _repo.GetById(createDepartmentFormTransferDto.AssetId);
+        //    if (asset == null) throw new KeyNotFoundException("Tài sản không tồn tại");
+
+        //    //Kiểm tra tài sản có thuộc phòng ban nào không
+        //    if (asset.DepartmentId == null)
+        //        throw new InvalidOperationException("Tài sản chưa được gán cho phòng ban nào");
+            
+        //    //Tài sản có thuộc phòng ban nhập  vào  không
+        //    if (asset.DepartmentId != createDepartmentFormTransferDto.FromDepartmentId)
+        //    {
+        //        throw new InvalidOperationException("Tài sản này không thuộc phòng ban bạn đã nhập");
+        //    }
+
+        //    //Phòng ban nhận phải khác phòng ban ban đầu
+        //    if (asset.DepartmentId == createDepartmentFormTransferDto.ToDepartmentId)
+        //    {
+        //        throw new InvalidOperationException("Phòng ban chuyển đến phải khác phòng ban hiện tại");
+        //    }
+
+        //    //Check xung đột phiếu
+        //    bool isPending = await _repo.AnyAsync(x => x.AssetId == asset.AssetId && x.Status == AssetTransferStatus.Pending);
+        //    if (isPending)
+        //    {
+        //        throw new InvalidOperationException("Tài sản này đang có phiếu bàn giao/thu hồi chờ duyệt");
+        //    }
+
+        //    //Check xem tài sản đã được bàn giao hay chưa
+        //    if (!string.IsNullOrEmpty(asset.UserId))
+        //    {
+        //        throw new InvalidOperationException("Tài sản đang được giữ bởi người khác. Phải thu hồi trước");
+        //    }
+
+        //    //Check trạng thái tài sản
+        //    if (asset.Status == AssetStatus.DangSuDung || asset.Status == AssetStatus.ThanhLy || asset.Status == AssetStatus.Mat)
+        //    {
+        //        throw new InvalidOperationException("Tài sản không ở trạng thái có thể bàn giao");
+        //    }
+
+        //    //Kiểm tra phòng ban có tồn tại hay không
+        //    var department = await _departmentService.GetDepartmentById(createDepartmentFormTransferDto.ToDepartmentId);
+        //    if (department == null)
+        //        throw new KeyNotFoundException("Phòng ban không tồn tại");
+
+
+        //    var transfer = new AssetTransfer
+        //    {
+        //        AssetId = asset.AssetId,
+        //        TransferType = QuanLyTaiSan.Enum.AssetTransferType.DepartmentMove,
+        //        Status = QuanLyTaiSan.Enum.AssetTransferStatus.Pending,
+        //        FromDepartmentId = asset.DepartmentId,
+        //        ToDepartmentId = createDepartmentFormTransferDto.ToDepartmentId,
+        //        FromUserId = null,
+        //        ToUserId = null,
+        //        CreatedByUserId = GetCurrentUserId(),
+        //        CreatedAt = DateTime.Now,
+        //        Purpose = createDepartmentFormTransferDto.Purpose,
+        //        Note = createDepartmentFormTransferDto.Note
+        //    };
+        //    await _repo.AddTransfer(transfer);
+        //    return new AssetFormHandoverDto
+        //    {
+        //        TransferId = transfer.TransferId,
+        //        AssetId = transfer.AssetId,
+        //        TransferType = transfer.TransferType.ToDisplayName(),
+        //        Status = transfer.Status.ToDisplayName(),
+        //        FromDepartmentId = transfer.FromDepartmentId,
+        //        ToDepartmentId = transfer.ToDepartmentId,
+        //        FromUserId = transfer.FromUserId,
+        //        ToUserId = transfer.ToUserId,
+        //        CreatedByUserId = transfer.CreatedByUserId,
+        //        Purpose = transfer.Purpose,
+        //        Note = transfer.Note,
+        //        CreatedAt = transfer.CreatedAt
+        //    };
+        //}
+
+
+        //Tạo phiếu bàn giao nhiều tài sản
+        public async Task<List<AssetFormHandoverDto>> CreateMultiFormHandover(CreateMultiFormTransferDto createMultiFormHandoverDto)
         {
             //Kiểm tra đầu vào null không
-            if (createFormTransferDto == null)
-                throw new ArgumentNullException(nameof(createFormTransferDto));
+            if (createMultiFormHandoverDto == null)
+                throw new ArgumentNullException(nameof(createMultiFormHandoverDto));
 
-            if (string.IsNullOrEmpty(createFormTransferDto.ToUserId))
-                throw new ArgumentException("Vui lòng chọn nhân viên nhận bàn giao");
+            if (createMultiFormHandoverDto.AssetIds == null || !createMultiFormHandoverDto.AssetIds.Any())
+                throw new ArgumentException("Danh sách tài sản trống");
 
-            if (createFormTransferDto.DepartmentId == null)
-                throw new ArgumentException("Vui lòng chọn phòng ban nhận bàn giao");
+            if (string.IsNullOrEmpty(createMultiFormHandoverDto.ToUserId))
+                throw new ArgumentException("Vui lòng chọn nhân viên ");
+
+            if (createMultiFormHandoverDto.DepartmentId == null)
+                throw new ArgumentException("Vui lòng chọn phòng ban ");
 
             //Kiêm tra tài sản có tồn tại hay không
-            var asset = await _repo.GetById(createFormTransferDto.AssetId);
-            if (asset == null) throw new KeyNotFoundException("Tài sản không tồn tại");
-
-            //Check xung đột phiếu
-            bool isPending = await _repo.AnyAsync(x =>x.AssetId == asset.AssetId &&x.Status == AssetTransferStatus.Pending);
-            if (isPending)
-            {
-                throw new InvalidOperationException("Tài sản này đang có phiếu bàn giao/thu hồi chờ duyệt");
-            }
-
-            //Check xem tài sản đã được bàn giao hay chưa
-
-            if (!string.IsNullOrEmpty(asset.UserId))
-            {
-                throw new InvalidOperationException("Tài sản đang được giữ bởi người khác. Phải thu hồi trước");
-            }
-
-            //Check trạng thái tài sản
-            if (asset.Status != AssetStatus.SanSang)
-            {
-                throw new InvalidOperationException("Tài sản không ở trạng thái sẵn sàng để bàn giao");
-            }
+            var assets = await _repo.GetAssetsByIds(createMultiFormHandoverDto.AssetIds);
+            if (assets.Count != createMultiFormHandoverDto.AssetIds.Count) 
+                throw new KeyNotFoundException("Một số tài sản không tồn tại");
 
             //Kiểm tra người dùng có tồn tại hay không
-            var user = await _authService.GetUserById(createFormTransferDto.ToUserId);
+            var user = await _authService.GetUserById(createMultiFormHandoverDto.ToUserId);
             if (user == null)
-            {
-                throw new KeyNotFoundException($"Không tồn tại tài khoản có id = {createFormTransferDto.ToUserId}");
-            }
+                throw new KeyNotFoundException($"KNgười nhận không tồn tại");
+
+            //Kiểm tra xem tài khoản người dùng còn hoạt động không
+            if (user.Status != UserStatus.active)
+                throw new KeyNotFoundException("Tài khoản người nhận đã ngừng hoạt động");
 
             //Kiểm tra phòng ban có tồn tại hay không
-            var department = await _departmentService.GetDepartmentById(createFormTransferDto.DepartmentId.Value);
+            var department = await _departmentService.GetDepartmentById(createMultiFormHandoverDto.DepartmentId.Value);
 
             if (department == null)
                 throw new KeyNotFoundException("Phòng ban không tồn tại");
 
+            var resultList = new List<AssetFormHandoverDto>();
+            var transferList = new List<AssetTransfer>();
+            var batchId = Guid.NewGuid();
 
-            //check xem tài sản , nhân viên có cùng thuộc 1 phòng ban không
-            if (asset.DepartmentId != createFormTransferDto.DepartmentId)
+            foreach (var asset in assets)
             {
-                throw new InvalidOperationException($"Tài sản ID = {asset.AssetId} không thuộc về phòng ban ID = {createFormTransferDto.DepartmentId}");
-            }
-            if (user.DepartmentId != createFormTransferDto.DepartmentId)
-            {
-                throw new InvalidOperationException($"Nhân viên không thuộc về phòng ban ID = {createFormTransferDto.DepartmentId}");
-            }
-            if (asset.DepartmentId != user.DepartmentId)
-            {
-                throw new InvalidOperationException("Tài sản và nhân viên không cùng thuộc 1 phòng ban");
+                //Check xung đột phiếu
+                bool isPending = await _repo.AnyAsync(x => x.AssetId == asset.AssetId && x.Status == AssetTransferStatus.Pending);
+                if (isPending)
+                    throw new InvalidOperationException($"Tài sản {asset.AssetCode} đang chờ duyệt");
+
+                //Check xem tài sản đã được bàn giao hay chưa
+                if (!string.IsNullOrEmpty(asset.UserId))
+                    throw new InvalidOperationException($"Tài sản {asset.AssetCode} đang được giữ bởi người khác. Phải thu hồi trước");
+
+                //Check trạng thái tài sản
+                if (asset.Status != AssetStatus.SanSang)
+                    throw new InvalidOperationException($"Tài sản {asset.AssetCode} không ở trạng thái sẵn sàng để bàn giao");
+
+
+                //check xem tài sản , nhân viên có cùng thuộc 1 phòng ban không
+                if (asset.DepartmentId != createMultiFormHandoverDto.DepartmentId)
+                    throw new InvalidOperationException($"Tài sản {asset.AssetCode} không thuộc về phòng ban này");
+                if (user.DepartmentId != createMultiFormHandoverDto.DepartmentId)
+                    throw new InvalidOperationException($"Nhân viên đã chọn không thuộc về phòng ban này");
+                if (asset.DepartmentId != user.DepartmentId)
+                    throw new InvalidOperationException("Tài sản và nhân viên không cùng thuộc 1 phòng ban");
+
+                //add phiếu vào danh sách
+                transferList.Add(new AssetTransfer
+                {
+                    AssetId = asset.AssetId,
+                    TransferType = QuanLyTaiSan.Enum.AssetTransferType.Handover,
+                    Status = QuanLyTaiSan.Enum.AssetTransferStatus.Pending,
+                    FromDepartmentId = createMultiFormHandoverDto.DepartmentId,
+                    ToDepartmentId = null,
+                    FromUserId = null,
+                    ToUserId = createMultiFormHandoverDto.ToUserId,
+                    CreatedByUserId = GetCurrentUserId(),
+                    CreatedAt = DateTime.Now,
+                    Purpose = createMultiFormHandoverDto.Purpose,
+                    Note = createMultiFormHandoverDto.Note,
+                    BatchId = batchId
+                });
             }
 
-            var transfer = new AssetTransfer
+            //Nếu các tài sản đều hợp lệ thì thêm vào db
+            foreach (var transfer in transferList)
             {
-                AssetId = asset.AssetId,
-                TransferType = QuanLyTaiSan.Enum.AssetTransferType.Handover,
-                Status = QuanLyTaiSan.Enum.AssetTransferStatus.Pending,
-                DepartmentId = createFormTransferDto.DepartmentId,
-                FromUserId = null,
-                ToUserId = createFormTransferDto.ToUserId,
-                CreatedByUserId = GetCurrentUserId(),
-                CreatedAt = DateTime.Now,
-                Purpose = createFormTransferDto.Purpose,
-                Note = createFormTransferDto.Note
-            };
-            await _repo.AddTransfer(transfer);
-            return new AssetFormHandoverDto
-            {
-                TransferId = transfer.TransferId,
-                AssetId = transfer.AssetId,
-                TransferType = transfer.TransferType.ToDisplayName(),
-                Status = transfer.Status.ToDisplayName(),
-                DepartmentId = transfer.DepartmentId,
-                FromUserId = transfer.FromUserId,
-                ToUserId = transfer.ToUserId,
-                CreatedByUserId = transfer.CreatedByUserId,
-                Purpose = transfer.Purpose,
-                Note = transfer.Note,
-                CreatedAt = transfer.CreatedAt
-            };
+                await _repo.AddTransfer(transfer);
+
+                // Add vào list kết quả trả về
+                resultList.Add(new AssetFormHandoverDto
+                {
+                    TransferId = transfer.TransferId,
+                    AssetId = transfer.AssetId,
+                    BatchId = transfer.BatchId,
+                    TransferType = transfer.TransferType.ToDisplayName(),
+                    Status = transfer.Status.ToDisplayName(),
+                    FromDepartmentId = transfer.FromDepartmentId,
+                    ToDepartmentId = transfer.ToDepartmentId,
+                    FromUserId = transfer.FromUserId,
+                    ToUserId = transfer.ToUserId,
+                    CreatedByUserId = transfer.CreatedByUserId,
+                    Purpose = transfer.Purpose,
+                    Note = transfer.Note,
+                    CreatedAt = transfer.CreatedAt
+                });
+            }
+
+            return resultList;
         }
-        public async Task<AssetFormHandoverDto> CreateFormRecall(CreateFormTransferDto createFormTransferDto)
-        {
-            // kiểm tra xem nhân viên và tài sản có tồn tại không
-            var asset = await _repo.GetById(createFormTransferDto.AssetId);
-            if (asset == null) throw new KeyNotFoundException("Tài sản không tồn tại");
 
-            var user = await _authService.GetUserById(createFormTransferDto.ToUserId);
+        // Tạo phiếu thu hồi nhiều tài sản
+        public async Task<List<AssetFormHandoverDto>> CreateMultiFormRecall(CreateMultiFormTransferDto createMultiFormRecallDto)
+        {
+            //Kiểm tra đầu vào null không
+            if (createMultiFormRecallDto.AssetIds == null || !createMultiFormRecallDto.AssetIds.Any())
+                throw new ArgumentException("Danh sách tài sản thu hồi bị trống");
+            if (string.IsNullOrEmpty(createMultiFormRecallDto.ToUserId))
+                throw new ArgumentException("Vui lòng chọn nhân viên cần thu hồi");
+
+            var user = await _authService.GetUserById(createMultiFormRecallDto.ToUserId);
             if (user == null) throw new KeyNotFoundException("Nhân viên không tồn tại");
 
-            //Check xung đột phiếu
-            bool isPending = await _repo.AnyAsync(x =>x.AssetId == asset.AssetId &&x.Status == AssetTransferStatus.Pending);
-            if (isPending)
+            // Lấy dữ liệu tài sản
+            var assets = await _repo.GetAssetsByIds(createMultiFormRecallDto.AssetIds);
+            if (assets.Count != createMultiFormRecallDto.AssetIds.Count)
+                throw new KeyNotFoundException("Một số tài sản không tồn tại hoặc đã bị xóa");
+
+
+            // Chuẩn bị danh sách
+            var resultList = new List<AssetFormHandoverDto>();
+            var transferList = new List<AssetTransfer>();
+            var batchId = Guid.NewGuid();
+            foreach (var asset in assets)
             {
-                throw new InvalidOperationException("Tài sản này đang có phiếu chờ duyệt");
+                //Check xung đột phiếu , đang có phiếu treo
+                bool isPending = await _repo.AnyAsync(x => x.AssetId == asset.AssetId && x.Status == AssetTransferStatus.Pending);
+                if (isPending)
+                    throw new InvalidOperationException($"Tài sản {asset.AssetCode} đang có phiếu chờ duyệt");
+
+                // kiểm tra xem tài sản có đang được sử dụng không 
+                if (string.IsNullOrEmpty(asset.UserId))
+                    throw new InvalidOperationException($"Tài sản {asset.AssetCode} chưa được cấp phát, không thể thu hồi");
+
+
+                // kiểm tra xem nhân viên có sở hữu  tài sản này không 
+                if (asset.UserId != createMultiFormRecallDto.ToUserId)
+                    throw new InvalidOperationException($"Tài sản {asset.AssetCode} không thuộc về nhân viên {user.Fullname}");
+                
+                //Tạo phiếu
+                var transfer = new AssetTransfer
+                {
+                    AssetId = asset.AssetId,
+                    BatchId = batchId,
+                    TransferType = QuanLyTaiSan.Enum.AssetTransferType.Recall,
+                    Status = QuanLyTaiSan.Enum.AssetTransferStatus.Pending,
+
+                    FromDepartmentId = createMultiFormRecallDto.DepartmentId,
+                    ToDepartmentId = createMultiFormRecallDto.DepartmentId,
+
+                    FromUserId = asset.UserId,
+                    ToUserId = null,
+
+                    CreatedByUserId = GetCurrentUserId(),
+                    CreatedAt = DateTime.Now,
+                    Purpose = createMultiFormRecallDto.Purpose,
+                    Note = createMultiFormRecallDto.Note
+                };
+                transferList.Add(transfer);
             }
-
-            // kiểm tra xem tài sản có đang được sử dụng không 
-            if (string.IsNullOrEmpty(asset.UserId))
-                throw new InvalidOperationException("Tài sản chưa được cấp phát, không thể thu hồi");
-
-            // kiểm tra xem nhân viên có sở hữu  tài sản này không 
-            if (asset.UserId != createFormTransferDto.ToUserId)
-                throw new InvalidOperationException("Nhân viên không sở hữu tài sản này");
-
-            var transfer = new AssetTransfer
+            //Lưu vào Database
+            foreach (var transfer in transferList)
             {
-                AssetId = createFormTransferDto.AssetId,
-                TransferType = QuanLyTaiSan.Enum.AssetTransferType.Recall,
-                Status = QuanLyTaiSan.Enum.AssetTransferStatus.Pending,
-                DepartmentId = createFormTransferDto.DepartmentId,
-                FromUserId = asset.UserId,
-                ToUserId = null,
-                CreatedByUserId = GetCurrentUserId(),
-                CreatedAt = DateTime.Now,
-                Purpose = createFormTransferDto.Purpose,
-                Note = createFormTransferDto.Note
-            };
-            await _repo.AddTransfer(transfer);
-            return new AssetFormHandoverDto
-            {
-                TransferId = transfer.TransferId,
-                AssetId = transfer.AssetId,
-                TransferType = transfer.TransferType.ToDisplayName(),
-                Status = transfer.Status.ToDisplayName(),
-                DepartmentId = transfer.DepartmentId,
+                await _repo.AddTransfer(transfer);
+                resultList.Add(new AssetFormHandoverDto
+                {
+                    TransferId = transfer.TransferId,
+                    AssetId = transfer.AssetId,
+                    BatchId = transfer.BatchId,
+                    TransferType = transfer.TransferType.ToDisplayName(),
+                    Status = transfer.Status.ToDisplayName(),
+                    FromDepartmentId = transfer.FromDepartmentId,
+                    ToDepartmentId = transfer.ToDepartmentId,
 
-                FromUserId = transfer.FromUserId,
-                ToUserId = transfer.ToUserId,
-                CreatedByUserId = transfer.CreatedByUserId,
-                Note = transfer.Note,
-                Purpose = transfer.Purpose,
-                CreatedAt = transfer.CreatedAt
-            };
-
+                    FromUserId = transfer.FromUserId,
+                    ToUserId = transfer.ToUserId,
+                    CreatedByUserId = transfer.CreatedByUserId,
+                    Note = transfer.Note,
+                    Purpose = transfer.Purpose,
+                    CreatedAt = transfer.CreatedAt
+                });
+            }
+            return resultList;
         }
-        
-        //Quy trình xác nhận
-        public async Task<ProcessTransferResultDto> ProcessApproval(int transferID, ProcessTransferDto processTransferDto)
+
+        // Tạo phiếu điều chuyển nhiều tài sản sang phòng ban khác
+        public async Task<List<AssetFormHandoverDto>> CreateMultiFormDepartmentMove(CreateMultiDepartmentFormTransferDto createMultiDepartmentFormTransferDto)
         {
-            // Kiểm tra xem phiếu có tồn tại không và đang trong trạng thái chờ duyệt hay không
-            var transfer = await _repo.GetTransferById(transferID);
-            if (transfer == null)
+            //Kiểm tra đầu vào null không
+            if (createMultiDepartmentFormTransferDto == null)
+                throw new ArgumentNullException(nameof(createMultiDepartmentFormTransferDto));
+
+            if (createMultiDepartmentFormTransferDto.AssetIds == null || !createMultiDepartmentFormTransferDto.AssetIds.Any())
+                throw new ArgumentException("Danh sách tài sản điều chuyển bị trống");
+
+            if (createMultiDepartmentFormTransferDto.ToDepartmentId == null)
+                throw new ArgumentException("Vui lòng chọn phòng ban nhận bàn giao");
+
+            //Phòng ban nhận phải khác phòng ban ban đầu
+            if (createMultiDepartmentFormTransferDto.FromDepartmentId == createMultiDepartmentFormTransferDto.ToDepartmentId)
             {
-                throw new KeyNotFoundException("Không tồn tại phiếu");
+                throw new InvalidOperationException("Phòng ban chuyển đến phải khác phòng ban hiện tại");
             }
-            if (transfer.Status != AssetTransferStatus.Pending)
+
+            //Kiểm tra phòng ban nhận có tồn tại hay không
+            var department = await _departmentService.GetDepartmentById(createMultiDepartmentFormTransferDto.ToDepartmentId);
+            if (department == null)
+                throw new KeyNotFoundException("Phòng ban nhận không tồn tại");
+
+            //Kiểm tra xem phòng ban còn hoạt động không
+            if (department.DepartmentStatus != DepartmentStatus.Active)
+                throw new KeyNotFoundException("Phòng ban nhận đã ngừng hoạt động");
+
+            //Kiêm tra tài sản có tồn tại hay không
+            var assets = await _repo.GetAssetsByIds(createMultiDepartmentFormTransferDto.AssetIds);
+            if (assets.Count != createMultiDepartmentFormTransferDto.AssetIds.Count)
+                throw new KeyNotFoundException("Một số tài sản không tồn tại hoặc đã bị xóa");
+
+
+            var transferList = new List<AssetTransfer>();
+            var resultList = new List<AssetFormHandoverDto>();
+            string currentUserId = GetCurrentUserId();
+            var batchId = Guid.NewGuid();
+
+            foreach (var asset in assets)
             {
-                throw new InvalidOperationException("Phiếu không ở trong trạng thái chờ duyệt");
+                // Kiểm tra tài sản có thuộc phòng ban nguồn đã chọn không
+                if (asset.DepartmentId != createMultiDepartmentFormTransferDto.FromDepartmentId)
+                    throw new InvalidOperationException($"Tài sản {asset.AssetCode} không thuộc phòng ban nguồn bạn đã chọn");
+
+                //Check xung đột phiếu
+                bool isPending = await _repo.AnyAsync(x => x.AssetId == asset.AssetId && x.Status == AssetTransferStatus.Pending);
+                if (isPending)
+                    throw new InvalidOperationException($"Tài sản {asset.AssetCode} đang có phiếu bàn giao/thu hồi chờ duyệt");
+
+                //Check xem tài sản đã được bàn giao hay chưa
+                if (!string.IsNullOrEmpty(asset.UserId))
+                    throw new InvalidOperationException($"Tài sản {asset.AssetCode} đang được giữ bởi người khác. Phải thu hồi trước");
+
+                //Kiểm tra tài sản có thuộc phòng ban nào không
+                if (asset.DepartmentId == null)
+                    throw new InvalidOperationException("Tài sản chưa được gán cho phòng ban nào");
+
+
+                //Check trạng thái tài sản
+                if (asset.Status == AssetStatus.DangSuDung || asset.Status == AssetStatus.ThanhLy || asset.Status == AssetStatus.Mat)
+                    throw new InvalidOperationException($"Tài sản {asset.AssetCode}không ở trạng thái có thể bàn giao");
+
+                //Tạo phiếu
+                var transfer = new AssetTransfer
+                {
+                    AssetId = asset.AssetId,
+                    BatchId = batchId,
+                    TransferType = QuanLyTaiSan.Enum.AssetTransferType.DepartmentMove,
+                    Status = QuanLyTaiSan.Enum.AssetTransferStatus.Pending,
+
+                    FromDepartmentId = asset.DepartmentId,
+                    ToDepartmentId = createMultiDepartmentFormTransferDto.ToDepartmentId,
+
+                    FromUserId = null,
+                    ToUserId = null,
+
+                    CreatedByUserId = GetCurrentUserId(),
+                    CreatedAt = DateTime.Now,
+                    Purpose = createMultiDepartmentFormTransferDto.Purpose,
+                    Note = createMultiDepartmentFormTransferDto.Note
+                };
+                transferList.Add(transfer);
             }
-             //kiểm tra xem tài sản có dữ liệu không
-            var asset = transfer.Asset;
-            if (asset == null)
-                throw new KeyNotFoundException("Dữ liệu tài sản bị trống");
+
+            foreach (var transfer in transferList)
+            {
+                await _repo.AddTransfer(transfer);
+                resultList.Add(new AssetFormHandoverDto
+                {
+                    TransferId = transfer.TransferId,
+                    AssetId = transfer.AssetId,
+                    BatchId = transfer.BatchId,
+                    TransferType = transfer.TransferType.ToDisplayName(),
+                    Status = transfer.Status.ToDisplayName(),
+                    FromDepartmentId = transfer.FromDepartmentId,
+                    ToDepartmentId = transfer.ToDepartmentId,
+                    FromUserId = transfer.FromUserId,
+                    ToUserId = transfer.ToUserId,
+                    CreatedByUserId = transfer.CreatedByUserId,
+                    Purpose = transfer.Purpose,
+                    Note = transfer.Note,
+                    CreatedAt = transfer.CreatedAt
+                });
+            }
+            return resultList;
+        }
+
+        ////Quy trình xác nhận
+        //public async Task<ProcessTransferResultDto> ProcessApproval(int transferID, ProcessTransferDto processTransferDto)
+        //{
+        //    // Kiểm tra xem phiếu có tồn tại không và đang trong trạng thái chờ duyệt hay không
+        //    var transfer = await _repo.GetTransferById(transferID);
+        //    if (transfer == null)
+        //    {
+        //        throw new KeyNotFoundException("Không tồn tại phiếu");
+        //    }
+        //    if (transfer.Status != AssetTransferStatus.Pending)
+        //    {
+        //        throw new InvalidOperationException("Phiếu không ở trong trạng thái chờ duyệt");
+        //    }
+        //     //kiểm tra xem tài sản có dữ liệu không
+        //    var asset = transfer.Asset;
+        //    if (asset == null)
+        //        throw new KeyNotFoundException("Dữ liệu tài sản bị trống");
+
+        //    //Kiểm tra người duyệt có tồn tại không
+        //    var currentUserId = GetCurrentUserId();
+        //    if (string.IsNullOrEmpty(currentUserId))
+        //        throw new UnauthorizedAccessException("Không xác định được người duyệt");
+
+        //    // Xử lý từ chối duyệt phiếu
+        //    if (processTransferDto.IsApproved == false)
+        //    {
+        //        transfer.Status = AssetTransferStatus.Rejected;
+        //        transfer.ApprovedByUserId = currentUserId;
+        //        transfer.ApprovedAt = DateTime.Now;
+        //        transfer.RejectReason = processTransferDto.RejectReason ?? "Không có lý do";
+
+        //        await _repo.Update();
+        //        await SaveHistory(asset, "TRANSFER_REJECTED", $"Từ chối phiếu {transfer.TransferId}. Lý do: {processTransferDto.RejectReason}", currentUserId, asset.UserId);
+        //        return BuildResultDto(transfer);
+        //    }
+        //    //Xử lý duyệt phiếu
+        //    transfer.Status = AssetTransferStatus.Approved;
+        //    transfer.ApprovedByUserId = currentUserId;
+        //    transfer.ApprovedAt = DateTime.Now;
+
+        //    string? actionType="";
+        //    string? note = "";
+        //    string? assignedUserId = null;
+        //    if (transfer.TransferType == AssetTransferType.Handover)
+        //    {
+        //        transfer.Asset.UserId = transfer.ToUserId;
+        //        transfer.Asset.Status = AssetStatus.DangSuDung;
+
+        //        assignedUserId = transfer.ToUserId;
+        //        actionType = "HANDOVER";
+        //        var toUserName = transfer.ToUser?.UserName ?? "Không rõ";
+        //        note = $"Bàn giao tài sản ''{transfer.Asset.AssetCode}-{transfer.Asset.AssetName}'' cho nhân viên:{toUserName}";
+        //    }
+        //    else if (transfer.TransferType == AssetTransferType.Recall)
+        //    {
+        //        transfer.Asset.UserId = null;
+        //        transfer.Asset.Status = AssetStatus.SanSang;
+
+        //        actionType = "RECALL";
+        //        var fromUserName = transfer.FromUser?.UserName ?? "Đã nghỉ việc/Không rõ";
+        //        note = $"Thu hồi tài sản '{transfer.Asset.AssetCode}-{transfer.Asset.AssetName}' của nhân viên:{fromUserName}";
+        //    }
+        //    else  if (transfer.TransferType == AssetTransferType.DepartmentMove)
+        //    {
+        //        if (!transfer.ToDepartmentId.HasValue)
+        //        {
+        //            throw new InvalidOperationException("Phiếu điều chuyển phòng ban bị thiếu ID phòng ban nhận");
+        //        }
+        //        transfer.Asset.UserId = null;
+        //        transfer.Asset.DepartmentId = transfer.ToDepartmentId.Value;
+        //        transfer.Asset.Status = AssetStatus.SanSang;
+
+        //        actionType = "TRANSFER_DEPARTMENT";
+        //        var fromDep = transfer.FromDepartment?.DepartmentName ?? "Không rõ";
+        //        var toDep = transfer.ToDepartment?.DepartmentName ?? "Không rõ";
+        //        note = $"Điều chuyển tài sản '{transfer.Asset.AssetCode}-{transfer.Asset.AssetName}' từ phòng ban:{transfer.FromDepartment.DepartmentName ?? "Không rõ"} -> {transfer.ToDepartment.DepartmentName ?? "Không rõ"}";
+        //    }
+        //    else
+        //    {
+        //        throw new InvalidOperationException("Loại phiếu không hợp lệ");
+        //    }
+        //    transfer.Asset.UpdatedTime = DateTime.UtcNow;
+        //    transfer.Status = AssetTransferStatus.Completed;
+
+        //    await _repo.Update();
+        //    await SaveHistory(asset, actionType, note, currentUserId, assignedUserId);
+
+        //    return BuildResultDto(transfer);
+        //}
+
+        //Duyệt/Từ chối nhiều phiếu
+        public async Task<List<ProcessTransferResultDto>> ProcessMultiApproval(ProcessMultiTransferDto processMultiTransferDto)
+        {
+            // Lấy tất cả phiếu có cùng BATCH ID
+            var transfers = await _repo.GetTransfersByBatchId(processMultiTransferDto.BatchId);
+            if (transfers == null || !transfers.Any())
+                throw new KeyNotFoundException("Không tìm thấy phiếu để duyệt");
+            //Check xem đã duyệt chưa
+            if (transfers.First().Status != AssetTransferStatus.Pending)
+                throw new InvalidOperationException("Phiếu này đã được xử lý rồi");
 
             //Kiểm tra người duyệt có tồn tại không
             var currentUserId = GetCurrentUserId();
             if (string.IsNullOrEmpty(currentUserId))
                 throw new UnauthorizedAccessException("Không xác định được người duyệt");
 
-            // Xử lý từ chối duyệt phiếu
-            if (processTransferDto.IsApproved == false)
+
+            var results = new List<ProcessTransferResultDto>();
+
+            foreach(var transfer in transfers)
             {
-                transfer.Status = AssetTransferStatus.Rejected;
-                transfer.ApprovedByUserId = currentUserId;
-                transfer.ApprovedAt = DateTime.Now;
-                transfer.RejectReason = processTransferDto.RejectReason ?? "Không có lý do";
+                if (transfer.Status != AssetTransferStatus.Pending)
+                {
+                    throw new InvalidOperationException($"Phiếu {transfer.TransferId} không ở trong trạng thái chờ duyệt");
+                }
 
-                await _repo.Update();
-                await SaveHistory(asset, "TRANSFER_REJECTED", $"Từ chối phiếu {transfer.TransferId}: {processTransferDto.RejectReason}", currentUserId, asset.UserId);
-                return BuildResultDto(transfer);
+                if(transfer.TransferType!=AssetTransferType.Handover && transfer.TransferType != AssetTransferType.Recall && transfer.TransferType != AssetTransferType.DepartmentMove)
+                {
+                    throw new InvalidOperationException("Loại phiếu không hợp lệ");
+                }
             }
-            //Xử lý duyệt phiếu
-            transfer.Status = AssetTransferStatus.Approved;
-            transfer.ApprovedByUserId = currentUserId;
-            transfer.ApprovedAt = DateTime.Now;
-
-            string actionType;
-            string note;
-            string? assignedUserId = null;
-            if (transfer.TransferType == AssetTransferType.Handover)
+            foreach (var transfer in transfers)
             {
-                transfer.Asset.UserId = transfer.ToUserId;
-                transfer.Asset.Status = AssetStatus.DangSuDung;
+                // Trường hợp từ chối
+                if (processMultiTransferDto.IsApproved == false)
+                {
+                    transfer.Status = AssetTransferStatus.Rejected;
+                    transfer.ApprovedByUserId = currentUserId;
+                    transfer.ApprovedAt = DateTime.Now;
+                    transfer.RejectReason = processMultiTransferDto.RejectReason ?? "Từ chối hàng loạt";
 
-                assignedUserId = transfer.ToUserId;
-                actionType = "HANDOVER";
-                note = $"Bàn giao tài sản cho nhân viên ID: {transfer.ToUserId}";
+                    await SaveHistory(transfer.Asset, "TRANSFER_REJECTED",
+                        $"Từ chối phiếu {transfer.TransferId}. Lý do: {transfer.RejectReason}", currentUserId);
+                }
+                // Trường hợp duyệt phiếu
+                else
+                {
+                    transfer.Status = AssetTransferStatus.Approved;
+                    transfer.ApprovedByUserId = currentUserId;
+                    transfer.ApprovedAt = DateTime.Now;
+
+                    string? actionType = "";
+                    string? note = "";
+                    string? assignedUserId = null;
+                    if (transfer.TransferType == AssetTransferType.Handover)
+                    {
+                        transfer.Asset.UserId = transfer.ToUserId;
+                        transfer.Asset.Status = AssetStatus.DangSuDung;
+
+                        assignedUserId = transfer.ToUserId;
+                        actionType = "HANDOVER";
+                        var toUserName = transfer.ToUser?.UserName ?? "Không rõ";
+                        note = $"Bàn giao tài sản '{transfer.Asset.AssetCode}-{transfer.Asset.AssetName}' cho nhân viên: {toUserName}";
+                    }
+                    else if (transfer.TransferType == AssetTransferType.Recall)
+                    {
+                        transfer.Asset.UserId = null;
+                        transfer.Asset.Status = AssetStatus.SanSang;
+
+                        actionType = "RECALL";
+                        var fromUserName = transfer.FromUser?.UserName ?? "Đã nghỉ việc/Không rõ";
+                        note = $"Thu hồi tài sản '{transfer.Asset.AssetCode}-{transfer.Asset.AssetName}' của nhân viên: {fromUserName}";
+                    }
+                    else if (transfer.TransferType == AssetTransferType.DepartmentMove)
+                    {
+                        if (!transfer.ToDepartmentId.HasValue)
+                        {
+                            throw new InvalidOperationException("Phiếu điều chuyển phòng ban bị thiếu ID phòng ban nhận");
+                        }
+                        transfer.Asset.UserId = null;
+                        transfer.Asset.DepartmentId = transfer.ToDepartmentId.Value;
+                        transfer.Asset.Status = AssetStatus.SanSang;
+
+                        actionType = "TRANSFER_DEPARTMENT";
+                        var fromDep = transfer.FromDepartment?.DepartmentName ?? "Không rõ";
+                        var toDep = transfer.ToDepartment?.DepartmentName ?? "Không rõ";
+                        note = $"Điều chuyển tài sản '{transfer.Asset.AssetCode}-{transfer.Asset.AssetName}' từ phòng ban: {transfer.FromDepartment.DepartmentName ?? "Không rõ"} -> {transfer.ToDepartment.DepartmentName ?? "Không rõ"}";
+                    }
+                    transfer.Asset.UpdatedTime = DateTime.UtcNow;
+                    transfer.Status = AssetTransferStatus.Completed;
+                    await SaveHistory(transfer.Asset, actionType, note, currentUserId, assignedUserId);
+                }
+                results.Add(BuildResultDto(transfer));
             }
-            else
-            {
-                transfer.Asset.UserId = null;
-                transfer.Asset.Status = AssetStatus.SanSang;
-
-                actionType = "RECALL";
-                note = $"Thu hồi tài sản từ nhân viên ID :{transfer.FromUserId}";
-            }
-            transfer.Asset.UpdatedTime = DateTime.UtcNow;
-            transfer.Status = AssetTransferStatus.Completed;
-
             await _repo.Update();
-            await SaveHistory(asset, actionType, note, currentUserId, assignedUserId);
-
-            return BuildResultDto(transfer);
+            return results;
         }
 
         private ProcessTransferResultDto BuildResultDto(AssetTransfer transfer)
@@ -272,7 +788,9 @@ namespace QuanLyTaiSanTest.Services.Implementations
                 AssetCode = transfer.Asset.AssetCode,
                 AssetName = transfer.Asset.AssetName,
 
-                DepartmentId = transfer.DepartmentId,
+                FromDepartmentId = transfer.FromDepartmentId,
+                ToDepartmentId = transfer.ToDepartmentId,
+
                 FromUserId = transfer.FromUserId,
                 ToUserId = transfer.ToUserId,
 
@@ -283,89 +801,158 @@ namespace QuanLyTaiSanTest.Services.Implementations
                 RejectReason = transfer.RejectReason
             };
         }
-
+        
+        //Lấy tất cả phiếu có phân trang
         public async Task<AssetTransferAllDto> GetAllTransfer(int pageIndex, int pageSize, int? status, int? type)
         {
-            var list = await _repo.GetAllTransfer(pageIndex, pageSize, status, type);
-            if (list.Items == null || list.TotalCount == 0)
+            //var list = await _repo.GetAllTransfer(pageIndex, pageSize, status, type);
+            //if (list.Items == null || list.TotalCount == 0)
+            //{
+            //    throw new KeyNotFoundException("Không có dữ liệu");
+            //}
+            //var items = list.Items.Select(h => new AssetTransferResponseDto
+            //{
+            //    TransferId = h.TransferId,
+            //    AssetId = h.AssetId,
+            //    BatchId = h.BatchId,
+            //    Asset = new AssetNameDtp
+            //    { 
+            //        AssetId = h.AssetId,
+            //        AssetCode = h.Asset.AssetCode,
+            //        AssetName = h.Asset.AssetName,
+            //        AssetStatus = h.Asset.Status.ToDisplayName()
+            //    },
+            //    TransferType = h.TransferType.ToDisplayName(),
+            //    Status = h.Status.ToDisplayName(),
+
+            //    FromDepartmentId=h.FromDepartmentId,
+            //    FromDepartment = h.FromDepartment == null ? null : new QuanLyTaiSan.Dtos.Department.DepartmentDto
+            //    { 
+            //        Id = h.FromDepartmentId,
+            //        DepartmentName = h.FromDepartment.DepartmentName,
+            //        Description = h.FromDepartment.Description
+            //    },
+            //    ToDepartmentId = h.ToDepartmentId,
+            //    ToDepartment = h.ToDepartment == null ? null : new QuanLyTaiSan.Dtos.Department.DepartmentDto
+            //    {
+            //        Id = h.ToDepartmentId,
+            //        DepartmentName = h.ToDepartment.DepartmentName,
+            //        Description = h.ToDepartment.Description
+            //    },
+
+            //    FromUserId = h.FromUserId,
+            //    FromUser = h.FromUser == null ? null : new QuanLyTaiSan.Dtos.Auth.UserDto
+            //    {
+            //        Id = h.FromUserId,
+            //        Username = h.FromUser.UserName,
+            //        Fullname = h.FromUser.FullName
+            //    },
+
+            //    ToUserId = h.ToUserId,
+            //    ToUser = h.ToUser == null ? null : new QuanLyTaiSan.Dtos.Auth.UserDto
+            //    {
+            //        Id = h.ToUserId,
+            //        Username = h.ToUser.UserName,
+            //        Fullname = h.ToUser.FullName
+            //    },
+
+            //    CreatedByUserId = h.CreatedByUserId,
+            //    CreatedByUser = h.CreatedByUser == null ? null : new QuanLyTaiSan.Dtos.Auth.UserDto
+            //    {
+            //        Id = h.CreatedByUserId,
+            //        Username = h.CreatedByUser.UserName,
+            //        Fullname = h.CreatedByUser.FullName
+            //    },
+
+            //    ApprovedByUserId = h.ApprovedByUserId,
+            //    ApprovedByUser = h.ApprovedByUser == null ? null : new QuanLyTaiSan.Dtos.Auth.UserDto
+            //    {
+            //        Id = h.ApprovedByUserId,
+            //        Username = h.ApprovedByUser.UserName,
+            //        Fullname = h.ApprovedByUser.FullName
+            //    },
+            //    CreatedAt = h.CreatedAt,
+            //    ApprovedAt =h.ApprovedAt,
+            //    Purpose = h.Purpose,
+            //    Note = h.Note,
+            //    RejectReason = h.RejectReason
+            //}).ToList();
+            //var totalPage = (int)Math.Ceiling(list.TotalCount / (double)pageSize);
+
+            //return new AssetTransferAllDto
+            //{
+            //    ListAsset = items,
+            //    Type = type,
+            //    Status = status,
+            //    PageIndex = pageIndex,
+            //    PageSize = pageSize,
+            //    TotalCount = list.TotalCount,
+            //    TotalPage = totalPage,
+
+            //    HasPreviousPage = pageIndex > 1,
+            //    HasNextPage = pageIndex < totalPage
+            //};
+
+
+            // Gọi Repo lấy về danh sách dữ liệu của các lô
+            var result = await _repo.GetAllTransfer(pageIndex, pageSize, status, type);
+            // Kiểm tra rỗng
+            if (result.Items == null || !result.Items.Any())
+                return new AssetTransferAllDto { ListBatches = new List<AssetTransferBatchResponseDto>(), TotalCount = 0 };
+
+            //Gom nhóm theo batchId
+            var groupedBatches = result.Items.GroupBy(x => x.BatchId).Select(g =>
             {
-                throw new KeyNotFoundException("Không có dữ liệu");
-            }
-            var items = list.Items.Select(h => new AssetTransferResponseDto
-            {
-                TransferId = h.TransferId,
-                AssetId = h.AssetId,
-                Asset = new AssetNameDtp
-                { 
-                    AssetId = h.AssetId,
-                    AssetCode = h.Asset.AssetCode,
-                    AssetName = h.Asset.AssetName
-                },
-                TransferType = h.TransferType.ToDisplayName(),
-                Status = h.Status.ToDisplayName(),
+                var firstItem = g.First(); // Lấy item đầu để lấy thông tin chung
 
-                DepartmentId=h.DepartmentId,
-                Department = h.Department == null ? null : new QuanLyTaiSan.Dtos.Department.DepartmentDto
-                { 
-                    Id = h.DepartmentId,
-                    DepartmentName = h.Department.DepartmentName,
-                    Description = h.Department.Description
-                },
-
-                FromUserId = h.FromUserId,
-                FromUser = h.FromUser == null ? null : new QuanLyTaiSan.Dtos.Auth.UserDto
+                return new AssetTransferBatchResponseDto
                 {
-                    Id = h.FromUserId,
-                    Username = h.FromUser.UserName,
-                    Fullname = h.FromUser.FullName
-                },
+                    BatchId = g.Key,
+                    CreatedAt = firstItem.CreatedAt,
+                    Status = firstItem.Status.ToDisplayName(),
+                    TransferType = firstItem.TransferType.ToDisplayName(),
 
-                ToUserId = h.ToUserId,
-                ToUser = h.ToUser == null ? null : new QuanLyTaiSan.Dtos.Auth.UserDto
-                {
-                    Id = h.ToUserId,
-                    Username = h.ToUser.UserName,
-                    Fullname = h.ToUser.FullName
-                },
+                    // Map thông tin đại diện
+                    FromUserName = firstItem.FromUser?.FullName,
+                    ToUserName = firstItem.ToUser?.FullName,
+                    FromDepartmentName = firstItem.FromDepartment?.DepartmentName,
+                    ToDepartmentName = firstItem.ToDepartment?.DepartmentName,
+                    Purpose = firstItem.Purpose,
+                    Note = firstItem.Note,
+                    AssetCount = g.Count(),
 
-                CreatedByUserId = h.CreatedByUserId,
-                CreatedByUser = h.CreatedByUser == null ? null : new QuanLyTaiSan.Dtos.Auth.UserDto
-                {
-                    Id = h.CreatedByUserId,
-                    Username = h.CreatedByUser.UserName,
-                    Fullname = h.CreatedByUser.FullName
-                },
+                    // Map danh sách con
+                    AssetsTransfer = g.Select(a => new AssetTransferDetailDto
+                    {
+                        TransferId = a.TransferId,
+                        AssetId = a.AssetId,
+                        AssetCode = a.Asset.AssetCode,
+                        AssetName = a.Asset.AssetName,
+                        AssetStatus = a.Asset.Status.ToDisplayName()
+                    }).ToList()
+                };
+            }).OrderByDescending(x => x.CreatedAt) 
+              .ToList();
 
-                ApprovedByUserId = h.ApprovedByUserId,
-                ApprovedByUser = h.ApprovedByUser == null ? null : new QuanLyTaiSan.Dtos.Auth.UserDto
-                {
-                    Id = h.ApprovedByUserId,
-                    Username = h.ApprovedByUser.UserName,
-                    Fullname = h.ApprovedByUser.FullName
-                },
-                CreatedAt = h.CreatedAt,
-                ApprovedAt =h.ApprovedAt,
-                Purpose = h.Purpose,
-                Note = h.Note,
-                RejectReason = h.RejectReason
-            }).ToList();
-            var totalPage = (int)Math.Ceiling(list.TotalCount / (double)pageSize);
+            var totalPage = (int)Math.Ceiling(result.TotalCount / (double)pageSize);
 
             return new AssetTransferAllDto
             {
-                ListAsset = items,
+                ListBatches = groupedBatches,
                 Type = type,
                 Status = status,
                 PageIndex = pageIndex,
                 PageSize = pageSize,
-                TotalCount = list.TotalCount,
+                TotalCount = result.TotalCount,
                 TotalPage = totalPage,
 
                 HasPreviousPage = pageIndex > 1,
                 HasNextPage = pageIndex < totalPage
             };
+
         }
 
+        //Thêm tài sản
         public async Task<AssetRespondDto> Create(CreateAssetDto createAssetDto)
         {
             if (createAssetDto == null)
@@ -376,12 +963,12 @@ namespace QuanLyTaiSanTest.Services.Implementations
             var category = await _repoCate.GetById(createAssetDto.CategoryId);
             if (category == null)
             {
-                throw new KeyNotFoundException("Mã loại tài sản không tồn tại");
+                throw new KeyNotFoundException("Loại tài sản không tồn tại");
             }
 
             if ((await _departmentService.GetDepartmentById(createAssetDto.DepartmentId)) == null)
             {
-                throw new KeyNotFoundException("Không tồn tại phòng ban");
+                throw new KeyNotFoundException("Phòng ban không tồn tại");
             }
 
             var words = category.CategoryName.Split(' ', StringSplitOptions.RemoveEmptyEntries);
@@ -420,7 +1007,7 @@ namespace QuanLyTaiSanTest.Services.Implementations
             // LẤY USER ID RA
             string currentUserId = GetCurrentUserId();
             await _repo.Create(h);
-            await SaveHistory(h, "CREATE", $"Thêm mới tài sản từ loại ID: {h.CategoryId}", currentUserId);
+            await SaveHistory(h, "CREATE", $"Thêm mới tài sản thuộc loại: {h.Category.CategoryName}", currentUserId);
             return new AssetRespondDto
             {
                 AssetCode = h.AssetCode,
@@ -442,40 +1029,20 @@ namespace QuanLyTaiSanTest.Services.Implementations
                 DepartmentId = h.DepartmentId
             };
         }
+
+        //Sửa tài sản
         public async Task<AssetRespondDto> Update(UpdateAssetDto updateAssetDto, int id)
         {
             var h = await _repo.GetById(id);
             if (h == null)
             {
-                throw new KeyNotFoundException("Không tồn tại tài sản có id = " + id);
+                throw new KeyNotFoundException("Tài sản không tồn tại");
             }
             if ((await _repoCate.GetById(updateAssetDto.CategoryId)) == null)
             {
-                throw new KeyNotFoundException("Không tồn tại loại có id = " + updateAssetDto.CategoryId);
+                throw new KeyNotFoundException("Loại tài sản không tồn tại");
             }
-            if ((await _departmentService.GetDepartmentById(updateAssetDto.DepartmentId)) == null)
-            {
-                throw new KeyNotFoundException("Không tồn tại phòng ban có id = " + updateAssetDto.DepartmentId);
-            }
-
-            //Chặn đổi phòng ban khi đang chờ xác nhận phiếu hoặc có người sở hữu
-            bool isChangeDepartment = h.DepartmentId != updateAssetDto.DepartmentId;
-            if(isChangeDepartment)
-            {
-                // Check đang có phiếu bàn giao/thu hồi Pending không
-                bool hasPendingTransfer = await _repo.AnyAsync(x => x.AssetId == h.AssetId && x.Status == AssetTransferStatus.Pending);
-                if(hasPendingTransfer)
-                {
-                    throw new InvalidOperationException("Không thể thay đổi phòng ban khi tài sản đang có phiếu bàn giao/thu hồi chờ duyệt");
-                }
-
-                // Check tài sản đã có người sử dụng chưa
-                if (!string.IsNullOrEmpty(h.UserId))
-                {
-                    throw new InvalidOperationException("Không thể thay đổi phòng ban khi tài sản đang được cấp cho nhân viên");
-                }
-            }
-
+         
             // So sánh để tạo log
             var changes = new List<string>();
 
@@ -508,16 +1075,11 @@ namespace QuanLyTaiSanTest.Services.Implementations
             if (h.CategoryId != updateAssetDto.CategoryId)
                 changes.Add($"Loại tài sản ID: {h.CategoryId} -> {updateAssetDto.CategoryId}");
 
-            if (isChangeDepartment)
-                changes.Add($"Phòng ban ID: {h.DepartmentId} -> {updateAssetDto.DepartmentId}");
-
             // Tạo chuỗi nội dung log
             string historyAction = changes.Count > 0
                 ? "Cập nhật các trường: " + string.Join("; ", changes)
                 : "Cập nhật thông tin (Không có thay đổi thực tế)";
          
-
-
             //  Thực hiện Update (
             h.AssetName = updateAssetDto.AssetName;
             h.Descriptions = updateAssetDto.Descriptions;
@@ -529,7 +1091,6 @@ namespace QuanLyTaiSanTest.Services.Implementations
             h.Note = updateAssetDto.Note;
             h.Unit = updateAssetDto.Unit;
             h.CategoryId = updateAssetDto.CategoryId;
-            h.DepartmentId = updateAssetDto.DepartmentId;
 
             h.UpdatedTime = DateTime.Now;
 
@@ -561,6 +1122,7 @@ namespace QuanLyTaiSanTest.Services.Implementations
             };
         }
 
+        //Xoắ tài sản
         public async Task Delete(int id)
         {
             var h = await _repo.GetById(id);
@@ -581,6 +1143,7 @@ namespace QuanLyTaiSanTest.Services.Implementations
             await _repo.Update();
         }
 
+        //Lấy tất cả tài sản
         public async Task<List<AssetRespondDto>> GetAll()
         {
             var lissAsset = await _repo.GetAll();
@@ -635,6 +1198,7 @@ namespace QuanLyTaiSanTest.Services.Implementations
             }
         }
 
+        //Lấy tất cả tài sản có phân trang
         public async Task<AssetAllDto> GetPageList(int pageIndex, int pageSize, string? search, int? categoryId, string? userId, int? status, string sortBy, bool desc)
         {
             var data = await _repo.GetPageList(pageIndex, pageSize, search, categoryId, userId, status, sortBy, desc);
@@ -701,6 +1265,7 @@ namespace QuanLyTaiSanTest.Services.Implementations
 
         }
 
+        //Lấy tài sản theo id
         public async Task<AssetDto> GetById(int id)
         {
             var h = await _repo.GetById(id);
@@ -770,6 +1335,7 @@ namespace QuanLyTaiSanTest.Services.Implementations
             }
         }
 
+        //Lấy tài sản theo mã code
         public async Task<AssetDto> GetByCode(string code)
         {
             var h = await _repo.GetByCode(code);
@@ -822,6 +1388,7 @@ namespace QuanLyTaiSanTest.Services.Implementations
                 };
             }
         }
+
         //Hàm xư lý lưu lịch sử
         private async Task SaveHistory(Asset asset, string actionType, string note, string? CreatedByUserId = null, string AssignedToUserId = null)
         {
@@ -857,6 +1424,7 @@ namespace QuanLyTaiSanTest.Services.Implementations
                 throw new Exception($"Lỗi Logic: {ex.Message}");
             }
         }
+      
         //Hàm lấy thông tin người dùng 
         private string? GetCurrentUserId()
         {

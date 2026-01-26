@@ -4,7 +4,7 @@ using System.ComponentModel.DataAnnotations;
 
 namespace QuanLyTaiSan.Dtos.AssetTransfer
 {
-    public class CreateFormTransferDto
+    public class CreateAssetFormTransferDto
     {
         public int? DepartmentId { get; set; }
 

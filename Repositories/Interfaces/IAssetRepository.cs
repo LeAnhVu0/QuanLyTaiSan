@@ -2,6 +2,7 @@
 using QuanLyTaiSan.Models;
 using QuanLyTaiSanTest.Dtos.Asset;
 using QuanLyTaiSanTest.Models;
+using System;
 using System.Linq.Expressions;
 
 namespace QuanLyTaiSanTest.Repositories.Interfaces
@@ -15,11 +16,17 @@ namespace QuanLyTaiSanTest.Repositories.Interfaces
         public Task<Asset> Create(Asset asset);
         public Task Update();
         public Task Delete(Asset asset);
+       // Kiểm tra xem có  đối tượng nào thỏa mãn điều kiện predicate hay không.
         public Task<bool> AnyAsync(Expression<Func<AssetTransfer, bool>> predicate);
         public Task<bool> AnyAssetAsync(Expression<Func<Asset, bool>> predicate);
+
+        Task<List<Asset>> GetAssetsByIds(List<int> assetIds);
+        Task<List<AssetTransfer>> GetTransfersByIds(List<int> transferIds);
+
         public Task<Asset?> GetLatesAssetByCategory(int categoryId);
         public Task AddTransfer(AssetTransfer assetTransfer);
         public Task<AssetTransfer?> GetTransferById(int transferId);
+        public Task<List<AssetTransfer>> GetTransfersByBatchId(Guid batchId);
         public Task<(List<AssetTransfer> Items , int TotalCount)> GetAllTransfer(int pageIndex, int pageSize, int? status, int? type);
 
     }

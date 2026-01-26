@@ -123,32 +123,98 @@ namespace QuanLyTaiSanTest.Repositories.Implementations
 
         public async Task<AssetTransfer?> GetTransferById(int transferId)
         {
-            return await _context.AssetTransfer.Include(h => h.Asset).FirstOrDefaultAsync(h => h.TransferId == transferId);
-        }
-
-        public async Task<(List<AssetTransfer> Items, int TotalCount)> GetAllTransfer(int pageIndex, int pageSize, int? status , int? type)
-        {
-             var list = _context.AssetTransfer
+            return await _context.AssetTransfer
                                 .Include(t => t.Asset)
-                                .Include(t => t.Department)      // Join bảng Phòng ban
+                                .Include(t => t.FromDepartment)      // Join bảng Phòng ban ban đầu
+                                .Include(t => t.ToDepartment)      // Join bảng Phòng ban cũ
                                 .Include(t => t.FromUser)        // Join người gửi
                                 .Include(t => t.ToUser)          // Join người nhận
                                 .Include(t => t.CreatedByUser)   // Join người tạo
                                 .Include(t => t.ApprovedByUser)  // Join người duyệt
-                                .AsQueryable();
+                                .FirstOrDefaultAsync(h => h.TransferId == transferId);
+        }
 
+        public async Task<(List<AssetTransfer> Items, int TotalCount)> GetAllTransfer(int pageIndex, int pageSize, int? status , int? type)
+        {
+            // var list = _context.AssetTransfer
+            //                    .Include(t => t.Asset)
+            //                    .Include(t => t.FromDepartment)      // Join bảng Phòng ban ban đầu
+            //                    .Include(t => t.ToDepartment)      // Join bảng Phòng ban cũ
+            //                    .Include(t => t.FromUser)        // Join người gửi
+            //                    .Include(t => t.ToUser)          // Join người nhận
+            //                    .Include(t => t.CreatedByUser)   // Join người tạo
+            //                    .Include(t => t.ApprovedByUser)  // Join người duyệt
+            //                    .AsQueryable();
+
+            //if (status != null)
+            //{
+            //    list = list.Where(h => h.Status == (AssetTransferStatus)status);
+            //}
+            //if (type != null)
+            //{
+            //    list = list.Where(h => h.TransferType == (AssetTransferType)type);
+            //}
+
+            //var totalCount = await list.CountAsync();
+            //var listResult = await list.Skip((pageIndex - 1) * pageSize).Take(pageSize).ToListAsync();
+            //return (listResult,totalCount);
+            
+            var query = _context.AssetTransfer.AsNoTracking().AsQueryable();
             if (status != null)
-            {
-                list = list.Where(h => h.Status == (AssetTransferStatus)status);
-            }
-            if (type != null)
-            {
-                list = list.Where(h => h.TransferType == (AssetTransferType)type);
-            }
+                query = query.Where(h => h.Status == (AssetTransferStatus)status);
 
-            var totalCount = await list.CountAsync();
-            var listResult = await list.Skip((pageIndex - 1) * pageSize).Take(pageSize).ToListAsync();
-            return (listResult,totalCount);
+            if (type != null)
+                query = query.Where(h => h.TransferType == (AssetTransferType)type);
+
+            // Nhóm theo BatchId để đếm xem có bao nhiêu Lô
+            var batchGroupQuery = query.GroupBy(x => x.BatchId)
+                                       .Select(g => new
+                                       {
+                                           BatchId = g.Key,
+                                           LatestDate = g.Max(x => x.CreatedAt) // Lấy ngày mới nhất để sắp xếp
+                                       });
+            // Đếm tổng số Lô
+            var totalGroupCount = await batchGroupQuery.CountAsync();
+
+            // Lấy danh sách BatchId của trang hiện tại
+            var pageBatchIds = await batchGroupQuery.OrderByDescending(x => x.LatestDate)
+                                                    .Skip((pageIndex - 1) * pageSize).Take(pageSize)
+                                                    .Select(x => x.BatchId)
+                                                    .ToListAsync();
+
+            //Lấy toàn bộ tài sản thuộc về các BatchId vừa tìm được
+            var items = await _context.AssetTransfer.Include(t => t.Asset)
+                                                    .Include(t => t.FromDepartment)
+                                                    .Include(t => t.ToDepartment)
+                                                    .Include(t => t.FromUser)
+                                                    .Include(t => t.ToUser)
+                                                    .Include(t => t.CreatedByUser)
+                                                    .Include(t => t.ApprovedByUser)
+                                                    .Where(t => pageBatchIds.Contains(t.BatchId)) 
+                                                    .OrderByDescending(t => t.CreatedAt)
+                                                    .ToListAsync();
+
+            return (items, totalGroupCount);
+        }
+        // Lấy danh sách tài sản theo List ID
+        public async Task<List<Asset>> GetAssetsByIds(List<int> assetIds)
+        {
+            return await _context.Assets
+                .Where(x => assetIds.Contains(x.AssetId) && x.IsDelete == false)
+                .ToListAsync();
+        }
+
+        // Lấy danh sách phiếu theo List ID 
+        public async Task<List<AssetTransfer>> GetTransfersByIds(List<int> transferIds)
+        {
+            return await _context.AssetTransfer
+                .Include(t => t.Asset)
+                .Include(t => t.FromDepartment)
+                .Include(t => t.ToDepartment)
+                .Include(t => t.FromUser)
+                .Include(t => t.ToUser)
+                .Where(t => transferIds.Contains(t.TransferId))
+                .ToListAsync();
         }
         // AssetRepository
         public async Task<bool> AnyAssetAsync(Expression<Func<Asset, bool>> predicate)
@@ -156,5 +222,15 @@ namespace QuanLyTaiSanTest.Repositories.Implementations
             return await _context.Assets.AnyAsync(predicate);
         }
 
+        public async Task<List<AssetTransfer>> GetTransfersByBatchId(Guid batchId)
+        {
+          return await _context.AssetTransfer
+                .Include(t => t.Asset)
+                .Include(t => t.FromDepartment)
+                .Include(t => t.ToDepartment)
+                .Include(t => t.FromUser)
+                .Include(t => t.ToUser)        
+                .Where(h => h.BatchId == batchId).ToListAsync();
+        }
     }
 }

@@ -37,7 +37,7 @@ namespace QuanLyTaiSan.Controllers
             }
             catch (KeyNotFoundException ex)
             {
-                return NotFound(new ApiResponse<string>
+                return Ok(new ApiResponse<string>
                 {
                     Success = false,
                     Message = "Lấy danh sách thất bại",
@@ -54,17 +54,69 @@ namespace QuanLyTaiSan.Controllers
                 });
             }
         }
-
-
+        
         [Authorize(Policy = Permissions.AssetAssign)]
-        [HttpPost("CreateFormHandover")]
-        public async Task<IActionResult> CreateFormTransfer(CreateFormTransferDto createFormTransferDto)
+        //[HttpPost("CreateFormHandover")]
+        //public async Task<IActionResult> CreateFormTransfer(CreateAssetFormTransferDto createFormTransferDto)
+        //{
+        //    try
+        //    {
+        //        var form = await _assetService.CreateFormHandover(createFormTransferDto);
+
+        //        return Ok(new ApiResponse<AssetFormHandoverDto>
+        //        {
+        //            Success = true,
+        //            Message = "Tạo phiếu bàn giao thành công",
+        //            Data = form
+        //        });
+        //    }
+        //    catch (KeyNotFoundException ex)
+        //    {
+        //        return Ok(new ApiResponse<string>
+        //        {
+        //            Success = false,
+        //            Message = "Tạo phiếu bàn giao thất bại",
+        //            Errors = new { Detail = ex.Message }
+        //        });
+        //    }
+        //    catch (ArgumentException ex)
+        //    {
+        //        return Ok(new ApiResponse<string>
+        //        {
+        //            Success = false,
+        //            Message = "Tạo phiếu bàn giao thất bại",
+        //            Errors = new { Detail = ex.Message }
+        //        });
+        //    }
+        //    catch (InvalidOperationException ex)
+        //    {
+        //        return  Ok(new ApiResponse<string>
+        //        {
+
+        //            Success = false,
+        //            Message = "Tạo phiếu bàn giao thất bại",
+        //            Errors = new { Detail = ex.Message }
+        //        });
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        return StatusCode(500, new ApiResponse<string>
+        //        {
+        //            Success = false,
+        //            Message = "Lỗi hệ thống",
+        //            Errors = new { Detail = ex.Message }
+        //        });
+        //    }
+        //}
+
+        [HttpPost("CreateFormHandovers")]
+        public async Task<IActionResult> CreateFormTransfers(CreateMultiFormTransferDto createMultiFormHandoverDto)
         {
             try
             {
-                var form = await _assetService.CreateFormHandover(createFormTransferDto);
+                var form = await _assetService.CreateMultiFormHandover(createMultiFormHandoverDto);
 
-                return Ok(new ApiResponse<AssetFormHandoverDto>
+                return Ok(new ApiResponse<List<AssetFormHandoverDto>>
                 {
                     Success = true,
                     Message = "Tạo phiếu bàn giao thành công",
@@ -73,7 +125,16 @@ namespace QuanLyTaiSan.Controllers
             }
             catch (KeyNotFoundException ex)
             {
-                return NotFound(new ApiResponse<string>
+                return Ok(new ApiResponse<string>
+                {
+                    Success = false,
+                    Message = "Tạo phiếu bàn giao thất bại",
+                    Errors = new { Detail = ex.Message }
+                });
+            }
+            catch (ArgumentException ex)
+            {
+                return Ok(new ApiResponse<string>
                 {
                     Success = false,
                     Message = "Tạo phiếu bàn giao thất bại",
@@ -82,7 +143,7 @@ namespace QuanLyTaiSan.Controllers
             }
             catch (InvalidOperationException ex)
             {
-                return BadRequest(new ApiResponse<string>
+                return Ok(new ApiResponse<string>
                 {
 
                     Success = false,
@@ -101,15 +162,60 @@ namespace QuanLyTaiSan.Controllers
             }
         }
 
+
         [Authorize(Policy = Permissions.AssetRecall)]
-        [HttpPost("CreateFormRecall")]
-        public async Task<IActionResult> CreateFormRecall(CreateFormTransferDto createFormTransferDto)
+        //[HttpPost("CreateFormRecall")]
+        //public async Task<IActionResult> CreateFormRecall(CreateAssetFormTransferDto createFormTransferDto)
+        //{
+        //    try
+        //    {
+        //        var form = await _assetService.CreateFormRecall(createFormTransferDto);
+
+        //        return Ok(new ApiResponse<AssetFormHandoverDto>
+        //        {
+        //            Success = true,
+        //            Message = "Tạo phiếu thu hồi thành công",
+        //            Data = form
+        //        });
+        //    }
+        //    catch (KeyNotFoundException ex)
+        //    {
+        //        return Ok(new ApiResponse<string>
+        //        {
+        //            Success = false,
+        //            Message = "Tạo phiếu thu hồi thất bại",
+        //            Errors = new { Detail = ex.Message }
+        //        });
+        //    }
+        //    catch (InvalidOperationException ex)
+        //    {
+        //        return Ok(new ApiResponse<string>
+        //        {
+
+        //            Success = false,
+        //            Message = "Tạo phiếu thu hồi thất bại",
+        //            Errors = new { Detail = ex.Message }
+        //        });
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        return StatusCode(500, new ApiResponse<string>
+        //        {
+        //            Success = false,
+        //            Message = "Lỗi hệ thống",
+        //            Errors = new { Detail = ex.Message }
+        //        });
+        //    }
+        //}
+
+        [HttpPost("CreateFormRecalls")]
+        public async Task<IActionResult> CreateFormRecalls(CreateMultiFormTransferDto createMultiFormRecallDto)
         {
             try
             {
-                var form = await _assetService.CreateFormRecall(createFormTransferDto);
+                var form = await _assetService.CreateMultiFormRecall(createMultiFormRecallDto);
 
-                return Ok(new ApiResponse<AssetFormHandoverDto>
+                return Ok(new ApiResponse<List<AssetFormHandoverDto>>
                 {
                     Success = true,
                     Message = "Tạo phiếu thu hồi thành công",
@@ -118,7 +224,7 @@ namespace QuanLyTaiSan.Controllers
             }
             catch (KeyNotFoundException ex)
             {
-                return NotFound(new ApiResponse<string>
+                return Ok(new ApiResponse<string>
                 {
                     Success = false,
                     Message = "Tạo phiếu thu hồi thất bại",
@@ -127,7 +233,7 @@ namespace QuanLyTaiSan.Controllers
             }
             catch (InvalidOperationException ex)
             {
-                return BadRequest(new ApiResponse<string>
+                return Ok(new ApiResponse<string>
                 {
 
                     Success = false,
@@ -145,23 +251,185 @@ namespace QuanLyTaiSan.Controllers
                 });
             }
         }
-        [HttpPost("ProcessApproval")]
-        public async Task<IActionResult> ProcessApproval(int transfer,ProcessTransferDto processTransferDto)
+
+
+        //[HttpPost("CreateDepartmentFormTransfer")]
+        //public async Task<IActionResult> CreateDepartmentFormTransfer(CreateDepartmentFormTransferDto createDepartmentFormTransferDto)
+        //{
+        //    try
+        //    {
+        //        var form = await _assetService.CreateFormDepartmentMove(createDepartmentFormTransferDto);
+
+        //        return Ok(new ApiResponse<AssetFormHandoverDto>
+        //        {
+        //            Success = true,
+        //            Message = "Tạo phiếu điều chuyển thành công",
+        //            Data = form
+        //        });
+        //    }
+        //    catch (KeyNotFoundException ex)
+        //    {
+        //        return Ok(new ApiResponse<string>
+        //        {
+        //            Success = false,
+        //            Message = "Tạo phiếu điều chuyển thất bại",
+        //            Errors = new { Detail = ex.Message }
+        //        });
+        //    }
+        //    catch (ArgumentException ex)
+        //    {
+        //        return Ok(new ApiResponse<string>
+        //        {
+        //            Success = false,
+        //            Message = "Tạo phiếu điều chuyển thất bại",
+        //            Errors = new { Detail = ex.Message }
+        //        });
+        //    }
+        //    catch (InvalidOperationException ex)
+        //    {
+        //        return Ok(new ApiResponse<string>
+        //        {
+
+        //            Success = false,
+        //            Message = "Tạo phiếu điều chuyển thất bại",
+        //            Errors = new { Detail = ex.Message }
+        //        });
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        return StatusCode(500, new ApiResponse<string>
+        //        {
+        //            Success = false,
+        //            Message = "Lỗi hệ thống",
+        //            Errors = new { Detail = ex.Message }
+        //        });
+        //    }
+        //}
+
+        [HttpPost("CreateDepartmentFormTransfers")]
+        public async Task<IActionResult> CreateDepartmentFormTransfers(CreateMultiDepartmentFormTransferDto createMultiDepartmentFormTransferDto)
         {
             try
             {
-                var result = await _assetService.ProcessApproval(transfer,processTransferDto);
+                var form = await _assetService.CreateMultiFormDepartmentMove(createMultiDepartmentFormTransferDto);
 
-                return Ok(new ApiResponse<object>
+                return Ok(new ApiResponse<List<AssetFormHandoverDto>>
                 {
                     Success = true,
-                    Message = processTransferDto.IsApproved ? "Duyệt phiếu thành công":"Từ chối duyệt phiếu",
+                    Message = "Tạo phiếu điều chuyển thành công",
+                    Data = form
+                });
+            }
+            catch (KeyNotFoundException ex)
+            {
+                return Ok(new ApiResponse<string>
+                {
+                    Success = false,
+                    Message = "Tạo phiếu điều chuyển thất bại",
+                    Errors = new { Detail = ex.Message }
+                });
+            }
+            catch (ArgumentException ex)
+            {
+                return Ok(new ApiResponse<string>
+                {
+                    Success = false,
+                    Message = "Tạo phiếu điều chuyển thất bại",
+                    Errors = new { Detail = ex.Message }
+                });
+            }
+            catch (InvalidOperationException ex)
+            {
+                return Ok(new ApiResponse<string>
+                {
+
+                    Success = false,
+                    Message = "Tạo phiếu điều chuyển thất bại",
+                    Errors = new { Detail = ex.Message }
+                });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new ApiResponse<string>
+                {
+                    Success = false,
+                    Message = "Lỗi hệ thống",
+                    Errors = new { Detail = ex.Message }
+                });
+            }
+        }
+
+        //[HttpPost("ProcessApproval")]
+        //public async Task<IActionResult> ProcessApproval(int transfer,ProcessTransferDto processTransferDto)
+        //{
+        //    try
+        //    {
+        //        var result = await _assetService.ProcessApproval(transfer,processTransferDto);
+
+        //        return Ok(new ApiResponse<object>
+        //        {
+        //            Success = true,
+        //            Message = processTransferDto.IsApproved ? "Duyệt phiếu thành công":"Từ chối duyệt phiếu",
+        //            Data = result
+        //        });
+        //    }
+        //    catch (KeyNotFoundException ex)
+        //    {
+        //        return Ok(new ApiResponse<string>
+        //        {
+        //            Success = false,
+        //            Message = "Xác nhận phiếu thất bại",
+        //            Errors = new { Detail = ex.Message }
+        //        });
+        //    }
+        //    catch (InvalidOperationException ex)
+        //    {
+        //        return Ok(new ApiResponse<string>
+        //        {
+
+        //            Success = false,
+        //            Message = "Xác nhận phiếu thất bại",
+        //            Errors = new { Detail = ex.Message }
+        //        });
+        //    }
+        //    catch(UnauthorizedAccessException ex)
+        //    {
+        //        return Ok(new ApiResponse<string>
+        //        {
+
+        //            Success = false,
+        //            Message = "Xác nhận phiếu thất bại",
+        //            Errors = new { Detail = ex.Message }
+        //        });
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        return StatusCode(500, new ApiResponse<string>
+        //        {
+        //            Success = false,
+        //            Message = "Lỗi hệ thống",
+        //            Errors = new { Detail = ex.Message }
+        //        });
+        //    }
+        //}
+
+        [HttpPost("ProcessApprovals")]
+        public async Task<IActionResult> ProcessApprovals(ProcessMultiTransferDto processMultiTransferDto)
+        {
+            try
+            {
+                var result = await _assetService.ProcessMultiApproval(processMultiTransferDto);
+
+                return Ok(new ApiResponse<List<ProcessTransferResultDto>>
+                {
+                    Success = true,
+                    Message = processMultiTransferDto.IsApproved ? "Duyệt phiếu thành công" : "Từ chối duyệt phiếu",
                     Data = result
                 });
             }
             catch (KeyNotFoundException ex)
             {
-                return NotFound(new ApiResponse<string>
+                return Ok(new ApiResponse<string>
                 {
                     Success = false,
                     Message = "Xác nhận phiếu thất bại",
@@ -170,7 +438,7 @@ namespace QuanLyTaiSan.Controllers
             }
             catch (InvalidOperationException ex)
             {
-                return BadRequest(new ApiResponse<string>
+                return Ok(new ApiResponse<string>
                 {
 
                     Success = false,
@@ -178,9 +446,9 @@ namespace QuanLyTaiSan.Controllers
                     Errors = new { Detail = ex.Message }
                 });
             }
-            catch(UnauthorizedAccessException ex)
+            catch (UnauthorizedAccessException ex)
             {
-                return BadRequest(new ApiResponse<string>
+                return Ok(new ApiResponse<string>
                 {
 
                     Success = false,
@@ -198,5 +466,7 @@ namespace QuanLyTaiSan.Controllers
                 });
             }
         }
+
+
     }
 }

@@ -10,17 +10,23 @@ namespace QuanLyTaiSan.Dtos.AssetTransfer
     {
         public int TransferId { get; set; }
         public int AssetId { get; set; }
+        public Guid? BatchId { get; set; }
         public AssetNameDtp Asset { get; set; }
         public string TransferType { get; set; }
-        public int? DepartmentId { get; set; }
-        public DepartmentDto? Department { get; set; }
+        public string Status { get; set; }
+
+
+        public int? FromDepartmentId { get; set; }
+        public DepartmentDto? FromDepartment { get; set; }
+
+        public int? ToDepartmentId { get; set; }
+        public DepartmentDto? ToDepartment { get; set; }
         public string? FromUserId { get; set; }
         public UserDto? FromUser { get; set; }
 
         public string? ToUserId { get; set; }
         public UserDto? ToUser { get; set; }
 
-        public string Status { get; set; }
 
         public string CreatedByUserId { get; set; }
         public UserDto CreatedByUser { get; set; }

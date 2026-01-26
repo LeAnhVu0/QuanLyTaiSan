@@ -20,7 +20,7 @@ namespace QuanLyTaiSan.Repositories.Implementations
         {
             return await _appDbContext.Department
                 .Include(d => d.User)
-                .Include(d => d.Assets)
+                .Include(d => d.Assets.Where(h => h.IsDelete == false))
                 .FirstOrDefaultAsync(d => d.Id == id);
         }
 

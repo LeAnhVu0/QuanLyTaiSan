@@ -43,7 +43,7 @@ namespace QuanLyTaiSanTest.Services.Implementations
             var category = await _repo.GetById(id);
             if (category == null)
             {
-                throw new KeyNotFoundException("Không tồn tại loại tài sản có id = " + id);
+                throw new KeyNotFoundException("Loại tài sản không tồn tại");
             }
             else
             {
@@ -118,7 +118,7 @@ namespace QuanLyTaiSanTest.Services.Implementations
             var category = await _repo.GetById(id);
             if (category == null)
             {
-                throw new KeyNotFoundException("Không tìm thấy loại tài sản có id = " + id);
+                throw new KeyNotFoundException("Loại tài sản không tồn tại");
             }
             else
             {
@@ -134,7 +134,8 @@ namespace QuanLyTaiSanTest.Services.Implementations
                     { 
                         AssetId = h.AssetId,
                         AssetCode = h.AssetCode,
-                        AssetName = h.AssetName
+                        AssetName = h.AssetName,
+                        AssetStatus = h.Status.ToDisplayName()
                     }).ToList()
                 };
             }
@@ -146,7 +147,7 @@ namespace QuanLyTaiSanTest.Services.Implementations
             var category = await _repo.GetById(id);
             if (category == null)
             {
-                throw new KeyNotFoundException("Không tìm thấy loại tài sản có id = " + id);
+                throw new KeyNotFoundException("Loại tài sản không tồn tại");
             }
             bool hasAssets = await _repo.CheckAssetInCategory(id);
             

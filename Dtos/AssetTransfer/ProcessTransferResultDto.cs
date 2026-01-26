@@ -10,7 +10,8 @@
         public string AssetCode { get; set; }
         public string AssetName { get; set; }
 
-        public int? DepartmentId { get; set; }
+        public int? FromDepartmentId { get; set; }
+        public int? ToDepartmentId { get; set; }
         public string? FromUserId { get; set; }
         public string? ToUserId { get; set; }
 

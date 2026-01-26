@@ -1,24 +1,31 @@
-﻿using QuanLyTaiSan.Dtos.Auth;
+﻿using Microsoft.AspNetCore.Identity;
+using QuanLyTaiSan.Dtos.AssetHistory;
+using QuanLyTaiSan.Dtos.Auth;
+using QuanLyTaiSan.Models;
 using QuanLyTaiSanTest.Dtos.AssetHistory;
 using QuanLyTaiSanTest.Models;
 using QuanLyTaiSanTest.Repositories.Interfaces;
 using QuanLyTaiSanTest.Services.Interfaces;
+using System.Threading.Tasks;
+using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace QuanLyTaiSanTest.Services.Implementations
 {
     public class AssetHistoryService:IAssetHistoryService
     {
         private readonly IAssetHistoryRepository _repo;
+        private readonly UserManager<ApplicationUser> _userManager;
 
-        public AssetHistoryService(IAssetHistoryRepository repo) 
+        public AssetHistoryService(IAssetHistoryRepository repo, UserManager<ApplicationUser> userManager)
         {
             _repo = repo;
+            _userManager = userManager;
         }
 
-        public async Task<List<AssetHistoryDto>> GetAll()
+        public async Task<AssetHistoryAllDto> GetAll(int pageIndex, int pageSize, string? searchName, string? actionType)
         {
-            var listHistory = await _repo.GetAll();
-            return listHistory.Select(h => new AssetHistoryDto
+            var result = await _repo.GetAll(pageIndex,pageSize,searchName,actionType);
+            var items =  result.items.Select(h => new AssetHistoryDto
             {
                 HistoryID = h.HistoryID,
                 ActionType = h.ActionType,
@@ -27,21 +34,37 @@ namespace QuanLyTaiSanTest.Services.Implementations
                 AssetId = h.AssetId,
                 AssetName = h.AssetName,
                 Status = h.Status,
-                CreatedByUserId = new UserDto
+                CreatedByUser = new UserDto
                 {
                     Id = h.CreatedByUserId,
-                    Username = h.CreatedByUser.UserName
-                    //Email = h.CreatedByUser.Email,
-                    //PhoneNumber = h.CreatedByUser.PhoneNumber
+                    Username = h.CreatedByUser.UserName,
+                    Fullname = h.CreatedByUser.FullName
+
                 },
-                AssignedToUserId = h.AssignedToUserId == null ? null : new UserDto
+                AssignedToUser = h.AssignedToUserId == null ? null : new UserDto
                 { 
                     Id = h.AssignedToUserId,
-                    Username = h.AssignedToUser.UserName
-                    //Email = h.AssignedToUser.Email,
-                    //PhoneNumber = h.AssignedToUser.PhoneNumber
+                    Username = h.AssignedToUser?.UserName ,
+                    Fullname = h.AssignedToUser?.FullName 
+
                 }
             }).ToList();
+
+            var totalCount = result.totalCount;
+            var totalPage = (int)Math.Ceiling(totalCount / (double)pageSize);
+
+            return new AssetHistoryAllDto
+            {
+                ListAssetHistory = items,
+                SearchName = searchName,
+                ActionType = actionType,
+                PageIndex = pageIndex,
+                PageSize = pageSize,
+                TotalCount = totalCount,
+                TotalPage = totalPage,
+                HasNextPage = totalPage > pageIndex,
+                HasPreviousPage = pageIndex > 1
+            };
         }
         public async Task<List<AssetHistoryDto>> GetById(int assetId)
         {
@@ -61,17 +84,19 @@ namespace QuanLyTaiSanTest.Services.Implementations
                     AssetId = h.AssetId,
                     AssetName = h.AssetName,
                     Status = h.Status,
-                    CreatedByUserId = new UserDto
+                    CreatedByUser = new UserDto
                     {
                         Id = h.CreatedByUserId,
-                        Username = h.CreatedByUser.UserName
+                        Username = h.CreatedByUser.UserName,
+                        Fullname = h.CreatedByUser.FullName
                         //Email = h.CreatedByUser.Email,
                         //PhoneNumber = h.CreatedByUser.PhoneNumber
                     },
-                    AssignedToUserId = h.AssignedToUserId == null ? null : new UserDto
+                    AssignedToUser = h.AssignedToUserId == null ? null : new UserDto
                     {
                         Id = h.AssignedToUserId,
-                        Username = h.AssignedToUser.UserName
+                        Username = h.AssignedToUser.UserName ,
+                        Fullname = h.AssignedToUser.FullName
                         //Email = h.AssignedToUser.Email,
                         //PhoneNumber = h.AssignedToUser.PhoneNumber
                     }

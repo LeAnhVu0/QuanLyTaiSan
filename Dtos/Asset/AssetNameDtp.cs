@@ -7,5 +7,7 @@
         public required string AssetCode { get; set; }
 
         public required string AssetName { get; set; }
+
+        public required string AssetStatus { get; set; }
     }
 }

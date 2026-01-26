@@ -93,6 +93,7 @@ namespace QuanLyTaiSanTest.Controllers
                 });
             }
         }
+       
         [HttpGet("{id:int}")]
         public async Task<IActionResult> GetById(int id)
         {
@@ -207,6 +208,7 @@ namespace QuanLyTaiSanTest.Controllers
                 });
             }
         }
+       
         [Authorize(Policy = Permissions.AssetDelete)]
         [HttpDelete("{id}")]
         public async Task<IActionResult> Delete(int id)
@@ -244,6 +246,7 @@ namespace QuanLyTaiSanTest.Controllers
                 });
             }
         }
+      
         [Authorize(Policy = Permissions.AssetUpdate)]
         [HttpPatch("{id}")]
         public async Task<IActionResult> Update(int id,UpdateAssetDto updateAssetDto)
@@ -286,13 +289,23 @@ namespace QuanLyTaiSanTest.Controllers
                 });
             }
         }
+       
         [Authorize(Policy = Permissions.AssetGetHistory)]
         [HttpGet("History")]
-        public async Task<IActionResult> GetAllHistory()
+        public async Task<IActionResult> GetAllHistory(int pageIndex = 1, int pageSize = 5, string? searchName = null, string? actionType = null)
         {
             try
             {
-                return Ok( await _assetHistoryService.GetAll());
+
+                if (pageIndex < 1)
+                {
+                    pageIndex = 1;
+                }
+                if (pageSize < 1)
+                {
+                    pageSize = 5;
+                }
+                return Ok( await _assetHistoryService.GetAll(pageIndex, pageSize, searchName, actionType));
             }
             catch (Exception ex)
             {

@@ -6,7 +6,7 @@
         DangSuDung = 2,   // Đang được bàn giao
         HongHoc = 3,      // Đang hỏng/Sửa chữa
         ThanhLy = 4,      // Đã thanh lý
-        Mat = 5           // Đã mất
+        Mat = 0           // Đã mất
     }
     public static class AssetStatusExtensions
     {

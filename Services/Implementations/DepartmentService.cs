@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.OpenApi.Extensions;
 using QuanLyTaiSan.Dtos.Asset;
 using QuanLyTaiSan.Dtos.Auth;
 using QuanLyTaiSan.Dtos.Department;
@@ -8,6 +9,7 @@ using QuanLyTaiSan.Enum;
 using QuanLyTaiSan.Models;
 using QuanLyTaiSan.Repositories.Interfaces;
 using QuanLyTaiSan.Services.Interfaces;
+using QuanLyTaiSanTest.Enum;
 using QuanLyTaiSanTest.Repositories.Interfaces;
 using static Microsoft.EntityFrameworkCore.DbLoggerCategory;
 namespace QuanLyTaiSan.Services.Implementations
@@ -64,14 +66,17 @@ namespace QuanLyTaiSan.Services.Implementations
                 Users = department.User.Select(u => new UserInDepartmentDto
                 {
                     Id = u.Id,
+                    UseName = u.UserName,
                     FullName = u.FullName,
-                    Email = u.Email
+                    Email = u.Email,
+                    Status = u.Status.ToFriendlyString()
                 }).ToList(),
                 Assets=department.Assets.Select(a=>new AssetNameDtp
                 {
                     AssetId=a.AssetId,
                     AssetCode=a.AssetCode,
-                    AssetName=a.AssetName
+                    AssetName=a.AssetName,
+                    AssetStatus = a.Status.ToDisplayName()
                 }).ToList()
             };
         }
