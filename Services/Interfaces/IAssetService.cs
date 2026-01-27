@@ -23,7 +23,7 @@ namespace QuanLyTaiSanTest.Services.Interfaces
 
 
         public Task<AssetTransferAllDto> GetAllTransfer(int pageIndex, int pageSize, int? status, int? type);
-        public Task<AssetAllDto> GetPageList(int pageIndex, int pageSize, string? search, int? categoryId, string? userId, int? status, string sortBy, bool desc);
+        public Task<AssetAllDto> GetPageList(int pageIndex, int pageSize, string? search, int? categoryId, string? userId, int? departmentId, int? status, string sortBy, bool desc);
         public Task<List<AssetRespondDto>> GetAll();
 
         public Task<AssetDto> GetById(int id);

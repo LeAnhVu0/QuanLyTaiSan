@@ -865,9 +865,9 @@ namespace QuanLyTaiSanTest.Services.Implementations
         }
 
         //Lấy tất cả tài sản có phân trang
-        public async Task<AssetAllDto> GetPageList(int pageIndex, int pageSize, string? search, int? categoryId, string? userId, int? status, string sortBy, bool desc)
+        public async Task<AssetAllDto> GetPageList(int pageIndex, int pageSize, string? search, int? categoryId, string? userId, int? departmentId, int? status, string sortBy, bool desc)
         {
-            var data = await _repo.GetPageList(pageIndex, pageSize, search, categoryId, userId, status, sortBy, desc);
+            var data = await _repo.GetPageList(pageIndex, pageSize, search, categoryId, userId,departmentId, status, sortBy, desc);
             if (data.Items == null || data.Items.Count == 0)
             {
                 throw new KeyNotFoundException("Không có dữ liệu");

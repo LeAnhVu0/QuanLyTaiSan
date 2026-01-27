@@ -20,9 +20,14 @@ namespace QuanLyTaiSanTest.Repositories.Implementations
             return inventory;
         }
 
-        public async Task<List<Inventory>> GetAll()
+        public async Task<(List<Inventory> Items, int TotalCount)> GetAll(int pageIndex, int pageSize)
         {
-           return await _context.Inventory.Include(h => h.User).Include(h => h.Department).ToListAsync();
+
+            var result = _context.Inventory.Include(h => h.User).Include(h => h.Department).AsQueryable();
+
+            var totalCount = await result.CountAsync();
+            var items = await result.Skip((pageIndex - 1) * pageSize).Take(pageSize).ToListAsync();
+            return (items, totalCount);
         }
 
         public async Task<Inventory?> GetById(int id)

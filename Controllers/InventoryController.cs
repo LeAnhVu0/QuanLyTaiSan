@@ -21,16 +21,34 @@ namespace QuanLyTaiSanTest.Controllers
             _inventoryService = inventoryService;
         }
         [HttpGet]
-        public async Task<IActionResult> GetAllInvention()
+        public async Task<IActionResult> GetAllInvention(int pageIndex = 1, int pageSize = 5)
         {
             try
             {
-                var data = await _inventoryService.GetAll();
-                return Ok(new ApiResponse<List<InventoryResponseDto>>
+                if (pageIndex < 1)
+                {
+                    pageIndex = 1;
+                }
+                if (pageSize < 1)
+                {
+                    pageSize = 5;
+                }
+                var data = await _inventoryService.GetAll(pageIndex,pageSize);
+
+                return Ok(new ApiResponse<InventoryAllDto>
                 {
                     Success = true,
                     Data = data,
                     Message = "Hiển thị thành công"
+                });
+            }
+            catch (KeyNotFoundException ex)
+            {
+                return Ok(new ApiResponse<string>
+                {
+                    Success = false,
+                    Message = "Lấy dữ liệu thất bại",
+                    Errors = new { Detail = ex.Message }
                 });
             }
             catch (Exception ex)

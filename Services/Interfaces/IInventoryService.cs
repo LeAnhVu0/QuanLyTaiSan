@@ -8,6 +8,6 @@ namespace QuanLyTaiSanTest.Services.Interfaces
     {
         public Task<Inventory> CreatePlan(CreateInventoryDto createInventoryDto);
         public Task Update(int id , UpdateInventoryDto updateInventoryDto);
-        public Task<List<InventoryResponseDto>> GetAll();
+        public Task<InventoryAllDto> GetAll(int pageIndex, int pageSize);
     }
 }
