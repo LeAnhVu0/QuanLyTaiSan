@@ -82,9 +82,9 @@ namespace QuanLyTaiSan.Controllers
             var result = await _authService.GetUserById(id);
             var userId = User.FindFirstValue("sub");
             if (userId == id) return NotFound("Không thể ngừng hoạt động của chính bạn");
-            if (result == null) return NotFound("Change status false");
+            if (result == null) return NotFound("Thay đổi trạng thái k thành công");
             await _authService.DeleteUser(id);
-            return Ok("Change status done ");
+            return Ok("Thay đổi trạng thái thành công");
         }
       
         [Authorize]
@@ -110,6 +110,11 @@ namespace QuanLyTaiSan.Controllers
         [HttpPatch("update-user")] 
         public async Task<ActionResult<UserUpdateDto>> UpdateUser(string id,UserUpdateDto dto)
         {
+            //var userId = User.FindFirstValue("sub");
+            //if (userId == id)
+            //{
+            //    return BadRequest("khong duoc ngung hoat dong chinsh minhf");
+            //}
             var result= await _authService.UpdateUser(id, dto);
             if (result == null) return NotFound();
             

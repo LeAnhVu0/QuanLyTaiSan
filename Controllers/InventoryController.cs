@@ -13,6 +13,7 @@ using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace QuanLyTaiSanTest.Controllers
 {
+    [Authorize(Roles = "Admin")]
     [Route("api/[controller]")]
     [ApiController]
     public class InventoryController : ControllerBase
