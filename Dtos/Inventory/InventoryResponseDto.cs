@@ -12,8 +12,9 @@ namespace QuanLyTaiSan.Dtos.Inventory
         public int BookQuantity { get; set; }
         public int ActualQuantity { get; set; }
         public string Note { get; set; }
-        public DepartmentDto Department { get; set; }
+        public DepartmentDto? Department { get; set; }
 
-        public UserDto User { get; set; }
+        public UserDto? User { get; set; }
+        public string Status {  get; set; }
     }
 }

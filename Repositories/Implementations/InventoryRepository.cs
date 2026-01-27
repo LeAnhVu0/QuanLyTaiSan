@@ -1,4 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using QuanLyTaiSan.Enum;
 using QuanLyTaiSanTest.Data;
 using QuanLyTaiSanTest.Models;
 using QuanLyTaiSanTest.Repositories.Interfaces;
@@ -20,11 +21,19 @@ namespace QuanLyTaiSanTest.Repositories.Implementations
             return inventory;
         }
 
-        public async Task<(List<Inventory> Items, int TotalCount)> GetAll(int pageIndex, int pageSize)
+        public async Task<(List<Inventory> Items, int TotalCount)> GetAll(int pageIndex, int pageSize, int? departmentId, int? status)
         {
 
             var result = _context.Inventory.Include(h => h.User).Include(h => h.Department).AsQueryable();
 
+            if (departmentId != null)
+            {
+                result = result.Where(h => h.Department.Id == departmentId);
+            }
+            if (status != null)
+            {
+                result = result.Where(h => h.Status == (InventoryStatus)status);
+            }
             var totalCount = await result.CountAsync();
             var items = await result.Skip((pageIndex - 1) * pageSize).Take(pageSize).ToListAsync();
             return (items, totalCount);
@@ -32,7 +41,7 @@ namespace QuanLyTaiSanTest.Repositories.Implementations
 
         public async Task<Inventory?> GetById(int id)
         {
-            return await _context.Inventory.FirstOrDefaultAsync(h => h.InventoryId==id);
+            return await _context.Inventory.Include(h => h.User).Include(h => h.Department).FirstOrDefaultAsync(h => h.InventoryId==id);
         }
 
         public async Task Update()

@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Http;
 using QuanLyTaiSan.Dtos.Asset;
 using QuanLyTaiSan.Dtos.Inventory;
+using QuanLyTaiSan.Enum;
 using QuanLyTaiSanTest.Dtos.NewFolder1;
 using QuanLyTaiSanTest.Models;
 using QuanLyTaiSanTest.Repositories.Interfaces;
@@ -18,7 +19,7 @@ namespace QuanLyTaiSanTest.Services.Implementations
             _repo=repo;
             _httpContextAccessor = httpContextAccessor;
         }
-        public async Task<Inventory> CreatePlan(CreateInventoryDto createInventoryDto)
+        public async Task<CreateInventoryResponseDto> CreatePlan(CreateInventoryDto createInventoryDto)
         {
             var inventory = new Inventory
             {
@@ -26,14 +27,24 @@ namespace QuanLyTaiSanTest.Services.Implementations
                 DepartmentId = createInventoryDto.DepartmentId,
                 Note = createInventoryDto.Note,
                 UserIdBy = _httpContextAccessor.HttpContext?.User?
-                                               .FindFirst(System.IdentityModel.Tokens.Jwt.JwtRegisteredClaimNames.Sub)?.Value
+                                               .FindFirst(System.IdentityModel.Tokens.Jwt.JwtRegisteredClaimNames.Sub)?.Value,
+                Status = QuanLyTaiSan.Enum.InventoryStatus.ChuaKiemKe
             } ;
-           return await _repo.Create(inventory);
+           var result =  await _repo.Create(inventory);
+           return new CreateInventoryResponseDto
+            {
+                InventoryId = result.InventoryId,
+                PlanDate = result.PlanDate,
+                DepartmentId = result.DepartmentId,
+                UserIdBy = result.UserIdBy,
+                Note = result.Note,
+                Status = result.Status.ToDisplayName()
+            };
         }
 
-        public async Task<InventoryAllDto> GetAll(int pageIndex, int pageSize)
+        public async Task<InventoryAllDto> GetAll(int pageIndex, int pageSize, int? departmentId, int? status)
         {
-            var data = await _repo.GetAll( pageIndex, pageSize);
+            var data = await _repo.GetAll( pageIndex, pageSize, departmentId, status);
             if (data.Items == null || data.Items.Count == 0)
             {
                 throw new KeyNotFoundException("Không có dữ liệu");
@@ -57,7 +68,8 @@ namespace QuanLyTaiSanTest.Services.Implementations
                     Id = h.User.Id,
                     Username = h.User.UserName,
                     Fullname = h.User.FullName 
-                }
+                },
+                Status = h.Status.ToDisplayName()
             }).ToList();
             var totalPage = (int)Math.Ceiling(data.TotalCount / (double)pageSize);
 
@@ -69,25 +81,79 @@ namespace QuanLyTaiSanTest.Services.Implementations
                 PageSize = pageSize,
                 TotalCount = data.TotalCount,
                 TotalPage = totalPage,
-
                 HasPreviousPage = pageIndex > 1,
                 HasNextPage = pageIndex < totalPage
             };
 
         }
-
-        public async Task Update(int id, UpdateInventoryDto dto)
+        public async Task<InventoryResponseDto> GetById(int id)
         {
-            var inv = await _repo.GetById(id);
+            var result = await _repo.GetById(id);
+            if(result == null)
+                throw new KeyNotFoundException("Phiếu không tồn tại");
 
-            if (inv == null)
+            return new InventoryResponseDto
+            {
+                InventoryId = result.InventoryId,
+                PlanDate = result.PlanDate,
+                Department = new QuanLyTaiSan.Dtos.Department.DepartmentDto
+                {
+                    Id = result.DepartmentId,
+                    DepartmentName = result.Department.DepartmentName,
+                    Description = result.Department.Description
+                },
+                User = new QuanLyTaiSan.Dtos.Auth.UserDto
+                {
+                    Id = result.UserIdBy,
+                    Username = result.User.UserName,
+                    Fullname = result.User.FullName,
+
+                },
+                Note = result.Note,
+                InventoryDate = result.InventoryDate,
+                ActualQuantity = result.ActualQuantity,
+                BookQuantity = result.BookQuantity,
+                Status = result.Status.ToDisplayName()
+            };
+        
+        }
+
+        public async Task<InventoryResponseDto> Update(int id, UpdateInventoryDto dto)
+        {
+            var result = await _repo.GetById(id);
+
+            if (result == null)
             {
                 throw new KeyNotFoundException("Không có phiếu kiểm kê");
             }    
-            inv.InventoryDate = dto.InventoryDate;
-            inv.BookQuantity = dto.BookQuantity;
-            inv.ActualQuantity = dto.ActualQuantity;
+            result.InventoryDate = dto.InventoryDate;
+            result.BookQuantity = dto.BookQuantity;
+            result.ActualQuantity = dto.ActualQuantity;
+            result.Status = (result.ActualQuantity != result.BookQuantity) ? InventoryStatus.ChenhLech : InventoryStatus.KhopSoLuong;
             await _repo.Update();
+            return new InventoryResponseDto
+            {
+                InventoryId = result.InventoryId,
+                PlanDate = result.PlanDate,
+                Department = new QuanLyTaiSan.Dtos.Department.DepartmentDto
+                {
+                    Id = result.DepartmentId,
+                    DepartmentName = result.Department.DepartmentName,
+                    Description = result.Department.Description
+                },
+                User = new QuanLyTaiSan.Dtos.Auth.UserDto
+                {
+                    Id = result.UserIdBy,
+                    Username = result.User.UserName,
+                    Fullname = result.User.FullName,
+
+                },
+                Note = result.Note,
+                InventoryDate = result.InventoryDate,
+                ActualQuantity = result.ActualQuantity,
+                BookQuantity = result.BookQuantity,
+                Status = (result.ActualQuantity != result.BookQuantity) ? InventoryStatus.ChenhLech.ToDisplayName() : InventoryStatus.KhopSoLuong.ToDisplayName()
+            };
         }
     }
 }
