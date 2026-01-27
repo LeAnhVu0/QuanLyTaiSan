@@ -82,9 +82,9 @@ namespace QuanLyTaiSan.Controllers
             var result = await _authService.GetUserById(id);
             var userId = User.FindFirstValue("sub");
             if (userId == id) return NotFound("Không thể ngừng hoạt động của chính bạn");
-            if (result == null) return NotFound("Change status false");
+            if (result == null) return NotFound("Thay đổi trạng thái k thành công");
             await _authService.DeleteUser(id);
-            return Ok("Change status done ");
+            return Ok("Thay đổi trạng thái thành công");
         }
       
         [Authorize]
