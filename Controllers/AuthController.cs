@@ -110,6 +110,11 @@ namespace QuanLyTaiSan.Controllers
         [HttpPatch("update-user")] 
         public async Task<ActionResult<UserUpdateDto>> UpdateUser(string id,UserUpdateDto dto)
         {
+            var userId = User.FindFirstValue("sub");
+            if (userId == id)
+            {
+                return BadRequest("khong duoc ngung hoat dong chinsh minhf");
+            }
             var result= await _authService.UpdateUser(id, dto);
             if (result == null) return NotFound();
             

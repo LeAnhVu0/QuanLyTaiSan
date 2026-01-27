@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace QuanLyTaiSanTest.Controllers
 {
-    [Authorize(Policy = Permissions.ReportGet)]
+    [Authorize(Roles ="Admin")]
     [Route("api/[controller]")]
     [ApiController]
     public class ReportController : ControllerBase

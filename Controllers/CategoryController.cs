@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using QuanLyTaiSan.Dtos.Asset;
 using QuanLyTaiSan.Dtos.Category;
@@ -11,6 +12,7 @@ using System.Threading.Tasks;
 
 namespace QuanLyTaiSanTest.Controllers
 {
+    [Authorize(Roles = "Admin")]
     [Route("api/[controller]")]
     [ApiController]
     public class CategoryController : ControllerBase

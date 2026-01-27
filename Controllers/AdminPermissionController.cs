@@ -4,6 +4,7 @@ using QuanLyTaiSan.Dtos.Auth;
 using QuanLyTaiSan.Models;
 using QuanLyTaiSan.Services.Interfaces;
 using System.Runtime.InteropServices;
+using System.Security.Claims;
 
 namespace QuanLyTaiSan.Controllers
 {
@@ -35,6 +36,11 @@ namespace QuanLyTaiSan.Controllers
         public async Task<IActionResult> RevokePermission(
             GrantPermissionDto dto)
         {
+            var id = User.FindFirstValue("sub");
+            if (id == dto.UserId)
+            {
+                return BadRequest("Khong the tu xoa quyen cuar minfh");
+            }
             await _permissionService
                 .RevokePermissionAsync(dto.UserId, dto.Permission);
 
