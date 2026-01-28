@@ -106,7 +106,7 @@ namespace QuanLyTaiSan.Controllers
         }
 
 
-        [Authorize(Policy =Permissions.UserDelete)]
+        [Authorize(Roles ="Admin")]
         [HttpPatch("update-user")] 
         public async Task<ActionResult<UserUpdateDto>> UpdateUser(string id,UserUpdateDto dto)
         {

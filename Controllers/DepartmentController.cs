@@ -37,11 +37,24 @@ namespace QuanLyTaiSan.Controllers
         }
         [Authorize(Policy = Permissions.DepartmentCreate)]
         [HttpPost]
-        public async Task<ActionResult<DepartmentResponseDto>> CreateDepartment([FromBody] DepartmentCreateDto dto)
+        [HttpPost]
+        public async Task<ActionResult<DepartmentResponseDto>> CreateDepartment(
+    [FromBody] DepartmentCreateDto dto)
         {
-            var result = await _service.AddDepartment(dto);
-            return Ok(result);
+            try
+            {
+                var result = await _service.AddDepartment(dto);
+                return Ok(result);
+            }
+            catch (InvalidOperationException ex)
+            {
+                return BadRequest(new
+                {
+                    message = ex.Message
+                });
+            }
         }
+
         [Authorize(Policy = Permissions.DepartmentUpdate)]
         [HttpPut("{id}")]
         public async Task<ActionResult<DepartmentResponseDto>> UpdateDepartment(
