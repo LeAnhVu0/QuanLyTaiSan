@@ -236,5 +236,14 @@ namespace QuanLyTaiSanTest.Repositories.Implementations
                 .Include(t => t.ToUser)        
                 .Where(h => h.BatchId == batchId).ToListAsync();
         }
+
+        public async Task<int> CountAssetsByDepartment(int departmentId)
+        {
+            return await _context.Assets
+                .Where(x => x.DepartmentId == departmentId
+                       && x.Status != AssetStatus.ThanhLy
+                       && x.Status != AssetStatus.Mat) 
+                .CountAsync();
+        }
     }
 }

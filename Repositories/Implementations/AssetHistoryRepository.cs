@@ -19,10 +19,12 @@ namespace QuanLyTaiSanTest.Repositories.Implementations
             await _context.SaveChangesAsync();
         }
 
-        public async Task<(List<AssetHistory> items, int totalCount)> GetAll(int pageIndex, int pageSize, string? searchName, string? actionType)
+        public async Task<(List<AssetHistory> items, int totalCount)> GetAll(int pageIndex, int pageSize, int? assetId, string? searchName, string? actionType)
         {
             var list = _context.AssetHistory.Include(h=>h.CreatedByUser)
                                             .Include(h=>h.AssignedToUser)
+                                            .Where(h => h.Asset.AssetId == assetId)
+                                            .OrderByDescending(h => h.ActionDate)
                                             .AsQueryable();
 
             if(!string.IsNullOrEmpty(searchName))

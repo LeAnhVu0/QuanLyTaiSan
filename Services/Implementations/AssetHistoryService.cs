@@ -22,9 +22,9 @@ namespace QuanLyTaiSanTest.Services.Implementations
             _userManager = userManager;
         }
 
-        public async Task<AssetHistoryAllDto> GetAll(int pageIndex, int pageSize, string? searchName, string? actionType)
+        public async Task<AssetHistoryAllDto> GetAll(int pageIndex, int pageSize,int? assetId, string? searchName, string? actionType)
         {
-            var result = await _repo.GetAll(pageIndex,pageSize,searchName,actionType);
+            var result = await _repo.GetAll(pageIndex,pageSize, assetId,searchName,actionType);
             var items =  result.items.Select(h => new AssetHistoryDto
             {
                 HistoryID = h.HistoryID,

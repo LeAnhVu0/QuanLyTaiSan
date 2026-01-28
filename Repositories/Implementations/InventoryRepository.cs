@@ -24,7 +24,7 @@ namespace QuanLyTaiSanTest.Repositories.Implementations
         public async Task<(List<Inventory> Items, int TotalCount)> GetAll(int pageIndex, int pageSize, int? departmentId, int? status)
         {
 
-            var result = _context.Inventory.Include(h => h.User).Include(h => h.Department).AsQueryable();
+            var result = _context.Inventory.Include(h => h.User).Include(h => h.Department).OrderByDescending(h => h.InventoryId).AsQueryable();
 
             if (departmentId != null)
             {

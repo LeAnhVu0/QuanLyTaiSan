@@ -93,8 +93,9 @@ namespace QuanLyTaiSanTest.Controllers
                 });
             }
         }
+       
         [Authorize]
-         [HttpGet("{id:int}")]
+        [HttpGet("{id:int}")]
         public async Task<IActionResult> GetById(int id)
         {
             try
@@ -280,6 +281,15 @@ namespace QuanLyTaiSanTest.Controllers
                     Errors = new { Detail = ex.Message }
                 });
             }
+            catch (InvalidOperationException ex)
+            {
+                return NotFound(new ApiResponse<string>
+                {
+                    Success = false,
+                    Message = "Sửa tài sản thất bại",
+                    Errors = new { Detail = ex.Message }
+                });
+            }
             catch (Exception ex)
             {
                 return StatusCode(500, new ApiResponse<string>
@@ -293,7 +303,7 @@ namespace QuanLyTaiSanTest.Controllers
        
         [Authorize(Policy = Permissions.AssetGetHistory)]
         [HttpGet("History")]
-        public async Task<IActionResult> GetAllHistory(int pageIndex = 1, int pageSize = 5, string? searchName = null, string? actionType = null)
+        public async Task<IActionResult> GetAllHistory(int pageIndex = 1, int pageSize = 5,int? assetId = null, string? searchName = null, string? actionType = null)
         {
             try
             {
@@ -306,7 +316,7 @@ namespace QuanLyTaiSanTest.Controllers
                 {
                     pageSize = 5;
                 }
-                return Ok( await _assetHistoryService.GetAll(pageIndex, pageSize, searchName, actionType));
+                return Ok( await _assetHistoryService.GetAll(pageIndex, pageSize,assetId, searchName, actionType));
             }
             catch (Exception ex)
             {

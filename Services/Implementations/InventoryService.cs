@@ -13,11 +13,13 @@ namespace QuanLyTaiSanTest.Services.Implementations
     {
         private readonly IInventoryRepository _repo;
         private readonly IHttpContextAccessor _httpContextAccessor;
+        private readonly IAssetRepository _repoAsset;
 
-        public InventoryService(IInventoryRepository repo, IHttpContextAccessor httpContextAccessor) 
+        public InventoryService(IInventoryRepository repo, IHttpContextAccessor httpContextAccessor , IAssetRepository repoAsset) 
         {
             _repo=repo;
             _httpContextAccessor = httpContextAccessor;
+            _repoAsset = repoAsset;
         }
         public async Task<CreateInventoryResponseDto> CreatePlan(CreateInventoryDto createInventoryDto)
         {
@@ -127,7 +129,7 @@ namespace QuanLyTaiSanTest.Services.Implementations
                 throw new KeyNotFoundException("Không có phiếu kiểm kê");
             }    
             result.InventoryDate = dto.InventoryDate;
-            result.BookQuantity = dto.BookQuantity;
+            result.BookQuantity = await _repoAsset.CountAssetsByDepartment(result.DepartmentId);
             result.ActualQuantity = dto.ActualQuantity;
             result.Status = (result.ActualQuantity != result.BookQuantity) ? InventoryStatus.ChenhLech : InventoryStatus.KhopSoLuong;
             await _repo.Update();

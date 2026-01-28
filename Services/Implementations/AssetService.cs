@@ -410,8 +410,22 @@ namespace QuanLyTaiSanTest.Services.Implementations
                     else if (transfer.TransferType == AssetTransferType.Recall)
                     {
                         transfer.Asset.UserId = null;
-                        transfer.Asset.Status = AssetStatus.SanSang;
-
+                        if (transfer.Asset.Status == AssetStatus.HongHoc)
+                        {
+                            transfer.Asset.Status = AssetStatus.HongHoc;
+                        }
+                        else if (transfer.Asset.Status == AssetStatus.ThanhLy)
+                        {
+                            transfer.Asset.Status = AssetStatus.ThanhLy;
+                        }
+                        else if (transfer.Asset.Status == AssetStatus.Mat)
+                        {
+                            transfer.Asset.Status = AssetStatus.Mat;
+                        }
+                        else
+                        {
+                            transfer.Asset.Status = AssetStatus.SanSang;
+                        }
                         actionType = "RECALL";
                         var fromUserName = transfer.FromUser?.UserName ?? "Đã nghỉ việc/Không rõ";
                         note = $"Thu hồi tài sản '{transfer.Asset.AssetCode}-{transfer.Asset.AssetName}' của nhân viên: {fromUserName}";
@@ -471,95 +485,6 @@ namespace QuanLyTaiSanTest.Services.Implementations
         //Lấy tất cả phiếu có phân trang
         public async Task<AssetTransferAllDto> GetAllTransfer(int pageIndex, int pageSize, int? status, int? type)
         {
-            //var list = await _repo.GetAllTransfer(pageIndex, pageSize, status, type);
-            //if (list.Items == null || list.TotalCount == 0)
-            //{
-            //    throw new KeyNotFoundException("Không có dữ liệu");
-            //}
-            //var items = list.Items.Select(h => new AssetTransferResponseDto
-            //{
-            //    TransferId = h.TransferId,
-            //    AssetId = h.AssetId,
-            //    BatchId = h.BatchId,
-            //    Asset = new AssetNameDtp
-            //    { 
-            //        AssetId = h.AssetId,
-            //        AssetCode = h.Asset.AssetCode,
-            //        AssetName = h.Asset.AssetName,
-            //        AssetStatus = h.Asset.Status.ToDisplayName()
-            //    },
-            //    TransferType = h.TransferType.ToDisplayName(),
-            //    Status = h.Status.ToDisplayName(),
-
-            //    FromDepartmentId=h.FromDepartmentId,
-            //    FromDepartment = h.FromDepartment == null ? null : new QuanLyTaiSan.Dtos.Department.DepartmentDto
-            //    { 
-            //        Id = h.FromDepartmentId,
-            //        DepartmentName = h.FromDepartment.DepartmentName,
-            //        Description = h.FromDepartment.Description
-            //    },
-            //    ToDepartmentId = h.ToDepartmentId,
-            //    ToDepartment = h.ToDepartment == null ? null : new QuanLyTaiSan.Dtos.Department.DepartmentDto
-            //    {
-            //        Id = h.ToDepartmentId,
-            //        DepartmentName = h.ToDepartment.DepartmentName,
-            //        Description = h.ToDepartment.Description
-            //    },
-
-            //    FromUserId = h.FromUserId,
-            //    FromUser = h.FromUser == null ? null : new QuanLyTaiSan.Dtos.Auth.UserDto
-            //    {
-            //        Id = h.FromUserId,
-            //        Username = h.FromUser.UserName,
-            //        Fullname = h.FromUser.FullName
-            //    },
-
-            //    ToUserId = h.ToUserId,
-            //    ToUser = h.ToUser == null ? null : new QuanLyTaiSan.Dtos.Auth.UserDto
-            //    {
-            //        Id = h.ToUserId,
-            //        Username = h.ToUser.UserName,
-            //        Fullname = h.ToUser.FullName
-            //    },
-
-            //    CreatedByUserId = h.CreatedByUserId,
-            //    CreatedByUser = h.CreatedByUser == null ? null : new QuanLyTaiSan.Dtos.Auth.UserDto
-            //    {
-            //        Id = h.CreatedByUserId,
-            //        Username = h.CreatedByUser.UserName,
-            //        Fullname = h.CreatedByUser.FullName
-            //    },
-
-            //    ApprovedByUserId = h.ApprovedByUserId,
-            //    ApprovedByUser = h.ApprovedByUser == null ? null : new QuanLyTaiSan.Dtos.Auth.UserDto
-            //    {
-            //        Id = h.ApprovedByUserId,
-            //        Username = h.ApprovedByUser.UserName,
-            //        Fullname = h.ApprovedByUser.FullName
-            //    },
-            //    CreatedAt = h.CreatedAt,
-            //    ApprovedAt =h.ApprovedAt,
-            //    Purpose = h.Purpose,
-            //    Note = h.Note,
-            //    RejectReason = h.RejectReason
-            //}).ToList();
-            //var totalPage = (int)Math.Ceiling(list.TotalCount / (double)pageSize);
-
-            //return new AssetTransferAllDto
-            //{
-            //    ListAsset = items,
-            //    Type = type,
-            //    Status = status,
-            //    PageIndex = pageIndex,
-            //    PageSize = pageSize,
-            //    TotalCount = list.TotalCount,
-            //    TotalPage = totalPage,
-
-            //    HasPreviousPage = pageIndex > 1,
-            //    HasNextPage = pageIndex < totalPage
-            //};
-
-
             // Gọi Repo lấy về danh sách dữ liệu của các lô
             var result = await _repo.GetAllTransfer(pageIndex, pageSize, status, type);
             // Kiểm tra rỗng
@@ -745,7 +670,21 @@ namespace QuanLyTaiSanTest.Services.Implementations
             string historyAction = changes.Count > 0
                 ? "Cập nhật các trường: " + string.Join("; ", changes)
                 : "Cập nhật thông tin (Không có thay đổi thực tế)";
-         
+            if ((AssetStatus)updateAssetDto.Status == AssetStatus.ThanhLy)
+            {
+                // Kiểm tra có ai đang giữ không (UserId phải null hoặc rỗng)
+                if (!string.IsNullOrEmpty(h.UserId))
+                {
+                    throw new InvalidOperationException($"Tài sản đang được giữ bởi nhân viên ({h.User.FullName}). Vui lòng thu hồi tài sản về kho trước khi thanh lý.");
+                }
+
+                // Kiểm tra trạng thái hiện tại (Chỉ được thanh lý khi đang Hỏng hoặc Sẵn sàng)
+                // Không thể thanh lý khi đang "Đang sử dụng", "Mất", hoặc "Đã thanh lý" rồi.
+                if (h.Status != AssetStatus.HongHoc && h.Status != AssetStatus.SanSang)
+                {
+                    throw new InvalidOperationException($"Không thể thanh lý tài sản đang ở trạng thái '{h.Status.ToDisplayName()}'. Tài sản phải ở trạng thái 'Hỏng' hoặc 'Sẵn sàng'.");
+                }
+            }
             //  Thực hiện Update (
             h.AssetName = updateAssetDto.AssetName;
             h.Descriptions = updateAssetDto.Descriptions;
@@ -1090,7 +1029,8 @@ namespace QuanLyTaiSanTest.Services.Implementations
                 throw new Exception($"Lỗi Logic: {ex.Message}");
             }
         }
-      
+
+
         //Hàm lấy thông tin người dùng 
         private string? GetCurrentUserId()
         {

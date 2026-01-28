@@ -49,6 +49,8 @@ namespace QuanLyTaiSanTest.Controllers
                 });
             }
         }
+        
+        [AllowAnonymous]
         [HttpGet("GetAllCategory")]
         public async Task<IActionResult> GetAll()
         {

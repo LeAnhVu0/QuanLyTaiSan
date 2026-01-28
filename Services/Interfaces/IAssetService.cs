@@ -7,13 +7,6 @@ namespace QuanLyTaiSanTest.Services.Interfaces
 {
     public interface IAssetService
     {
-        //public  Task<AssetFormHandoverDto> CreateFormHandover(CreateAssetFormTransferDto createFormTransferDto);
-
-        //public  Task<AssetFormHandoverDto> CreateFormRecall(CreateAssetFormTransferDto createFormTransferDto);
-        //public  Task<AssetFormHandoverDto> CreateFormDepartmentMove(CreateDepartmentFormTransferDto createDepartmentFormTransferDto);
-        //public  Task<ProcessTransferResultDto> ProcessApproval(int transferID,ProcessTransferDto processTransferDto);
-
-
         public Task<List<AssetFormHandoverDto>> CreateMultiFormHandover(CreateMultiFormTransferDto createMultiFormHandoverDto);
         public Task<List<AssetFormHandoverDto>> CreateMultiFormRecall(CreateMultiFormTransferDto createMultiFormRecallDto);
         public Task<List<AssetFormHandoverDto>> CreateMultiFormDepartmentMove(CreateMultiDepartmentFormTransferDto createMultiDepartmentFormTransferDto);

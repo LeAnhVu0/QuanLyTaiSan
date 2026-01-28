@@ -3,8 +3,6 @@
     public class UpdateInventoryDto
     {
         public DateTime InventoryDate { get; set; }
-        public int BookQuantity { get; set; }
-
         public int ActualQuantity { get; set; }
     }
 }
