@@ -138,6 +138,7 @@ namespace QuanLyTaiSan.Services.Implementations
                 .Skip((pageIndex - 1) * pageSize)
                 .Take(pageSize)
                 .ToListAsync();
+           totalCount = users.Count;
 
             var items = new List<UserResponseDto>();
 
