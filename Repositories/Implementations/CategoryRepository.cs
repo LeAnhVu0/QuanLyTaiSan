@@ -34,11 +34,11 @@ namespace QuanLyTaiSanTest.Repositories.Implementations
         }
         public async Task<List<Category>> GetAll()
         {
-           return await _context.Category.Include(h => h.Assets.Where(a => a.IsDelete == false)).ToListAsync();
+           return await _context.Category.Include(h => h.Assets.Where(a => a.IsDelete == false)).Where(h => h.IsDelete == false).ToListAsync();
         }
         public async Task<(List<Category> Items, int TotalCount)> GetPageList(int pageIndex, int pageSize, string? search, int? status, string sortBy, bool desc)
         {
-            var list = _context.Category.Include(h => h.Assets.Where(a => a.IsDelete == false)).AsQueryable();
+            var list = _context.Category.Include(h => h.Assets.Where(a => a.IsDelete == false)).Where(h => h.IsDelete == false).AsQueryable();
             if (!string.IsNullOrEmpty(search))
             {
                 list = list.Where(h => h.CategoryName.Contains(search));
@@ -66,11 +66,16 @@ namespace QuanLyTaiSanTest.Repositories.Implementations
 
         public async Task<Category?> GetById(int id)
         {
-            return await _context.Category.Include(C=>C.Assets.Where(a => a.IsDelete == false)).FirstOrDefaultAsync(c => c.CategoryId == id);
+            return await _context.Category.Include(C=>C.Assets.Where(a => a.IsDelete == false)).Where(h => h.IsDelete == false).FirstOrDefaultAsync(c => c.CategoryId == id);
         }
         public async Task Update()
         {
             await _context.SaveChangesAsync();
+        }
+
+        public async Task<bool> CheckNameCategory(string name)
+        {
+            return await _context.Category.AnyAsync(h => h.CategoryName == name);
         }
     }
 }

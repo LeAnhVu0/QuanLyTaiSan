@@ -743,15 +743,15 @@ namespace QuanLyTaiSanTest.Services.Implementations
             var h = await _repo.GetById(id);
             if (h == null)
             {
-                throw new KeyNotFoundException("Không tồn tại tài sản có id = " + id);
+                throw new KeyNotFoundException("Tài sản không tồn tại");
             }
             if (h.UserId != null)
             {
-                throw new InvalidOperationException("Không thể xóa tài sản đã và đang sử dụng bởi người khác");
+                throw new InvalidOperationException($"Không thể xóa vì tài sản {h.AssetName} đang sử dụng bởi người khác");
             }
             bool hasTransfer = await _repo.AnyAsync(t => t.AssetId == id);
             if (hasTransfer)
-            { throw new InvalidOperationException("Không thể xóa tài sản đã phát sinh bàn giao hoặc thu hồi"); }
+            { throw new InvalidOperationException($"Không thể xóa vì tài sản {h.AssetName} phát sinh bàn giao hoặc thu hồi"); }
 
             await SaveHistory(h, "DELETE", "Xóa tài sản khỏi hệ thống", GetCurrentUserId());
             h.IsDelete = true;

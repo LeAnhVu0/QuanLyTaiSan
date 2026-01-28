@@ -15,7 +15,7 @@ namespace QuanLyTaiSan.Services.Interfaces
         Task<string> DeleteUser(string id);
         Task<UserUpdateDto> UpdateUser(string id, UserUpdateDto dto);
 
-        Task<PagedResult<UserResponseDto>> GetUserAsync(int pageIndex, int pageSize,string? search, int? departmentId, UserStatus? status);
+        Task<PagedResult<UserResponseDto>> GetUserAsync(int pageIndex, int pageSize,string? search, int? departmentId, UserStatus? status, string? role);
     }
 }
 

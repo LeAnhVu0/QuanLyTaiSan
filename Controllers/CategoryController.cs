@@ -65,6 +65,7 @@ namespace QuanLyTaiSanTest.Controllers
                     Data = listCategory
                 });
             }
+
             catch (KeyNotFoundException ex)
             {
                 return Ok(new ApiResponse<string>
@@ -136,6 +137,15 @@ namespace QuanLyTaiSanTest.Controllers
                 });
             }
             catch (BadHttpRequestException ex)
+            {
+                return Ok(new ApiResponse<string>
+                {
+                    Success = false,
+                    Message = "Thêm loại tài sản thất bại",
+                    Errors = new { Detail = ex.Message }
+                });
+            }
+            catch (InvalidOperationException ex)
             {
                 return Ok(new ApiResponse<string>
                 {

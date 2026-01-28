@@ -28,6 +28,10 @@ namespace QuanLyTaiSanTest.Services.Implementations
             {
                 throw new BadHttpRequestException("Dữ liệu gửi lên bị null");
             }
+            if(await _repo.CheckNameCategory(createCategoryDto.CategoryName))
+            {
+                throw new InvalidOperationException("Tên đã tồn tại");
+            }    
             var newCategory = new Category
             {
                 CategoryName = createCategoryDto.CategoryName,
@@ -50,9 +54,10 @@ namespace QuanLyTaiSanTest.Services.Implementations
                 bool hasAssets = await _repo.CheckAssetInCategory(id);
                 if (hasAssets)
                 {
-                    throw new InvalidOperationException("Không thể xóa vì loại tài sản này đang được sử dụng");
+                    throw new InvalidOperationException($"Không thể xóa loại '{category.CategoryName}' vì đang có tài sản sử dụng.");
                 }
-                await _repo.Delete(category);
+                category.IsDelete = true;
+                await _repo.Update();
             }
         }
 

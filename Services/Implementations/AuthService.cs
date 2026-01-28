@@ -7,6 +7,7 @@ using QuanLyTaiSan.Dtos.Department;
 using QuanLyTaiSan.Enum;
 using QuanLyTaiSan.Models;
 using QuanLyTaiSan.Services.Interfaces;
+using QuanLyTaiSanTest.Data;
 using System.Data;
 using System.Net;
 using System.Net.NetworkInformation;
@@ -20,8 +21,8 @@ namespace QuanLyTaiSan.Services.Implementations
         private readonly SignInManager<ApplicationUser> _signInManager;
         private readonly JwtService _jwtService;
         private readonly IMapper _mapper;
-
-        public AuthService(UserManager<ApplicationUser> userManager, RoleManager<IdentityRole> roleManager, SignInManager<ApplicationUser> signInManager, JwtService jwtService, IMapper mapper)
+        private readonly AppDbContext _context;
+        public AuthService(UserManager<ApplicationUser> userManager, RoleManager<IdentityRole> roleManager, SignInManager<ApplicationUser> signInManager, JwtService jwtService, IMapper mapper, AppDbContext context)
         {
             _userManager = userManager;
             _roleManager = roleManager;
@@ -29,6 +30,8 @@ namespace QuanLyTaiSan.Services.Implementations
 
             _jwtService = jwtService;
             _mapper = mapper;
+
+            _context = context;
         }
         public async Task<UserResponseDto> RegisterAsync(UserRegisterDto dto)
         {
@@ -107,7 +110,7 @@ namespace QuanLyTaiSan.Services.Implementations
      int pageIndex,
      int pageSize,
      string? search,
-     int? departmentId, UserStatus? status)
+     int? departmentId, UserStatus? status, string? role)
         {
             var query = _userManager.Users.AsQueryable();
 
@@ -130,6 +133,14 @@ namespace QuanLyTaiSan.Services.Implementations
             {
                 query = query.Where(u => u.Status == status.Value);
             }
+            if (!string.IsNullOrEmpty(role))
+            {
+                 query = from u in query
+                                join ur in _context.UserRoles on u.Id equals ur.UserId
+                                join r in _context.Roles on ur.RoleId equals r.Id
+                                where r.Name == role
+                                select u;
+            }
             var totalCount = await query.CountAsync();
             var totalPage = (int)Math.Ceiling(totalCount / (double)pageSize);
 
@@ -138,8 +149,6 @@ namespace QuanLyTaiSan.Services.Implementations
                 .Skip((pageIndex - 1) * pageSize)
                 .Take(pageSize)
                 .ToListAsync();
-           totalCount = users.Count;
-
             var items = new List<UserResponseDto>();
 
             foreach (var user in users)

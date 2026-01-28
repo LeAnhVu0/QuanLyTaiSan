@@ -14,5 +14,6 @@ namespace QuanLyTaiSanTest.Models
         public DateTime CreatedTime { get; set; } = DateTime.Now;
         public DateTime? UpdatedTime { get; set; }
         public ICollection<Asset> Assets { get; set; }=new List<Asset>();
+        public bool IsDelete { get; set; } = false;
     }
 }

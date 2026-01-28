@@ -32,7 +32,7 @@ namespace QuanLyTaiSan.Controllers
                 return BadRequest(result.Message);
             return result is not null ? Ok(result) : Unauthorized();
         }
-        [Authorize]
+        [AllowAnonymous]
         [HttpPost("Refresh")]
         public async Task<ActionResult<LoginResponeDto>> Refresh([FromBody] RefreshRequestDto request)
         {
@@ -124,9 +124,9 @@ namespace QuanLyTaiSan.Controllers
 
         [Authorize(Policy = Permissions.UserGet)]
         [HttpGet("paged")]
-        public async Task<ActionResult> GetUserPagedAsync(  [FromQuery] string? search, int? departmentId,UserStatus? status, int pageIndex = 1, int pageSize = 5)
+        public async Task<ActionResult> GetUserPagedAsync(  [FromQuery] string? search, int? departmentId,UserStatus? status,string? role, int pageIndex = 1, int pageSize = 5 )
         {
-            var result = await _authService.GetUserAsync(pageIndex, pageSize, search,departmentId,status);
+            var result = await _authService.GetUserAsync(pageIndex, pageSize, search,departmentId,status,role);
             return Ok(result);
         }
     }
