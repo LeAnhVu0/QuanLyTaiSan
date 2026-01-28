@@ -32,6 +32,7 @@ namespace QuanLyTaiSan.Services.Implementations
             var totalCount =await _repository.GetAll().CountAsync();
             var totalPage = (int)Math.Ceiling(totalCount / (double)pageSize);
             var items = await _repository.GetAll()
+           .OrderByDescending(d => d.CreateTime)
            .Skip((pageIndex - 1) * pageSize)
            .Take(pageSize)
            .Select(d => new DepartmentResponseDto
@@ -82,11 +83,24 @@ namespace QuanLyTaiSan.Services.Implementations
         }
         public async Task<DepartmentResponseDto> AddDepartment(DepartmentCreateDto dto)
         {
+            
+            var departmentName = dto.DepartmentName.Trim();
+
+            var exists = await _repository.GetAll()
+                .AnyAsync(d => d.DepartmentName == departmentName);
+
+            if (exists)
+                throw new InvalidOperationException("Phòng ban đã tồn tại");
+
             var department = _mapper.Map<Department>(dto);
+            department.DepartmentName = departmentName;
+
             await _repository.AddDepartment(department);
             await _repository.SaveAsync();
+
             return _mapper.Map<DepartmentResponseDto>(department);
         }
+
 
         public async Task<DepartmentResponseDto> UpdateDepartment(
  int id, DepartmentUpdateDto dto)

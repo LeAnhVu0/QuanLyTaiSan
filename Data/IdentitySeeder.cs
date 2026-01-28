@@ -24,8 +24,8 @@ namespace QuanLyTaiSan.Data
             }
 
           
-            var superAdminEmail = "Nhat0903@gmail.com";
-            var superAdminPassword = "Nhat0902@";
+            var superAdminEmail = "admin@gmail.com";
+            var superAdminPassword = "123456aA@";
 
             var superAdmin = await userManager.FindByEmailAsync(superAdminEmail);
 
@@ -33,7 +33,7 @@ namespace QuanLyTaiSan.Data
             {
                 superAdmin = new ApplicationUser
                 {
-                    UserName = "Nhat",
+                    UserName = "admin",
                     Email = superAdminEmail,
                     EmailConfirmed = true
                 };
