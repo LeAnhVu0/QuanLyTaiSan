@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using QuanLyTaiSan.Dtos.Auth;
+using QuanLyTaiSan.Enum;
 using QuanLyTaiSan.Models;
 using QuanLyTaiSan.Services.Implementations;
 using QuanLyTaiSan.Services.Interfaces;
@@ -123,9 +124,9 @@ namespace QuanLyTaiSan.Controllers
 
         [Authorize(Policy = Permissions.UserGet)]
         [HttpGet("paged")]
-        public async Task<ActionResult> GetUserPagedAsync(  [FromQuery] string? search, int pageIndex = 1, int pageSize = 5)
+        public async Task<ActionResult> GetUserPagedAsync(  [FromQuery] string? search, int? departmentId,UserStatus? status, int pageIndex = 1, int pageSize = 5)
         {
-            var result = await _authService.GetUserAsync(pageIndex, pageSize, search);
+            var result = await _authService.GetUserAsync(pageIndex, pageSize, search,departmentId,status);
             return Ok(result);
         }
     }

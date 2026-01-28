@@ -104,13 +104,14 @@ namespace QuanLyTaiSan.Services.Implementations
             return result;
         }
         public async Task<PagedResult<UserResponseDto>> GetUserAsync(
-    int pageIndex,
-    int pageSize,
-    string? search)
+     int pageIndex,
+     int pageSize,
+     string? search,
+     int? departmentId, UserStatus? status)
         {
             var query = _userManager.Users.AsQueryable();
 
-        
+            // 🔎 Search
             if (!string.IsNullOrWhiteSpace(search))
             {
                 query = query.Where(u =>
@@ -120,14 +121,20 @@ namespace QuanLyTaiSan.Services.Implementations
                     u.PhoneNumber.Contains(search));
             }
 
-          
+            // 🏢 Filter theo department
+            if (departmentId.HasValue)
+            {
+                query = query.Where(u => u.DepartmentId == departmentId.Value);
+            }
+            if (status.HasValue)
+            {
+                query = query.Where(u => u.Status == status.Value);
+            }
             var totalCount = await query.CountAsync();
-
             var totalPage = (int)Math.Ceiling(totalCount / (double)pageSize);
 
-            // Paging
             var users = await query
-                .OrderBy(u => u.UserName) // nên có OrderBy
+                .OrderByDescending(u => u.CreateTime) // ⚠️ chỉ OrderBy 1 lần
                 .Skip((pageIndex - 1) * pageSize)
                 .Take(pageSize)
                 .ToListAsync();
@@ -162,6 +169,7 @@ namespace QuanLyTaiSan.Services.Implementations
                 Items = items
             };
         }
+
 
 
         public async Task<UserResponseDto> GetUserById(string id)
