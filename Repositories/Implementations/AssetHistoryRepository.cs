@@ -23,10 +23,13 @@ namespace QuanLyTaiSanTest.Repositories.Implementations
         {
             var list = _context.AssetHistory.Include(h=>h.CreatedByUser)
                                             .Include(h=>h.AssignedToUser)
-                                            .Where(h => h.Asset.AssetId == assetId)
                                             .OrderByDescending(h => h.ActionDate)
                                             .AsQueryable();
+            if(assetId != null)
+            {
 
+                list = list.Where(h => h.Asset.AssetId == assetId);
+            }    
             if(!string.IsNullOrEmpty(searchName))
             {
                 list = list.Where(h => h.AssignedToUser.UserName == searchName || h.CreatedByUser.UserName == searchName || h.Descriptions.Contains(searchName));

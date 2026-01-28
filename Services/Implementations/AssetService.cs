@@ -556,10 +556,20 @@ namespace QuanLyTaiSanTest.Services.Implementations
             {
                 throw new KeyNotFoundException("Loại tài sản không tồn tại");
             }
+            if(category.Status == CategoryStatus.NgungSuDung)
+            {
+                throw new InvalidOperationException("Loại tài sản đã ngưng sử dụng");
+            }
 
-            if ((await _departmentService.GetDepartmentById(createAssetDto.DepartmentId)) == null)
+            var department = await _departmentService.GetDepartmentById(createAssetDto.DepartmentId);
+            if(department == null)
             {
                 throw new KeyNotFoundException("Phòng ban không tồn tại");
+
+            }
+            if (department.DepartmentStatus == DepartmentStatus.Inactive)
+            {
+                throw new InvalidOperationException("Phòng ban đã ngưng sử dụng");
             }
 
             var words = category.CategoryName.Split(' ', StringSplitOptions.RemoveEmptyEntries);

@@ -57,10 +57,10 @@ namespace QuanLyTaiSanTest.Repositories.Interfaces
         // Xóa một tài sản khỏi Database
         public Task Delete(Asset asset);
 
-        // Kiểm tra xem có phiếu (AssetTransfer) nào thỏa mãn điều kiện hay không (VD: check phiếu trùng, phiếu đang chờ...)
+        // Kiểm tra xem có phiếu (AssetTransfer) nào thỏa mãn điều kiện hay không 
         public Task<bool> AnyAsync(Expression<Func<AssetTransfer, bool>> predicate);
 
-        // Kiểm tra xem có Tài sản (Asset) nào thỏa mãn điều kiện hay không (VD: check trùng mã, trùng tên...)
+        // Kiểm tra xem có Tài sản (Asset) nào thỏa mãn điều kiện hay không
         public Task<bool> AnyAssetAsync(Expression<Func<Asset, bool>> predicate);
 
         // Lấy danh sách nhiều tài sản cùng lúc dựa trên danh sách ID 
@@ -75,7 +75,7 @@ namespace QuanLyTaiSanTest.Repositories.Interfaces
         // Lấy tài sản mới nhất vừa được tạo của một Loại tài sản
         public Task<Asset?> GetLatesAssetByCategory(int categoryId);
 
-        // Tạo mới một phiếu (Bàn giao, Thu hồi, Điều chuyển, Thanh lý...)
+        // Tạo mới một phiếu (Bàn giao, Thu hồi, Điều chuyển)
         public Task AddTransfer(AssetTransfer assetTransfer);
 
         // Lấy chi tiết một phiếu theo ID phiếu

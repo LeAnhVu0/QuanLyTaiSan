@@ -184,7 +184,7 @@ namespace QuanLyTaiSanTest.Controllers
             }
             catch (BadHttpRequestException ex)
             {
-                return BadRequest(new ApiResponse<string>
+                return Ok(new ApiResponse<string>
                 {
                     Success = false,
                     Message = "Thêm tài sản thất bại",
@@ -193,14 +193,23 @@ namespace QuanLyTaiSanTest.Controllers
             }
             catch (KeyNotFoundException ex)
             {
-                return NotFound(new ApiResponse<string>
+                return Ok(new ApiResponse<string>
                 {
                     Success = false,
                     Message = "Thêm tài sản  thất bại",
                     Errors = new { Detail = ex.Message }
                 });
             }
-            catch(Exception ex)
+            catch (InvalidOperationException ex)
+            {
+                return Ok(new ApiResponse<string>
+                {
+                    Success = false,
+                    Message = "Thêm tài sản  thất bại",
+                    Errors = new { Detail = ex.Message }
+                });
+            }
+            catch (Exception ex)
             {
                 return StatusCode(500, new ApiResponse<string>
                 {
@@ -231,7 +240,7 @@ namespace QuanLyTaiSanTest.Controllers
             }
             catch (KeyNotFoundException ex)
             {
-                return NotFound(new ApiResponse<string>
+                return Ok(new ApiResponse<string>
                 {
                     Success = false,
                     Message = "Xóa tài sản thất bại",
@@ -283,7 +292,7 @@ namespace QuanLyTaiSanTest.Controllers
             }
             catch (InvalidOperationException ex)
             {
-                return NotFound(new ApiResponse<string>
+                return Ok(new ApiResponse<string>
                 {
                     Success = false,
                     Message = "Sửa tài sản thất bại",
