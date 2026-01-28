@@ -21,6 +21,7 @@ namespace QuanLyTaiSan.Controllers
         {
             _assetService = assetService;
         }
+        
         [HttpGet("ListTransfer")]
         public async Task<IActionResult> GetAll(int pageIndex = 1, int pageSize = 5, int? status = null,int? type = null)
         {

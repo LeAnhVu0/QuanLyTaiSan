@@ -32,6 +32,7 @@ namespace QuanLyTaiSan.Controllers
                 return BadRequest(result.Message);
             return result is not null ? Ok(result) : Unauthorized();
         }
+        
         [AllowAnonymous]
         [HttpPost("Refresh")]
         public async Task<ActionResult<LoginResponeDto>> Refresh([FromBody] RefreshRequestDto request)
@@ -41,6 +42,7 @@ namespace QuanLyTaiSan.Controllers
             var result = await _jwtService.ValidateRefreshToken(request.Token);
             return result is not null ? result : Unauthorized();
         }
+        
         [AllowAnonymous]
         [HttpPost("Register")]
        
@@ -68,6 +70,7 @@ namespace QuanLyTaiSan.Controllers
             var result = await _authService.GetAllUser();
             return Ok(result);
         }
+      
         [Authorize]
         [HttpGet("{id}")]
         public async Task<ActionResult<UserResponseDto>> GetUserById(string id)
@@ -76,6 +79,7 @@ namespace QuanLyTaiSan.Controllers
             if (result == null) return NotFound("User k tồn tại");
             return Ok(result);
         }
+       
         [Authorize(Policy = Permissions.UserDelete)]
         [HttpDelete("{id}")]
         public async Task<ActionResult<string>> DeleteUserAsync(string id)

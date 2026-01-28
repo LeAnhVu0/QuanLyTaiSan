@@ -161,6 +161,16 @@ namespace QuanLyTaiSanTest.Data
                 entity.Property(x => x.Status)
                       .HasConversion<int>();
             });
+            modelBuilder.Entity<Department>().HasData(
+                new Department
+                {
+                    Id = 1, 
+                    DepartmentName = "Phòng kho",
+                    Description = "Kho lưu trữ tài sản mặc định",
+                    DepartmentStatus = QuanLyTaiSan.Enum.DepartmentStatus.Active,
+                    CreateTime = DateTime.Now
+                }
+            );
         }
     }
 
